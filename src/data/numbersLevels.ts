@@ -26,6 +26,11 @@ export function getNumberLevel(value: number): NumberLevel | undefined {
   return NUMBER_LEVELS.find((level) => level.value === value)
 }
 
+/** Число словом для озвучки счёта: 3 → «три». */
+export function numberWord(value: number): string {
+  return getNumberLevel(value)?.word ?? String(value)
+}
+
 /** Сколько зверей в ряду: 4 → 2×2, 6 → 3+3, 8 → 4+4, 10 → 5+5 (ровные ряды легче считать). */
 const ANIMAL_COLUMNS = [1, 2, 3, 2, 3, 3, 4, 4, 5, 5] as const
 

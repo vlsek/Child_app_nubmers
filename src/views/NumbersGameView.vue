@@ -18,24 +18,19 @@ function isLearned(value: number): boolean {
 function openLevel(level: NumberLevel): void {
   router.push({ name: 'numbers-level', params: { level: level.value } })
 }
-
-function goBack(): void {
-  game.setMode(null)
-  router.push({ name: 'home' })
-}
 </script>
 
 <template>
   <main class="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-6 p-4 sm:p-8">
     <header class="flex items-center justify-between gap-4">
-      <button
-        type="button"
-        class="btn-round shrink-0"
-        aria-label="Назад в меню"
-        @click="goBack"
+      <!-- Звёзды за пройденные машины -->
+      <div
+        class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg"
+        :aria-label="`Звёзд: ${game.totalStars}`"
       >
-        <span aria-hidden="true">⬅️</span>
-      </button>
+        <span aria-hidden="true">⭐</span>
+        <span>{{ game.totalStars }}</span>
+      </div>
 
       <h1
         class="text-center text-3xl font-black leading-tight text-white drop-shadow-[0_4px_0_rgba(2,132,199,0.55)] sm:text-5xl"
@@ -45,7 +40,7 @@ function goBack(): void {
 
       <button
         type="button"
-        class="btn-round shrink-0"
+        class="btn-round"
         :aria-label="game.sound.muted ? 'Включить звук' : 'Выключить звук'"
         :aria-pressed="game.sound.muted"
         @click="game.toggleSound()"

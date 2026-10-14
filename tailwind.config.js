@@ -28,6 +28,11 @@ export default {
         'kid-pressed': '0 2px 0 0 rgba(0, 0, 0, 0.25)',
       },
       keyframes: {
+        // Зверь «подпрыгивает», когда его посчитали
+        hop: {
+          '0%, 100%': { transform: 'translateY(0) scale(1)' },
+          '40%': { transform: 'translateY(-22%) scale(1.15)' },
+        },
         wiggle: {
           '0%, 100%': { transform: 'rotate(-4deg)' },
           '50%': { transform: 'rotate(4deg)' },
@@ -43,6 +48,7 @@ export default {
         },
       },
       animation: {
+        hop: 'hop 0.45s ease-out',
         wiggle: 'wiggle 1.2s ease-in-out infinite',
         floaty: 'floaty 3s ease-in-out infinite',
         pop: 'pop 0.45s ease-out both',

@@ -125,6 +125,7 @@ export function useAudio() {
     playSfx,
     playVoice,
     speak,
+    stopSpeech,
     playMusic,
     stopMusic,
     toggleMute,
