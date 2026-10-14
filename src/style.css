@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
+
+  body {
+    @apply font-kids font-extrabold text-slate-800 antialiased;
+    background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 55%, #fef9c3 100%);
+    /* Игра для маленьких пальцев: без выделения текста и двойного тапа-зума */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+  /* Огромная «объёмная» детская кнопка */
+  .btn-kid {
+    @apply relative flex items-center justify-center gap-4 rounded-blob
+      px-10 py-8 text-5xl font-black text-white
+      transition-transform duration-100 ease-out
+      focus:outline-none focus-visible:ring-8 focus-visible:ring-white/80;
+    text-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-kid:active {
+    transform: translateY(8px);
+    @apply shadow-kid-pressed;
+  }
+
+  .btn-round {
+    @apply flex h-20 w-20 items-center justify-center rounded-full
+      bg-white text-4xl shadow-lg transition-transform duration-100
+      focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-kid;
+  }
+
+  .btn-round:active {
+    transform: scale(0.9);
+  }
+}
