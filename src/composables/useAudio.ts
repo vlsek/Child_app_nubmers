@@ -34,10 +34,16 @@ function safePlay(audio: HTMLAudioElement | null): void {
   })
 }
 
+/** Обрывает синтезированную речь (если браузер её умеет). */
+function stopSpeech(): void {
+  if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel()
+}
+
 // Mute и громкость применяются сразу к тому, что играет сейчас.
 watch(muted, (value) => {
   if (music) music.muted = value
   if (voice) voice.muted = value
+  if (value) stopSpeech()
 })
 watch(
   () => volumes.value.music,
@@ -65,6 +71,21 @@ export function useAudio() {
     voice?.pause()
     voice = createAudio(src, 'voice')
     safePlay(voice)
+  }
+
+  /**
+   * Временная озвучка: браузерный синтез речи. Пока нет записанных файлов
+   * голоса, им можно проговаривать слова; потом заменим на playVoice().
+   */
+  function speak(text: string): void {
+    if (muted.value || typeof speechSynthesis === 'undefined') return
+    speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'ru-RU'
+    utterance.rate = 0.8
+    utterance.pitch = 1.2
+    utterance.volume = volumes.value.voice
+    speechSynthesis.speak(utterance)
   }
 
   /** Фоновая музыка по кругу. Повторный вызов с тем же треком ничего не ломает. */
@@ -103,6 +124,7 @@ export function useAudio() {
     volumes,
     playSfx,
     playVoice,
+    speak,
     playMusic,
     stopMusic,
     toggleMute,

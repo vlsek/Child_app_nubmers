@@ -49,3 +49,19 @@ export interface GameState {
 
 /** Типы звуковых каналов, которыми управляет useAudio. */
 export type AudioChannel = 'music' | 'sfx' | 'voice'
+
+/** Уровень игры «Цифры»: одна машина в пробке с N зверями внутри. */
+export interface NumberLevel {
+  /** Цифра уровня и одновременно число зверей в машине (1–10). */
+  value: number
+  /** Число словом для озвучки и подписей: «пять». */
+  word: string
+  /** Эмодзи зверя, который сидит в машине. */
+  animal: string
+  /** Название зверя в единственном числе: «медведь». */
+  animalName: string
+  /** Основной цвет кузова (hex). */
+  color: string
+  /** Тёмный оттенок для обводки и теней (hex). */
+  shade: string
+}
