@@ -167,7 +167,7 @@ onBeforeUnmount(stopVoice)
         <p v-if="eaten.length === 8" class="rounded-full bg-green-500 px-5 py-2 text-xl font-black text-white shadow">Ура! Восемь ягодок — животик доволен!</p>
       </template>
 
-      <template v-else>
+      <template v-else-if="active === 'seeds'">
         <div class="flex items-center justify-center gap-4 text-6xl sm:text-7xl"><span>🐊</span><span>🍉</span><span>🗑️</span></div>
         <p class="rounded-full bg-white px-5 py-2 text-xl font-black text-slate-700 shadow">Косточек в мусорке: {{ removedSeeds.length }} из 8</p>
         <div class="grid grid-cols-4 gap-3 sm:gap-5">
