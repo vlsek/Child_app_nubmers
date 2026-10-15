@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import Icon from '@/components/common/Icon.vue'
 import { useAudio } from '@/composables/useAudio'
 
-type Task = 'colour' | 'trace' | 'feed' | 'seeds'
+type Task = 'colour' | 'trace' | 'feed' | 'seeds' | 'teeth'
 const router = useRouter()
 const { sayNumber, sayPraise, sayRetry, stopVoice } = useAudio()
 const tasks: { id: Task; title: string; emoji: string; hint: string }[] = [
@@ -12,6 +12,7 @@ const tasks: { id: Task; title: string; emoji: string; hint: string }[] = [
   { id: 'trace', title: 'Напиши 8', emoji: '✍️', hint: 'Веди пальчиком по пунктирной дорожке.' },
   { id: 'feed', title: 'Накорми крокодила', emoji: '🍓', hint: 'Дай крокодилу восемь ягод — по одной!' },
   { id: 'seeds', title: 'Арбуз без косточек', emoji: '🍉', hint: 'Убери восемь косточек в мусорку.' },
+  { id: 'teeth', title: 'Почисти зубки', emoji: '🪥', hint: 'Помоги птичке почистить восемь зубов крокодила.' },
 ]
 const active = ref<Task>('colour')
 const completed = ref<Task[]>([])
@@ -19,10 +20,12 @@ const palette = ['#fb7185', '#f97316', '#facc15', '#4ade80', '#38bdf8', '#a78bfa
 const chosenColour = ref(palette[0]!)
 const coloured = ref(false)
 const tracePoints = ref<{ x: number; y: number }[]>([])
+const traceGuide = ref<SVGPathElement | null>(null)
 const tracing = ref(false)
 const traceDone = ref(false)
 const eaten = ref<number[]>([])
 const removedSeeds = ref<number[]>([])
+const cleanedTeeth = ref<number[]>([])
 const activeIndex = computed(() => tasks.findIndex((task) => task.id === active.value))
 const allDone = computed(() => completed.value.length === tasks.length)
 
@@ -53,7 +56,18 @@ function moveTrace(event: PointerEvent) {
 async function finishTrace() {
   if (!tracing.value) return
   tracing.value = false
-  if (tracePoints.value.length >= 12) {
+  const guide = traceGuide.value
+  let coveredSamples = 0
+  if (guide && tracePoints.value.length >= 12) {
+    const length = guide.getTotalLength()
+    const sampleCount = 64
+    for (let i = 0; i < sampleCount; i++) {
+      const target = guide.getPointAtLength((i / (sampleCount - 1)) * length)
+      const nearTrace = tracePoints.value.some((point) => Math.hypot(point.x - target.x, point.y - target.y) <= 38)
+      if (nearTrace) coveredSamples++
+    }
+  }
+  if (tracePoints.value.length >= 12 && coveredSamples >= 18) {
     traceDone.value = true
     markDone('trace')
     await sayPraise()
@@ -64,6 +78,12 @@ async function feedBerry(i: number) {
   eaten.value = [...eaten.value, i]
   await sayNumber(eaten.value.length)
   if (eaten.value.length === 8) { markDone('feed'); await sayPraise() }
+}
+async function cleanTooth(i: number) {
+  if (cleanedTeeth.value.includes(i)) return
+  cleanedTeeth.value = [...cleanedTeeth.value, i]
+  await sayNumber(cleanedTeeth.value.length)
+  if (cleanedTeeth.value.length === 8) { markDone('teeth'); await sayPraise() }
 }
 async function removeSeed(i: number) {
   if (removedSeeds.value.includes(i)) return
@@ -77,6 +97,7 @@ function resetCurrent() {
   if (active.value === 'trace') { tracePoints.value = []; tracing.value = false; traceDone.value = false }
   if (active.value === 'feed') eaten.value = []
   if (active.value === 'seeds') removedSeeds.value = []
+  if (active.value === 'teeth') cleanedTeeth.value = []
 }
 function back() { router.push({ name: 'learn-level', params: { level: 8 } }) }
 onBeforeUnmount(stopVoice)
@@ -90,7 +111,7 @@ onBeforeUnmount(stopVoice)
         <h1 class="text-3xl font-black text-white drop-shadow-[0_4px_0_rgba(2,132,199,0.55)] sm:text-5xl">Приключения восьмёрки</h1>
         <p class="mt-1 text-lg font-black text-sky-900 sm:text-xl">Помоги крокодилу! 🐊</p>
       </div>
-      <div class="flex shrink-0 items-center gap-1 rounded-full bg-white px-3 py-2 text-xl shadow sm:px-5 sm:text-2xl"><Icon name="star" /> {{ completed.length }}/4</div>
+      <div class="flex shrink-0 items-center gap-1 rounded-full bg-white px-3 py-2 text-xl shadow sm:px-5 sm:text-2xl"><Icon name="star" /> {{ completed.length }}/5</div>
     </header>
 
     <nav class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3" aria-label="Задания">
@@ -127,11 +148,11 @@ onBeforeUnmount(stopVoice)
           <svg viewBox="0 0 320 380" class="w-full touch-none" role="img" aria-label="Обведи цифру восемь пальцем"
             @pointerdown="startTrace" @pointermove="moveTrace" @pointerup="finishTrace" @pointercancel="finishTrace">
             <path d="M160 180 C65 180 65 65 160 65 C255 65 255 180 160 180 C65 180 65 315 160 315 C255 315 255 180 160 180" fill="none" stroke="#bae6fd" stroke-width="66" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M160 180 C65 180 65 65 160 65 C255 65 255 180 160 180 C65 180 65 315 160 315 C255 315 255 180 160 180" fill="none" stroke="#0284c7" stroke-width="5" stroke-dasharray="5 13" stroke-linecap="round" />
+            <path ref="traceGuide" d="M160 180 C65 180 65 65 160 65 C255 65 255 180 160 180 C65 180 65 315 160 315 C255 315 255 180 160 180" fill="none" stroke="#0284c7" stroke-width="5" stroke-dasharray="5 13" stroke-linecap="round" />
             <polyline v-if="tracePoints.length > 1" :points="tracePoints.map((p) => p.x + ',' + p.y).join(' ')" fill="none" stroke="#f97316" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </div>
-        <p class="rounded-full bg-white px-5 py-2 text-lg font-black text-slate-700 shadow">{{ traceDone ? 'У тебя получилось написать 8! ✨' : 'Не страшно, если выйдет не идеально — пробуй!' }}</p>
+        <p class="rounded-full bg-white px-5 py-2 text-lg font-black text-slate-700 shadow">{{ traceDone ? 'У тебя получилось написать 8! ✨' : 'Веди по пунктиру. Не получилось? Попробуй ещё раз!' }}</p>
       </template>
 
       <template v-else-if="active === 'feed'">
@@ -156,6 +177,19 @@ onBeforeUnmount(stopVoice)
             :aria-label="removedSeeds.includes(i) ? 'Косточка убрана' : 'Убрать косточку'" :disabled="removedSeeds.includes(i)" @click="removeSeed(i)">{{ removedSeeds.includes(i) ? '✓' : '🌱' }}</button>
         </div>
         <p v-if="removedSeeds.length === 8" class="rounded-full bg-green-500 px-5 py-2 text-xl font-black text-white shadow">Арбуз без косточек! Ты всё посчитал!</p>
+      </template>
+
+      <template v-else-if="active === 'teeth'">
+        <div class="flex items-center justify-center gap-4 text-6xl sm:text-7xl"><span>🐊</span><span>🐦</span><span>🪥</span></div>
+        <p class="rounded-full bg-white px-5 py-2 text-xl font-black text-slate-700 shadow">Зубов почищено: {{ cleanedTeeth.length }} из 8</p>
+        <div class="grid grid-cols-4 gap-3 sm:gap-5">
+          <button v-for="i in 8" :key="i" type="button"
+            class="flex h-16 w-16 items-center justify-center rounded-2xl text-4xl shadow-md transition-all active:scale-75 sm:h-20 sm:w-20 sm:text-5xl"
+            :class="cleanedTeeth.includes(i) ? 'bg-green-200 opacity-70' : 'bg-white animate-pop'"
+            :aria-label="cleanedTeeth.includes(i) ? 'Зуб почищен' : 'Почистить зуб ' + i"
+            :disabled="cleanedTeeth.includes(i)" @click="cleanTooth(i)">{{ cleanedTeeth.includes(i) ? '✨' : '🦷' }}</button>
+        </div>
+        <p v-if="cleanedTeeth.length === 8" class="rounded-full bg-green-500 px-5 py-2 text-xl font-black text-white shadow">Все восемь зубов сияют! 🦷</p>
       </template>
 
       <div class="flex flex-wrap items-center justify-center gap-3">
