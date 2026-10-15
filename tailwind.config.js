@@ -28,6 +28,13 @@ export default {
         'kid-pressed': '0 2px 0 0 rgba(0, 0, 0, 0.25)',
       },
       keyframes: {
+        // Рука-подсказка «листай»: ведёт палец справа налево
+        swipe: {
+          '0%': { transform: 'translateX(60px)', opacity: '0' },
+          '20%': { opacity: '1' },
+          '70%': { transform: 'translateX(-60px)', opacity: '1' },
+          '100%': { transform: 'translateX(-60px)', opacity: '0' },
+        },
         // Зверь «подпрыгивает», когда его посчитали
         hop: {
           '0%, 100%': { transform: 'translateY(0) scale(1)' },
@@ -48,6 +55,7 @@ export default {
         },
       },
       animation: {
+        swipe: 'swipe 1.8s ease-in-out infinite',
         hop: 'hop 0.45s ease-out',
         wiggle: 'wiggle 1.2s ease-in-out infinite',
         floaty: 'floaty 3s ease-in-out infinite',

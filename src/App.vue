@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import { useAudio } from '@/composables/useAudio'
+
+// Фоновая музыка стартует с первого касания: раньше браузер звук не разрешит.
+useAudio().startMusicOnFirstTouch()
 </script>
 
 <template>

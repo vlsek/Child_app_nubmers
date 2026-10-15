@@ -40,6 +40,9 @@ export const useGameStore = defineStore('game', () => {
   // Синхронизируем сохранённый mute с аудио-менеджером при старте.
   audio.setMuted(soundMuted.value)
 
+  /** Какая машина по центру карусели: чтобы после уровня вернуться к ней же. Не сохраняется. */
+  const menuLevel = ref(1)
+
   // --- getters ---
   const sound = computed<SoundSettings>(() => ({
     muted: soundMuted.value,
@@ -59,6 +62,10 @@ export const useGameStore = defineStore('game', () => {
   // --- actions ---
   function setMode(mode: GameMode | null): void {
     currentMode.value = mode
+  }
+
+  function setMenuLevel(value: number): void {
+    menuLevel.value = value
   }
 
   function toggleSound(): void {
@@ -103,9 +110,11 @@ export const useGameStore = defineStore('game', () => {
     currentMode,
     progress,
     sound,
+    menuLevel,
     totalStars,
     currentProgress,
     setMode,
+    setMenuLevel,
     toggleSound,
     registerCorrect,
     registerMistake,

@@ -8,14 +8,13 @@ import {
   animalColumns,
   getNumberLevel,
   numberCardId,
-  numberWord,
 } from '@/data/numbersLevels'
 import { useGameStore } from '@/stores/useGameStore'
 
 const route = useRoute()
 const router = useRouter()
 const game = useGameStore()
-const { speak, stopSpeech } = useAudio()
+const { say, sayNumber, sayPraise, stopVoice } = useAudio()
 
 const level = computed(() => getNumberLevel(Number(route.params.level)))
 const total = computed(() => level.value?.value ?? 0)
@@ -60,33 +59,37 @@ async function countAnimal(index: number): Promise<void> {
   if (allCounted.value) resetCount()
   if (order.value[index]) return // этого зверя уже посчитали
 
-  const id = runId
+  // Тап малыша важнее показа «посчитай вслух»: останавливаем его, считаем сами.
+  const id = ++runId
   const n = counted.value + 1
   order.value[index] = n
-  speak(numberWord(n))
+  const said = sayNumber(n)
   if (n < total.value) return
 
-  // Досчитал до конца: звезда на машину (один раз за уровень) и похвала.
+  // Досчитал до конца: звезда на машину (один раз за уровень), затем похвала голосом.
   celebrate.value = true
   if (!learned.value) game.registerCorrect('numbers', numberCardId(total.value))
-  await sleep(1000)
+  await said
+  await sleep(300)
   if (id !== runId) return
-  speak('Молодец!')
-  await sleep(1400)
+  await sayPraise()
+  await sleep(500)
   if (id === runId) celebrate.value = false
 }
 
-/** Тап по цифре: считаем зверей вслух по одному, малыш смотрит и слушает. */
+/** Тап по цифре: «Посчитаем вместе!» и зверей вслух по одному, малыш смотрит и слушает. */
 async function countAloud(): Promise<void> {
   const current = level.value
   if (!current) return
   resetCount()
   const id = runId
+  await say('count-together')
+  await sleep(250)
   for (let n = 1; n <= current.value; n++) {
-    order.value[n - 1] = n
-    speak(numberWord(n))
-    await sleep(1100)
     if (id !== runId) return
+    order.value[n - 1] = n
+    // Не быстрее 0,8 с на зверя: тишина (mute) не должна «проматывать» счёт
+    await Promise.all([sayNumber(n), sleep(800)])
   }
 }
 
@@ -95,19 +98,21 @@ async function countAloud(): Promise<void> {
 onMounted(() => game.setMode('numbers'))
 
 // Называем число при входе на уровень и при переходе к соседнему.
-// Пока нет записанного голоса, это временная браузерная озвучка.
 watch(
   level,
   (current) => {
     resetCount()
-    if (current) speak(current.word)
+    if (current) {
+      game.setMenuLevel(current.value) // вернувшись в пробку, увидим эту же машину
+      void sayNumber(current.value)
+    }
   },
   { immediate: true },
 )
 
 onBeforeUnmount(() => {
   runId++
-  stopSpeech()
+  stopVoice()
 })
 
 // Размер зверей зависит от их числа: единицу и тройку можно показать крупно,
