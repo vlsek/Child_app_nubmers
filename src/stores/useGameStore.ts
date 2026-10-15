@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useAudio } from '@/composables/useAudio'
+import { activityCardId, numberCardId } from '@/data/numbersLevels'
 import type { GameMode, ModeProgress, Progress, SoundSettings } from '@/types/game'
 
 const STORAGE_KEY = 'kids-learning-game:v1'
@@ -75,6 +76,20 @@ export const useGameStore = defineStore('game', () => {
     menuLevel.value[mode] = value
   }
 
+  /**
+   * Активность уровня-цифры пройдена. Звезда даётся один раз за активность;
+   * сам уровень (машина в карусели) получает значок после первой пройденной.
+   * Возвращает true, если пройдена впервые.
+   */
+  function completeActivity(value: number, activityId: string): boolean {
+    const key = activityCardId(value, activityId)
+    const first = !hasLearned('learn', key)
+    if (first) registerCorrect('learn', key)
+    const levelId = numberCardId(value)
+    if (!hasLearned('learn', levelId)) progress.value.learn.learnedIds.push(levelId)
+    return first
+  }
+
   /** Пройдена ли карточка (уровень) в режиме. */
   function hasLearned(mode: GameMode, cardId: string): boolean {
     return progress.value[mode].learnedIds.includes(cardId)
@@ -128,6 +143,7 @@ export const useGameStore = defineStore('game', () => {
     setMode,
     setMenuLevel,
     hasLearned,
+    completeActivity,
     toggleSound,
     registerCorrect,
     registerMistake,

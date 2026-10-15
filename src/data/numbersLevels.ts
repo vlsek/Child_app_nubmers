@@ -42,3 +42,8 @@ export function animalColumns(value: number): number {
 export function numberCardId(value: number): string {
   return `num-${value}`
 }
+
+/** id активности в прогрессе: `num-4:wheels`. */
+export function activityCardId(value: number, activityId: string): string {
+  return `${numberCardId(value)}:${activityId}`
+}

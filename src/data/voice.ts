@@ -81,3 +81,8 @@ export function voiceText(key: VoiceKey): string {
   if (key.startsWith('num-')) return numberWord(Number(key.slice(4)))
   return PHRASE_TEXT[key as PhraseKey]
 }
+
+/** Запись произвольной реплики по имени файла (src/assets/audio/voice/<имя>.mp3), если она есть. */
+export function lineUrl(name: string): string | undefined {
+  return urls[name]
+}

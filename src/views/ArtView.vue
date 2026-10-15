@@ -1,5 +1,6 @@
 <script setup lang="ts">
 /** Галерея рисунков для разработки: открывается по адресу /art, только в режиме dev. */
+import Crocodile from '@/components/art/Crocodile.vue'
 import AnimalHead from '@/components/art/AnimalHead.vue'
 import VehicleArt from '@/components/art/VehicleArt.vue'
 import type { AnimalKind, VehicleKind } from '@/types/art'
@@ -22,6 +23,12 @@ const vehicles: { kind: VehicleKind; color: string; shade: string }[] = [
 
 <template>
   <main class="mx-auto max-w-5xl p-6">
+    <div class="mb-6 grid grid-cols-4 gap-3">
+      <Crocodile class="w-full rounded-2xl bg-white/70" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" :mouth="1" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="happy" :mouth="0.35" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="sleep" />
+    </div>
     <div class="mb-6 grid grid-cols-5 gap-3 sm:grid-cols-10">
       <svg v-for="a in animals" :key="a" viewBox="0 0 100 100" class="h-auto w-full rounded-2xl bg-white/70">
         <AnimalHead :kind="a" />

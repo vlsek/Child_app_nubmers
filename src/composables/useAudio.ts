@@ -6,6 +6,7 @@ import {
   numberKey,
   voiceText,
   voiceUrl,
+  lineUrl,
   type PhraseKey,
   type VoiceKey,
 } from '@/data/voice'
@@ -188,6 +189,15 @@ export function useAudio() {
     return url ? playVoice(url) : speak(voiceText(key))
   }
 
+  /**
+   * Реплика уровня: играет запись `<name>.mp3`, а пока её нет — читает `text` синтезом.
+   * Так любой агент может добавить фразу сразу, а голос записать позже.
+   */
+  function sayLine(name: string, text: string): Promise<void> {
+    const url = lineUrl(name)
+    return url ? playVoice(url) : speak(text)
+  }
+
   function sayNumber(value: number): Promise<void> {
     return say(numberKey(value))
   }
@@ -271,6 +281,7 @@ export function useAudio() {
     playVoice,
     speak,
     say,
+    sayLine,
     sayNumber,
     sayPraise,
     sayRetry,
