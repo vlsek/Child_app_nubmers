@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ModesView from '@/views/ModesView.vue'
 import { FIND_LEVELS } from '@/data/findLevels'
-import { findActivity } from '@/levels/registry'
 import { MAX_LEVEL, MIN_LEVEL } from '@/data/numbersLevels'
 
 const router = createRouter({
@@ -18,21 +17,12 @@ const router = createRouter({
     {
       path: '/learn/:level(\\d+)',
       name: 'learn-level',
-      // Хаб цифры: плитки с активностями.
-      component: () => import('@/views/LevelHubView.vue'),
+      // Уровень цифры: задания идут по очереди.
+      component: () => import('@/views/SequenceView.vue'),
       beforeEnter: (to) => {
         const value = Number(to.params.level)
         return value >= MIN_LEVEL && value <= MAX_LEVEL ? true : { name: 'levels', params: { mode: 'learn' } }
       },
-    },
-    {
-      path: '/learn/:level(\\d+)/:activity',
-      name: 'learn-activity',
-      component: () => import('@/views/ActivityView.vue'),
-      beforeEnter: (to) =>
-        findActivity(Number(to.params.level), String(to.params.activity))
-          ? true
-          : { name: 'learn-level', params: { level: Number(to.params.level) || 1 } },
     },
     {
       path: '/find/:level(\\d+)',

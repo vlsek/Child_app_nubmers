@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
@@ -118,6 +119,9 @@ async function drop(i: number): Promise<void> {
     <path d="M72 110 A118 118 0 0 0 308 110Z" fill="#ef4444" />
     <path d="M52 110 H328" stroke="#14532d" stroke-width="5" stroke-linecap="round" />
 
+    <!-- Друг держит ведро -->
+    <g transform="translate(340 112) scale(.6)" class="friend"><AnimalHead :kind="level.animal" /></g>
+
     <!-- Ведро -->
     <g :style="{ transform: `translate(${BIN.x}px, ${BIN.y + 20}px)`, transformOrigin: '0 0' }">
       <g :class="{ lid }">
@@ -167,6 +171,16 @@ async function drop(i: number): Promise<void> {
 @media (prefers-reduced-motion: reduce) {
   .seed {
     animation: none;
+  }
+}
+.friend {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cheer 1.2s ease-in-out infinite;
+}
+@keyframes cheer {
+  50% {
+    translate: 0 -5px;
   }
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
+import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
@@ -10,7 +11,7 @@ import type { NumberLevel } from '@/types/game'
  * на ближайшее свободное место, голос считает «один, два, три, четыре».
  * С четвёртым колесом машина поднимается и уезжает.
  */
-const props = defineProps<{ level: NumberLevel }>()
+defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
@@ -75,6 +76,8 @@ const nextSlot = computed(() => SLOTS[placed.value])
         <!-- Крыша и стёкла -->
         <path d="M60 152 L84 100 Q88 94 96 94 H312 Q322 94 326 102 L352 152Z" :fill="level.color" :stroke="level.shade" stroke-width="5" />
         <path d="M92 148 L108 108 H316 L336 148Z" fill="#d4ecfb" :stroke="level.shade" stroke-width="3" />
+        <!-- Друзья едут вместе с крокодилом -->
+        <g v-for="x in [112, 160]" :key="x" :transform="`translate(${x} 108) scale(.4)`"><AnimalHead :kind="level.animal" /></g>
         <!-- Крокодил за рулём -->
         <Crocodile x="226" y="96" width="104" height="76" :mood="driving ? 'happy' : 'idle'" :mouth="mouth" :look="1" />
         <path d="M92 148 L108 108 H316 L336 148Z" fill="none" :stroke="level.shade" stroke-width="3" />

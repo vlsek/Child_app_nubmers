@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
@@ -104,6 +105,9 @@ function flightStyle(i: number): Record<string, string> {
       <Crocodile x="0" y="140" width="240" height="175" :mood="full ? 'happy' : 'idle'" :mouth="mouth" :look="1" />
     </g>
 
+    <!-- Друг приносит пончики -->
+    <g transform="translate(346 14) scale(.62)" class="friend"><AnimalHead :kind="level.animal" /></g>
+
     <!-- Тарелка -->
     <rect x="262" y="110" width="176" height="180" rx="34" fill="#fff" opacity=".85" stroke="#cbd5e1" stroke-width="4" />
 
@@ -159,6 +163,16 @@ function flightStyle(i: number): Record<string, string> {
   }
   75% {
     transform: translateX(8px);
+  }
+}
+.friend {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cheer 1.2s ease-in-out infinite;
+}
+@keyframes cheer {
+  50% {
+    translate: 0 -5px;
   }
 }
 </style>

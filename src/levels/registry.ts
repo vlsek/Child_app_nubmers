@@ -1,41 +1,30 @@
 import type { ActivityDef } from '@/types/activity'
-import CountPreview from './shared/CountPreview.vue'
-import TracePreview from './shared/TracePreview.vue'
-import ColorPreview from './shared/ColorPreview.vue'
 
 /**
- * Реестр активностей. Каждая цифра может положить свои активности в
+ * Реестр заданий. Каждая цифра может положить свои задания в
  * `src/levels/digit-N/index.ts` (default-экспорт — массив ActivityDef); реестр
- * подхватывает их сам, править его не нужно. Общие активности (посчитай, напиши,
- * раскрась) есть у всех цифр.
+ * подхватывает их сам, править его не нужно.
+ *
+ * Последовательность уровня-цифры: сначала общая лёгкая разминка «крокодил и друзья»
+ * (считаем зверей), затем свои задания цифры по порядку.
  */
 const own = import.meta.glob<{ default: ActivityDef[] }>('./digit-*/index.ts', { eager: true })
 
-const count: ActivityDef = {
-  id: 'count',
-  title: 'Посчитай зверей',
-  preview: CountPreview,
-  component: () => import('./shared/CountActivity.vue'),
-}
-const trace: ActivityDef = {
-  id: 'trace',
-  title: 'Напиши цифру',
-  preview: TracePreview,
-  component: () => import('./shared/TraceActivity.vue'),
-}
-const color: ActivityDef = {
-  id: 'color',
-  title: 'Раскрась цифру',
-  preview: ColorPreview,
-  component: () => import('./shared/ColorActivity.vue'),
+const friends: ActivityDef = {
+  id: 'friends',
+  title: 'Крокодил и друзья: посчитай зверей',
+  component: () => import('./shared/FriendsActivity.vue'),
 }
 
-/** Активности цифры по порядку: счёт, затем свои (тематические), затем «напиши» и «раскрась». */
 export function activitiesFor(value: number): ActivityDef[] {
-  const mine = own[`./digit-${value}/index.ts`]?.default ?? []
-  return [count, ...mine, trace, color]
+  return [friends, ...(own[`./digit-${value}/index.ts`]?.default ?? [])]
 }
 
-export function findActivity(value: number, id: string): ActivityDef | undefined {
-  return activitiesFor(value).find((a) => a.id === id)
-}
+/**
+ * Сложные для 3–4 лет задания: в последовательность НЕ входят (малышу тяжело).
+ * Остаются в проекте на будущее, например для режима «старше».
+ */
+export const ADVANCED_ACTIVITIES: ActivityDef[] = [
+  { id: 'trace', title: 'Напиши цифру', component: () => import('./shared/TraceActivity.vue') },
+  { id: 'color', title: 'Раскрась цифру', component: () => import('./shared/ColorActivity.vue') },
+]
