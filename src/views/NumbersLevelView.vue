@@ -224,6 +224,17 @@ function backToCars(): void {
       {{ level.word }}
     </p>
 
+    <button
+      v-if="level.value === 8"
+      type="button"
+      class="btn-kid animate-pop !rounded-2xl !px-6 !py-3 !text-xl sm:!text-2xl"
+      style="background:#f59e0b;box-shadow:0 7px 0 #b45309"
+      aria-label="Играть в приключения восьмёрки"
+      @click="router.push({ name: 'level-8-activities' })"
+    >
+      🐊 Приключения восьмёрки
+    </button>
+
     <nav class="flex w-full items-center justify-between gap-4" aria-label="Переход между уровнями">
       <button
         type="button"
