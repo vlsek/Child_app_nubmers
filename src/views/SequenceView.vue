@@ -42,10 +42,12 @@ function armSkip(): void {
   timer = setTimeout(() => (showSkip.value = true), SKIP_AFTER_MS)
 }
 
-function restart(): void {
+function restart(first = false): void {
   runId++
   stopVoice()
-  step.value = 0
+  // ?step=K: открыть уровень сразу с задания K (для проверки заданий разработчиками)
+  const from = first ? Number(route.query.step) : 0
+  step.value = Number.isInteger(from) ? Math.min(Math.max(from, 0), list.value.length - 1) : 0
   solved.value = list.value.map(() => false)
   finished.value = false
   round.value++
@@ -82,11 +84,11 @@ function skip(): void {
   advance()
 }
 
-watch(value, restart)
+watch(value, () => restart())
 onMounted(() => {
   game.setMode('learn')
   game.setMenuLevel('learn', value.value)
-  restart()
+  restart(true)
 })
 onBeforeUnmount(() => {
   runId++
@@ -135,7 +137,7 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       <Crocodile class="w-[min(20rem,70vw)] animate-pop" mood="happy" :mouth="0.4" />
       <div class="animate-pop text-8xl"><Icon name="star" /></div>
       <div class="flex items-center gap-5">
-        <button type="button" class="btn-round" aria-label="Ещё раз" @click="restart"><Icon name="again" /></button>
+        <button type="button" class="btn-round" aria-label="Ещё раз" @click="restart()"><Icon name="again" /></button>
         <button type="button" class="btn-kid bg-grass shadow-kid-green !px-8 !py-5" aria-label="К машинкам" @click="toCars">
           <Icon name="home" />
         </button>
