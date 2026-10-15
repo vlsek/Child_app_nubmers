@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import AnimalHead from '@/components/art/AnimalHead.vue'
+import Icon from '@/components/common/Icon.vue'
 import { useAudio } from '@/composables/useAudio'
 import {
   MAX_LEVEL,
@@ -36,7 +38,7 @@ const allCounted = computed(() => total.value > 0 && counted.value === total.val
 const celebrate = ref(false)
 /** Уровень уже пройден: на цифре горит звезда (как на машине в пробке). */
 const learned = computed(() =>
-  game.progress.numbers.learnedIds.includes(numberCardId(total.value)),
+  game.progress.learn.learnedIds.includes(numberCardId(total.value)),
 )
 
 /**
@@ -68,7 +70,7 @@ async function countAnimal(index: number): Promise<void> {
 
   // Досчитал до конца: звезда на машину (один раз за уровень), затем похвала голосом.
   celebrate.value = true
-  if (!learned.value) game.registerCorrect('numbers', numberCardId(total.value))
+  if (!learned.value) game.registerCorrect('learn', numberCardId(total.value))
   await said
   await sleep(300)
   if (id !== runId) return
@@ -95,7 +97,7 @@ async function countAloud(): Promise<void> {
 
 // --- Жизненный цикл и навигация -----------------------------------------
 
-onMounted(() => game.setMode('numbers'))
+onMounted(() => game.setMode('learn'))
 
 // Называем число при входе на уровень и при переходе к соседнему.
 watch(
@@ -103,7 +105,7 @@ watch(
   (current) => {
     resetCount()
     if (current) {
-      game.setMenuLevel(current.value) // вернувшись в пробку, увидим эту же машину
+      game.setMenuLevel('learn', current.value) // вернувшись в пробку, увидим эту же машину
       void sayNumber(current.value)
     }
   },
@@ -126,11 +128,11 @@ const animalFont = computed(() => {
 const columns = computed(() => animalColumns(total.value || 1))
 
 function goTo(value: number): void {
-  router.push({ name: 'numbers-level', params: { level: value } })
+  router.push({ name: 'learn-level', params: { level: value } })
 }
 
 function backToCars(): void {
-  router.push({ name: 'numbers' })
+  router.push({ name: 'levels', params: { mode: 'learn' } })
 }
 </script>
 
@@ -146,7 +148,7 @@ function backToCars(): void {
       aria-label="К машинкам"
       @click="backToCars"
     >
-      <span aria-hidden="true">⬅️</span>
+      <Icon name="back" />
     </button>
 
     <button
@@ -156,7 +158,7 @@ function backToCars(): void {
       :aria-pressed="game.sound.muted"
       @click="game.toggleSound()"
     >
-      <span aria-hidden="true">{{ game.sound.muted ? '🔇' : '🔊' }}</span>
+      <Icon :name="game.sound.muted ? 'mute' : 'sound'" />
     </button>
 
     <!-- Цифра: тап по ней считает зверей вслух -->
@@ -181,8 +183,8 @@ function backToCars(): void {
         v-if="learned"
         class="absolute -right-[4%] -top-[4%] animate-pop text-[min(7rem,14vh)] leading-none drop-shadow-[0_6px_0_rgba(0,0,0,0.25)]"
         aria-hidden="true"
-        >⭐</span
-      >
+        ><Icon name="star"
+      /></span>
     </button>
 
     <!-- Звери: тап по зверю считает его, на посчитанном появляется номер -->
@@ -204,7 +206,9 @@ function backToCars(): void {
           :aria-label="order[n - 1] ? `Посчитан: ${order[n - 1]}` : 'Посчитать'"
           @click="countAnimal(n - 1)"
         >
-          {{ level.animal }}
+          <svg viewBox="0 0 100 100" class="block h-[1.15em] w-full" aria-hidden="true">
+            <AnimalHead :kind="level.animal" />
+          </svg>
           <span
             v-if="order[n - 1]"
             class="absolute -right-[0.18em] -top-[0.18em] flex h-[1.6em] w-[1.6em] items-center justify-center rounded-full bg-white text-[0.28em] font-black leading-none text-slate-700 shadow-md"
@@ -228,7 +232,7 @@ function backToCars(): void {
         aria-label="Предыдущая цифра"
         @click="prevValue !== null && goTo(prevValue)"
       >
-        <span aria-hidden="true">◀️</span>
+        <Icon name="left" />
       </button>
 
       <!-- Когда всё посчитано, кнопка «дальше» подпрыгивает и зовёт к следующей машинке -->
@@ -239,7 +243,7 @@ function backToCars(): void {
         aria-label="К машинкам"
         @click="backToCars"
       >
-        <span aria-hidden="true">🚗</span>
+        <Icon name="home" />
         <!-- На телефоне хватает значка: места мало, а малыши и так не читают -->
         <span class="hidden sm:inline">К машинкам</span>
       </button>
@@ -252,7 +256,7 @@ function backToCars(): void {
         aria-label="Следующая цифра"
         @click="nextValue !== null && goTo(nextValue)"
       >
-        <span aria-hidden="true">▶️</span>
+        <Icon name="right" />
       </button>
     </nav>
   </main>

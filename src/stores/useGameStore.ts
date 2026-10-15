@@ -10,12 +10,21 @@ function emptyModeProgress(): ModeProgress {
 }
 
 function emptyProgress(): Progress {
-  return { numbers: emptyModeProgress(), letters: emptyModeProgress() }
+  return { learn: emptyModeProgress(), find: emptyModeProgress() }
 }
 
 interface SavedState {
-  progress: Progress
+  /** Прогресс по режимам; в старых сохранениях режим «Учим цифры» назывался `numbers`. */
+  progress: Partial<Progress> & { numbers?: ModeProgress }
   sound: SoundSettings
+}
+
+/** Собираем прогресс из сохранённого, подтягивая звёзды из старого режима `numbers`. */
+function mergeProgress(saved: SavedState['progress'] | undefined): Progress {
+  return {
+    learn: saved?.learn ?? saved?.numbers ?? emptyModeProgress(),
+    find: saved?.find ?? emptyModeProgress(),
+  }
 }
 
 /** Читаем сохранённое состояние; битый или отсутствующий JSON не должен ронять игру. */
@@ -34,14 +43,14 @@ export const useGameStore = defineStore('game', () => {
 
   // --- state ---
   const currentMode = ref<GameMode | null>(null)
-  const progress = ref<Progress>({ ...emptyProgress(), ...saved.progress })
+  const progress = ref<Progress>(mergeProgress(saved.progress))
   const soundMuted = ref(saved.sound?.muted ?? false)
 
   // Синхронизируем сохранённый mute с аудио-менеджером при старте.
   audio.setMuted(soundMuted.value)
 
-  /** Какая машина по центру карусели: чтобы после уровня вернуться к ней же. Не сохраняется. */
-  const menuLevel = ref(1)
+  /** Какая машина по центру карусели в каждом режиме: чтобы после уровня вернуться к ней же. Не сохраняется. */
+  const menuLevel = ref<Record<GameMode, number>>({ learn: 1, find: 1 })
 
   // --- getters ---
   const sound = computed<SoundSettings>(() => ({
@@ -51,9 +60,7 @@ export const useGameStore = defineStore('game', () => {
     voiceVolume: audio.volumes.value.voice,
   }))
 
-  const totalStars = computed(
-    () => progress.value.numbers.stars + progress.value.letters.stars,
-  )
+  const totalStars = computed(() => progress.value.learn.stars + progress.value.find.stars)
 
   const currentProgress = computed<ModeProgress | null>(() =>
     currentMode.value ? progress.value[currentMode.value] : null,
@@ -64,8 +71,13 @@ export const useGameStore = defineStore('game', () => {
     currentMode.value = mode
   }
 
-  function setMenuLevel(value: number): void {
-    menuLevel.value = value
+  function setMenuLevel(mode: GameMode, value: number): void {
+    menuLevel.value[mode] = value
+  }
+
+  /** Пройдена ли карточка (уровень) в режиме. */
+  function hasLearned(mode: GameMode, cardId: string): boolean {
+    return progress.value[mode].learnedIds.includes(cardId)
   }
 
   function toggleSound(): void {
@@ -115,6 +127,7 @@ export const useGameStore = defineStore('game', () => {
     currentProgress,
     setMode,
     setMenuLevel,
+    hasLearned,
     toggleSound,
     registerCorrect,
     registerMistake,

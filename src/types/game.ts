@@ -1,7 +1,9 @@
-/** Режим игры: какой набор карточек сейчас изучается. */
-export type GameMode = 'numbers' | 'letters'
+import type { AnimalKind, VehicleKind } from '@/types/art'
 
-/** Игровая карточка: цифра или буква. */
+/** Режим игры: «Учим цифры» (считаем зверей) или «Найди цифру» (узнаём цифру на слух). */
+export type GameMode = 'learn' | 'find'
+
+/** Игровая карточка с символом и озвучкой. */
 export interface GameCard {
   id: string
   /** Что показываем ребёнку: «5» или «Б». */
@@ -56,8 +58,10 @@ export interface NumberLevel {
   value: number
   /** Число словом для озвучки и подписей: «пять». */
   word: string
-  /** Эмодзи зверя, который сидит в машине. */
-  animal: string
+  /** Какой зверь сидит в машине. */
+  animal: AnimalKind
+  /** Какая это машина (у каждого уровня своя). */
+  vehicle: VehicleKind
   /** Название зверя в единственном числе: «медведь». */
   animalName: string
   /** Основной цвет кузова (hex). */
