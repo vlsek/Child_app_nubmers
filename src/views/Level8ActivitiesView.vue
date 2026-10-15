@@ -198,6 +198,6 @@ onBeforeUnmount(stopVoice)
         <button v-else type="button" class="btn-kid !rounded-2xl !px-5 !py-3 !text-lg sm:!text-xl" style="background:#22c55e;box-shadow:0 6px 0 #15803d" @click="back"><Icon name="home" /> Готово</button>
       </div>
     </section>
-    <p v-if="allDone" class="animate-pop rounded-2xl bg-yellow-300 px-4 py-3 text-center text-2xl font-black text-yellow-950 shadow-lg">🏆 Все четыре задания пройдены! Крокодил тобой гордится!</p>
+    <p v-if="allDone" class="animate-pop rounded-2xl bg-yellow-300 px-4 py-3 text-center text-2xl font-black text-yellow-950 shadow-lg">🏆 Все пять заданий пройдены! Крокодил тобой гордится!</p>
   </main>
 </template>
