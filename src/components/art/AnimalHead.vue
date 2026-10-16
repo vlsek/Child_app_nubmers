@@ -7,10 +7,13 @@ import type { AnimalKind } from '@/types/art'
  * Контур у всех один и тот же (тёмно-коричневый), чтобы звери выглядели одной «семьёй».
  */
 defineProps<{ kind: AnimalKind }>()
+
+/** Фаза анимации своя у каждой головы, чтобы звери не моргали и не дышали хором. */
+const phase = `${-(Math.random() * 4).toFixed(2)}s`
 </script>
 
 <template>
-  <g stroke="#4a2f22" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+  <g class="animal" :style="{ '--phase': phase }" stroke="#4a2f22" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
     <!-- Медведь -->
     <template v-if="kind === 'bear'">
       <circle cx="24" cy="27" r="15" fill="#a56a40" />
@@ -23,10 +26,10 @@ defineProps<{ kind: AnimalKind }>()
       <path d="M50 66 V71 M42 74 Q50 80 58 74" fill="none" stroke-width="2.6" />
       <ellipse cx="27" cy="64" rx="6" ry="4" fill="#ff8aa5" stroke="none" opacity=".55" />
       <ellipse cx="73" cy="64" rx="6" ry="4" fill="#ff8aa5" stroke="none" opacity=".55" />
-      <circle cx="36" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="64" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="37.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
-      <circle cx="65.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="36" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="64" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="37.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="65.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
     </template>
 
     <!-- Зайчик -->
@@ -38,10 +41,10 @@ defineProps<{ kind: AnimalKind }>()
       <ellipse cx="50" cy="63" rx="36" ry="31" fill="#f8f8fc" />
       <ellipse cx="26" cy="69" rx="6" ry="4" fill="#ff8aa5" stroke="none" opacity=".55" />
       <ellipse cx="74" cy="69" rx="6" ry="4" fill="#ff8aa5" stroke="none" opacity=".55" />
-      <circle cx="35" cy="58" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="65" cy="58" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="36.6" cy="56.3" r="1.8" fill="#fff" stroke="none" />
-      <circle cx="66.6" cy="56.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="35" cy="58" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="65" cy="58" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="36.6" cy="56.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="66.6" cy="56.3" r="1.8" fill="#fff" stroke="none" />
       <path d="M44 76 Q50 80 56 76 V86 H44 Z" fill="#fff" stroke-width="2.6" />
       <path d="M50 76 V86" stroke-width="2" />
       <ellipse cx="50" cy="68" rx="5.5" ry="3.8" fill="#ff7a9c" stroke-width="2.4" />
@@ -59,10 +62,10 @@ defineProps<{ kind: AnimalKind }>()
       <ellipse cx="50" cy="71" rx="15" ry="10.5" fill="#fff1dd" stroke="none" />
       <ellipse cx="26" cy="66" rx="6" ry="4" fill="#ff8aa5" stroke="none" opacity=".5" />
       <ellipse cx="74" cy="66" rx="6" ry="4" fill="#ff8aa5" stroke="none" opacity=".5" />
-      <circle cx="35" cy="55" r="5.6" fill="#2b1a12" stroke="none" />
-      <circle cx="65" cy="55" r="5.6" fill="#2b1a12" stroke="none" />
-      <circle cx="36.8" cy="53.2" r="1.9" fill="#fff" stroke="none" />
-      <circle cx="66.8" cy="53.2" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="35" cy="55" r="5.6" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="65" cy="55" r="5.6" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="36.8" cy="53.2" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="66.8" cy="53.2" r="1.9" fill="#fff" stroke="none" />
       <polygon points="45.5,64 54.5,64 50,69.5" fill="#ff7a9c" stroke-width="2.4" />
       <path d="M50 69.5 V73 Q45 78 40 75 M50 73 Q55 78 60 75" fill="none" stroke-width="2.4" />
       <path d="M30 70 L12 66 M30 74 L12 78 M70 70 L88 66 M70 74 L88 78" fill="none" stroke-width="2" opacity=".6" />
@@ -75,10 +78,10 @@ defineProps<{ kind: AnimalKind }>()
       <ellipse cx="50" cy="57" rx="34" ry="34" fill="#e3ad68" />
       <ellipse cx="67" cy="49" rx="11" ry="12.5" fill="#8d5a2c" stroke="none" />
       <ellipse cx="50" cy="71" rx="19" ry="14" fill="#f8e6c8" stroke="none" />
-      <circle cx="35" cy="49" r="5.4" fill="#2b1a12" stroke="none" />
-      <circle cx="66" cy="49" r="5.4" fill="#2b1a12" stroke="none" />
-      <circle cx="36.7" cy="47.3" r="1.9" fill="#fff" stroke="none" />
-      <circle cx="67.7" cy="47.3" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="35" cy="49" r="5.4" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="66" cy="49" r="5.4" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="36.7" cy="47.3" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="67.7" cy="47.3" r="1.9" fill="#fff" stroke="none" />
       <path d="M45 78 Q50 94 55 78 Z" fill="#ff7a9c" stroke-width="2.6" />
       <path d="M50 68 V75 M39 77 Q50 86 61 77" fill="none" stroke-width="2.6" />
       <ellipse cx="50" cy="63" rx="8.5" ry="5.8" fill="#2b1a12" stroke="none" />
@@ -92,8 +95,8 @@ defineProps<{ kind: AnimalKind }>()
       <ellipse cx="50" cy="58" rx="38" ry="35" fill="#fdfdfd" />
       <ellipse cx="34" cy="54" rx="10.5" ry="13.5" transform="rotate(-22 34 54)" fill="#2e2e36" stroke="none" />
       <ellipse cx="66" cy="54" rx="10.5" ry="13.5" transform="rotate(22 66 54)" fill="#2e2e36" stroke="none" />
-      <circle cx="35" cy="53" r="4.6" fill="#fff" stroke="none" />
-      <circle cx="65" cy="53" r="4.6" fill="#fff" stroke="none" />
+      <circle class="eye" cx="35" cy="53" r="4.6" fill="#fff" stroke="none" />
+      <circle class="eye" cx="65" cy="53" r="4.6" fill="#fff" stroke="none" />
       <circle cx="35.6" cy="53.6" r="2.7" fill="#111" stroke="none" />
       <circle cx="65.6" cy="53.6" r="2.7" fill="#111" stroke="none" />
       <ellipse cx="50" cy="66" rx="6.5" ry="4.4" fill="#2e2e36" stroke="none" />
@@ -111,8 +114,8 @@ defineProps<{ kind: AnimalKind }>()
       <circle cx="71" cy="32" r="10.5" fill="#fff" stroke="none" />
       <circle cx="31" cy="33.5" r="5.4" fill="#1d2b12" stroke="none" />
       <circle cx="69" cy="33.5" r="5.4" fill="#1d2b12" stroke="none" />
-      <circle cx="32.8" cy="31.5" r="1.9" fill="#fff" stroke="none" />
-      <circle cx="70.8" cy="31.5" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="32.8" cy="31.5" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="70.8" cy="31.5" r="1.9" fill="#fff" stroke="none" />
       <path d="M20 64 Q50 95 80 64" fill="none" stroke-width="3.2" />
       <circle cx="44" cy="55" r="2" fill="#2d4a17" stroke="none" />
       <circle cx="56" cy="55" r="2" fill="#2d4a17" stroke="none" />
@@ -130,10 +133,10 @@ defineProps<{ kind: AnimalKind }>()
       <circle cx="39" cy="55" r="16" fill="#f5dab6" stroke="none" />
       <circle cx="61" cy="55" r="16" fill="#f5dab6" stroke="none" />
       <ellipse cx="50" cy="70" rx="22" ry="15" fill="#f5dab6" stroke="none" />
-      <circle cx="38" cy="52" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="62" cy="52" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="39.6" cy="50.3" r="1.8" fill="#fff" stroke="none" />
-      <circle cx="63.6" cy="50.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="38" cy="52" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="62" cy="52" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="39.6" cy="50.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="63.6" cy="50.3" r="1.8" fill="#fff" stroke="none" />
       <circle cx="46" cy="64" r="1.9" fill="#4a2f22" stroke="none" />
       <circle cx="54" cy="64" r="1.9" fill="#4a2f22" stroke="none" />
       <path d="M37 73 Q50 85 63 73" fill="none" stroke-width="2.8" />
@@ -147,10 +150,10 @@ defineProps<{ kind: AnimalKind }>()
       <ellipse cx="50" cy="68" rx="17" ry="12.5" fill="#f48fa7" />
       <ellipse cx="44" cy="68" rx="2.6" ry="4.2" fill="#9b2c4a" stroke="none" />
       <ellipse cx="56" cy="68" rx="2.6" ry="4.2" fill="#9b2c4a" stroke="none" />
-      <circle cx="33" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="67" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
-      <circle cx="34.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
-      <circle cx="68.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="33" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="67" cy="48" r="5.2" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="34.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="68.6" cy="46.3" r="1.8" fill="#fff" stroke="none" />
       <ellipse cx="21" cy="64" rx="6" ry="4" fill="#ff6d8f" stroke="none" opacity=".5" />
       <ellipse cx="79" cy="64" rx="6" ry="4" fill="#ff6d8f" stroke="none" opacity=".5" />
     </template>
@@ -164,10 +167,10 @@ defineProps<{ kind: AnimalKind }>()
       <ellipse cx="50" cy="57" rx="38" ry="34" fill="#fba91f" />
       <path d="M50 24 V38 M36 28 L40 38 M64 28 L60 38 M13 55 L26 58 M14 66 L27 64 M87 55 L74 58 M86 66 L73 64" fill="none" stroke="#3b2410" stroke-width="4.2" />
       <ellipse cx="50" cy="69" rx="18" ry="13" fill="#fff3d6" stroke="none" />
-      <circle cx="35" cy="50" r="5.4" fill="#2b1a12" stroke="none" />
-      <circle cx="65" cy="50" r="5.4" fill="#2b1a12" stroke="none" />
-      <circle cx="36.7" cy="48.3" r="1.9" fill="#fff" stroke="none" />
-      <circle cx="66.7" cy="48.3" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="35" cy="50" r="5.4" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="65" cy="50" r="5.4" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="36.7" cy="48.3" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="66.7" cy="48.3" r="1.9" fill="#fff" stroke="none" />
       <polygon points="44,60 56,60 50,67" fill="#ff7a9c" stroke-width="2.4" />
       <path d="M50 67 V72 Q44 78 38 74 M50 72 Q56 78 62 74" fill="none" stroke-width="2.6" />
     </template>
@@ -178,12 +181,35 @@ defineProps<{ kind: AnimalKind }>()
       <circle cx="50" cy="57" r="38" fill="#ffd83d" />
       <ellipse cx="25" cy="66" rx="6" ry="4" fill="#ff8a5c" stroke="none" opacity=".5" />
       <ellipse cx="75" cy="66" rx="6" ry="4" fill="#ff8a5c" stroke="none" opacity=".5" />
-      <circle cx="35" cy="49" r="5.6" fill="#2b1a12" stroke="none" />
-      <circle cx="65" cy="49" r="5.6" fill="#2b1a12" stroke="none" />
-      <circle cx="36.8" cy="47.2" r="1.9" fill="#fff" stroke="none" />
-      <circle cx="66.8" cy="47.2" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="35" cy="49" r="5.6" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="65" cy="49" r="5.6" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="36.8" cy="47.2" r="1.9" fill="#fff" stroke="none" />
+      <circle class="eye" cx="66.8" cy="47.2" r="1.9" fill="#fff" stroke="none" />
       <polygon points="41,59 59,59 50,72" fill="#ff8a1f" stroke-width="2.6" />
       <path d="M43 62 H57" stroke="#c75e00" stroke-width="2" fill="none" />
     </template>
   </g>
 </template>
+
+<style scoped>
+.animal {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: animal-breathe 3.4s ease-in-out var(--phase) infinite;
+}
+@keyframes animal-breathe {
+  50% { transform: scale(1.015, 1.03); }
+}
+.eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: animal-blink 4.4s var(--phase) infinite;
+}
+@keyframes animal-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95.5% { transform: scaleY(0.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animal, .eye { animation: none; }
+}
+</style>
