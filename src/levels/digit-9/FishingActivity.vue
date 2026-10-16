@@ -63,7 +63,7 @@ async function catchFish(i: number): Promise<void> {
     </g>
 
     <!-- Друг и ведёрко -->
-    <g transform="translate(366 118) scale(.6)" :class="count ? 'cheer' : ''"><AnimalHead :kind="level.animal" /></g>
+    <g transform="translate(362 100) scale(.6)" :class="count ? 'cheer' : ''"><AnimalHead :kind="level.animal" /></g>
     <g :transform="`translate(${BUCKET.x} ${BUCKET.y})`">
       <path d="M-24 -6 H24 L18 24 H-18Z" fill="#94a3b8" stroke="#475569" stroke-width="4" stroke-linejoin="round" />
       <ellipse cy="-6" rx="24" ry="6" fill="#38bdf8" stroke="#475569" stroke-width="3" />
