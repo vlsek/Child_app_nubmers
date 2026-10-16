@@ -2,6 +2,7 @@
 import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Crocodile from '@/components/art/Crocodile.vue'
+import Confetti from '@/components/common/Confetti.vue'
 import Icon from '@/components/common/Icon.vue'
 import { useAudio } from '@/composables/useAudio'
 import { getNumberLevel } from '@/data/numbersLevels'
@@ -28,6 +29,7 @@ const views = computed(() => list.value.map((a) => defineAsyncComponent(a.compon
 const step = ref(0)
 const solved = ref<boolean[]>([])
 const finished = ref(false)
+const burst = ref(0)
 const showSkip = ref(false)
 /** Меняется при «ещё раз»: всё начинается заново. */
 const round = ref(0)
@@ -57,6 +59,7 @@ function restart(first = false): void {
 function advance(): void {
   if (step.value + 1 >= list.value.length) {
     finished.value = true
+    burst.value++
     showSkip.value = false
     clearTimeout(timer)
     void sayNumber(value.value)
@@ -70,6 +73,7 @@ async function onComplete(): Promise<void> {
   if (solved.value[step.value]) return
   const id = ++runId
   solved.value[step.value] = true
+  burst.value++
   game.completeActivity(value.value, list.value[step.value]!.id)
   clearTimeout(timer)
   showSkip.value = false
@@ -101,6 +105,7 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
 
 <template>
   <main class="relative mx-auto flex h-full w-full max-w-4xl flex-col px-4 pb-6 pt-28">
+    <Confetti :burst="burst" :big="finished" />
     <button type="button" class="btn-round absolute left-4 top-4 z-30 sm:left-8 sm:top-8" aria-label="К машинкам" @click="toCars">
       <Icon name="back" />
     </button>

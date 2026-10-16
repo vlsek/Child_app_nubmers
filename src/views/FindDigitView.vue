@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Crocodile from '@/components/art/Crocodile.vue'
+import Confetti from '@/components/common/Confetti.vue'
 import Icon from '@/components/common/Icon.vue'
 import { useAudio } from '@/composables/useAudio'
 import { FIND_ROUNDS, buildRounds, findCardId, getFindLevel } from '@/data/findLevels'
@@ -23,6 +24,7 @@ const done = ref(false)
 const wrong = ref<number[]>([])
 /** Правильная цифра подсвечена, идёт похвала: тапы не принимаются. */
 const solved = ref(false)
+const burst = ref(0)
 
 const current = computed(() => rounds.value[round.value])
 
@@ -63,6 +65,7 @@ async function choose(n: number): Promise<void> {
     return
   }
   solved.value = true
+  burst.value++
   game.registerCorrect('find', `find-${index.value}-${c.target}`)
   await sayPraise()
   await sleep(400)
@@ -102,6 +105,7 @@ onBeforeUnmount(() => {
 
 <template>
   <main v-if="level && current" class="relative mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-center gap-6 px-4 pt-32 pb-12">
+    <Confetti :burst="burst" :big="done" />
     <button type="button" class="btn-round absolute left-4 top-4 sm:left-8 sm:top-8" aria-label="К машинкам" @click="back">
       <Icon name="back" />
     </button>
