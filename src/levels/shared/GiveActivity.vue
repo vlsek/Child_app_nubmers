@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -23,7 +24,7 @@ const emit = defineEmits<{ complete: [] }>()
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
 const TOTAL = props.n >= 10 ? 10 : Math.min(10, props.n + 4)
-const FRIEND = { x: 350, y: 80 }
+const FRIEND = { x: 362, y: 84 } // центр друга: сюда нужно донести предмет
 const spots = Array.from({ length: TOTAL }, (_, i) => ({ x: 60 + (i % 5) * 62, y: i < 5 ? 220 : 275 }))
 const COLORS: Record<string, string[]> = {
   melon: ['#22c55e'],
@@ -37,7 +38,7 @@ const colorOf = (i: number): string => COLORS[props.item]![i % COLORS[props.item
 const given = ref<number[]>(spots.map(() => 0))
 const count = computed(() => given.value.filter(Boolean).length)
 const done = computed(() => count.value >= props.n)
-const shake = ref(-1)
+const svg = ref<SVGSVGElement | null>(null)
 let alive = true
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -47,15 +48,15 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-async function give(i: number): Promise<void> {
-  if (given.value[i]) return
-  if (done.value) {
-    shake.value = i
-    setTimeout(() => (shake.value = -1), 400)
-    return
-  }
+function give(i: number): boolean {
+  if (given.value[i] || done.value) return false
   const k = count.value + 1
   given.value[i] = k
+  void finish(k)
+  return true
+}
+
+async function finish(k: number): Promise<void> {
   const said = sayNumber(k)
   if (k < props.n) return
   await said
@@ -63,19 +64,22 @@ async function give(i: number): Promise<void> {
   if (alive) emit('complete')
 }
 
-function place(i: number): { x: number; y: number } {
-  return given.value[i] ? { x: FRIEND.x, y: FRIEND.y + 38 } : spots[i]!
-}
+/** Перетащили предмет другу (или просто ткнули: тогда он долетает сам). */
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !given.value[i],
+  onDrop: (i, p) => near(p, FRIEND, 80) && give(i),
+  onTap: (i) => void give(i),
+})
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" :aria-label="`Дай ${n}`">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" :aria-label="`Дай ${n}`">
     <rect x="-20" y="196" width="480" height="140" fill="#fde68a" opacity=".6" />
     <Crocodile x="-12" y="40" width="160" height="117" :mood="done ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
 
     <!-- Друг и его просьба -->
-    <g :transform="`translate(${FRIEND.x - 30} ${FRIEND.y - 30}) scale(.6)`" :class="{ cheer: done }"><AnimalHead :kind="level.animal" /></g>
-    <g transform="translate(236 34)">
+    <AnimalFigure :kind="level.animal" flip :mood="done ? 'happy' : 'idle'" x="276" y="14" width="160" height="117" class="pointer-events-none" />
+    <g transform="translate(176 14)" class="pointer-events-none">
       <rect width="86" height="44" rx="22" fill="#fff" stroke="#94a3b8" stroke-width="3" />
       <path d="M86 24 L100 34 L84 34Z" fill="#fff" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round" />
       <circle v-for="k in n" :key="k" :cx="43 + (k - (n + 1) / 2) * Math.min(14, 66 / n)" cy="22" :r="n > 7 ? 3 : 5" :fill="k <= count ? '#22c55e' : '#cbd5e1'" />
@@ -85,9 +89,12 @@ function place(i: number): { x: number; y: number } {
     <g
       v-for="(_, i) in spots"
       :key="i"
-      :class="{ idle: !given[i], shake: shake === i }"
-      :style="{ transform: `translate(${place(i).x}px, ${place(i).y}px) scale(${given[i] ? 0.4 : 1})`, opacity: given[i] ? 0 : 1, transition: given[i] ? 'transform .7s ease-in, opacity .2s .5s' : 'none' }"
-      @click="give(i)"
+      :style="
+        given[i]
+          ? { transform: `translate(${FRIEND.x}px, ${FRIEND.y + 20}px) scale(0.4)`, opacity: 0, transition: 'transform .5s ease-in, opacity .2s .35s', pointerEvents: 'none' }
+          : drag.style(i, spots[i]!)
+      "
+      @pointerdown="drag.start($event, i, spots[i]!)"
     >
       <template v-if="item === 'melon'">
         <ellipse rx="26" ry="20" fill="#22c55e" stroke="#15803d" stroke-width="3" />
@@ -116,22 +123,5 @@ function place(i: number): { x: number; y: number } {
 <style scoped>
 g {
   transform-box: view-box;
-}
-.idle {
-  cursor: pointer;
-}
-.shake {
-  animation: shake 0.4s;
-}
-@keyframes shake {
-  25% { translate: -5px 0; }
-  75% { translate: 5px 0; }
-}
-.cheer {
-  transform-box: fill-box;
-  animation: hop 0.6s ease-in-out infinite;
-}
-@keyframes hop {
-  50% { translate: 0 -8px; }
 }
 </style>

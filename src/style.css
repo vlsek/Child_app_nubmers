@@ -46,3 +46,43 @@
     transform: scale(0.9);
   }
 }
+
+/* Общая анимация «живых» зверей в полный рост (src/components/art/animals/*) */
+.fig-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fig-blink 4.4s var(--phase, 0s) infinite;
+}
+@keyframes fig-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95.5% { transform: scaleY(0.08); }
+}
+.fig-breathe {
+  transform-box: view-box;
+  transform-origin: 80px 156px;
+  animation: fig-breathe 3.4s ease-in-out var(--phase, 0s) infinite;
+}
+@keyframes fig-breathe {
+  50% { transform: scale(1.015, 1.03); }
+}
+/* Хвост: задайте transform-origin своим style, например style="transform-origin: 40px 120px" */
+.fig-tail {
+  transform-box: view-box;
+  animation: fig-tail 2.4s ease-in-out var(--phase, 0s) infinite;
+}
+@keyframes fig-tail {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(8deg); }
+}
+.fig-happy {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fig-hop 0.7s ease-in-out infinite;
+}
+.fig-happy .fig-tail { animation-duration: 0.6s; }
+@keyframes fig-hop {
+  50% { transform: translateY(-4px) rotate(-1.5deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fig-blink, .fig-breathe, .fig-tail, .fig-happy { animation: none; }
+}
