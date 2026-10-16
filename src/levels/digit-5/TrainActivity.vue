@@ -1,0 +1,127 @@
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import AnimalHead from '@/components/art/AnimalHead.vue'
+import Crocodile from '@/components/art/Crocodile.vue'
+import { useAudio } from '@/composables/useAudio'
+import type { NumberLevel } from '@/types/game'
+
+/**
+ * Цифра 5: «Крокодил-машинист везёт пять друзей».
+ * Пять вагончиков висят над рельсами. Тап: вагончик опускается и цепляется, в окошке
+ * появляется друг, на борту цифра, голос считает. Прицепили все пять, и поезд едет.
+ */
+const props = defineProps<{ level: NumberLevel }>()
+const emit = defineEmits<{ complete: [] }>()
+
+const { sayNumber, sayLine, stopVoice } = useAudio()
+
+const COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#a855f7']
+const SLOT_X = (i: number) => 98 + i * 66
+
+/** hooked[i] — каким по счёту прицеплен вагон i (0 — висит). */
+const hooked = ref<number[]>([0, 0, 0, 0, 0])
+const count = computed(() => hooked.value.filter(Boolean).length)
+const driving = ref(false)
+let alive = true
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+onMounted(() => void sayLine('train-intro', 'Прицепи вагончики!'))
+onBeforeUnmount(() => {
+  alive = false
+  stopVoice()
+})
+
+async function hook(i: number): Promise<void> {
+  if (hooked.value[i]) return
+  const n = count.value + 1
+  hooked.value[i] = n
+  const said = sayNumber(n)
+  if (n < 5) return
+  await said
+  await sleep(500)
+  if (!alive) return
+  driving.value = true
+  void sayLine('train-go', 'Чух-чух! Поехали!')
+  await sleep(2000)
+  if (alive) emit('complete')
+}
+
+void props
+</script>
+
+<template>
+  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Прицепи пять вагончиков">
+    <rect x="-20" y="270" width="480" height="70" fill="#a3a3a3" opacity=".0" />
+    <rect x="-20" y="276" width="480" height="60" fill="#4ade80" />
+    <!-- Рельсы -->
+    <rect x="-20" y="270" width="480" height="7" fill="#78350f" />
+    <path d="M-20 266 H460" stroke="#475569" stroke-width="5" />
+
+    <g :style="{ transform: driving ? 'translateX(560px)' : 'translateX(0)', transition: driving ? 'transform 1.9s cubic-bezier(.5,0,.9,.6)' : 'none' }">
+      <!-- Паровозик с крокодилом-машинистом -->
+      <g transform="translate(8 0)">
+        <rect x="0" y="206" width="90" height="48" rx="8" :fill="level.color" :stroke="level.shade" stroke-width="4" />
+        <rect x="52" y="174" width="38" height="38" rx="6" :fill="level.color" :stroke="level.shade" stroke-width="4" />
+        <rect x="58" y="180" width="26" height="22" rx="4" fill="#d4ecfb" />
+        <rect x="10" y="184" width="16" height="26" rx="3" fill="#475569" stroke="#1e293b" stroke-width="3" />
+        <rect x="6" y="178" width="24" height="10" rx="4" fill="#64748b" />
+        <Crocodile x="56" y="178" width="30" height="22" mood="happy" :mouth="driving ? 0.5 : 0" :look="1" />
+        <g class="puff" fill="#fff" opacity=".85"><circle cx="18" cy="168" r="7" /><circle cx="26" cy="156" r="5" /></g>
+        <g v-for="x in [22, 62]" :key="x" :transform="`translate(${x} 262)`"><circle r="11" fill="#1f2937" /><circle r="4" fill="#cbd5e1" /></g>
+      </g>
+
+      <!-- Вагончики -->
+      <g
+        v-for="(c, i) in COLORS"
+        :key="i"
+        :style="{ transform: `translate(${SLOT_X(i)}px, ${hooked[i] ? 0 : -92}px)`, transition: 'transform .6s cubic-bezier(.4,1.4,.5,1)' }"
+        :class="{ hang: !hooked[i] }"
+        @click="hook(i)"
+      >
+        <!-- Сцепка -->
+        <rect x="-6" y="244" width="10" height="6" fill="#475569" />
+        <rect x="0" y="214" width="62" height="44" rx="6" :fill="c" stroke="#0f172a" stroke-opacity=".4" stroke-width="3.5" />
+        <rect x="6" y="220" width="30" height="24" rx="4" fill="#d4ecfb" />
+        <g v-if="hooked[i]" transform="translate(7 221) scale(.22)"><AnimalHead :kind="level.animal" /></g>
+        <circle v-if="hooked[i]" cx="48" cy="236" r="9" fill="#fff" />
+        <text v-if="hooked[i]" x="48" y="241" text-anchor="middle" font-size="14" font-weight="900" fill="#334155">{{ hooked[i] }}</text>
+        <g v-for="x in [14, 48]" :key="x" :transform="`translate(${x} 262)`"><circle r="9" fill="#1f2937" /><circle r="3" fill="#cbd5e1" /></g>
+        <rect x="-4" y="190" width="70" height="80" fill="transparent" />
+      </g>
+    </g>
+  </svg>
+</template>
+
+<style scoped>
+g {
+  cursor: default;
+}
+.hang {
+  cursor: pointer;
+  animation: sway 1.4s ease-in-out infinite;
+}
+@keyframes sway {
+  50% {
+    rotate: 2deg;
+  }
+}
+.puff {
+  animation: puff 1.4s ease-out infinite;
+}
+@keyframes puff {
+  from {
+    transform: translateY(6px);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hang,
+  .puff {
+    animation: none;
+  }
+}
+</style>
