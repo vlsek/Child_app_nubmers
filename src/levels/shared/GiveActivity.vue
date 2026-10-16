@@ -22,7 +22,7 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const TOTAL = Math.min(9, props.n + 4)
+const TOTAL = props.n >= 10 ? 10 : Math.min(10, props.n + 4)
 const FRIEND = { x: 350, y: 80 }
 const spots = Array.from({ length: TOTAL }, (_, i) => ({ x: 60 + (i % 5) * 62, y: i < 5 ? 220 : 275 }))
 const COLORS: Record<string, string[]> = {
@@ -78,7 +78,7 @@ function place(i: number): { x: number; y: number } {
     <g transform="translate(236 34)">
       <rect width="86" height="44" rx="22" fill="#fff" stroke="#94a3b8" stroke-width="3" />
       <path d="M86 24 L100 34 L84 34Z" fill="#fff" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round" />
-      <circle v-for="k in n" :key="k" :cx="43 + (k - (n + 1) / 2) * Math.min(14, 66 / n)" cy="22" r="5" :fill="k <= count ? '#22c55e' : '#cbd5e1'" />
+      <circle v-for="k in n" :key="k" :cx="43 + (k - (n + 1) / 2) * Math.min(14, 66 / n)" cy="22" :r="n > 7 ? 3 : 5" :fill="k <= count ? '#22c55e' : '#cbd5e1'" />
     </g>
 
     <!-- Предметы -->
