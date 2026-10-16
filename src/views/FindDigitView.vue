@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Crocodile from '@/components/art/Crocodile.vue'
 import Icon from '@/components/common/Icon.vue'
 import { useAudio } from '@/composables/useAudio'
 import { FIND_ROUNDS, buildRounds, findCardId, getFindLevel } from '@/data/findLevels'
@@ -124,6 +125,13 @@ onBeforeUnmount(() => {
         <Icon name="star" />
       </span>
     </div>
+
+    <Crocodile
+      :mood="solved || done ? 'happy' : 'idle'"
+      :mouth="solved ? 0.5 : 0"
+      :look="0"
+      class="pointer-events-none -mb-2 w-36 shrink-0 sm:w-52"
+    />
 
     <template v-if="!done">
       <!-- Повтор вопроса: большая кнопка с динамиком -->
