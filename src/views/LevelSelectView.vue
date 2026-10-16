@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from '@/components/common/Icon.vue'
+import TrophyShelf from '@/components/game/TrophyShelf.vue'
 import LevelCarousel, { type CarouselItem } from '@/components/game/LevelCarousel.vue'
 import { useAudio } from '@/composables/useAudio'
 import { FIND_LEVELS, findCardId } from '@/data/findLevels'
@@ -35,6 +36,8 @@ const items = computed<CarouselItem[]>(() =>
         label: `Уровень ${l.index}: цифры от 1 до ${l.max}`,
       })),
 )
+
+const learnedFlags = computed(() => NUMBER_LEVELS.map((l) => game.hasLearned('learn', numberCardId(l.value))))
 
 function open(index: number): void {
   game.setMenuLevel(mode.value, index + 1)
@@ -82,5 +85,6 @@ onBeforeUnmount(stopVoice)
       @active="onActive"
       @settle="onSettle"
     />
+    <TrophyShelf v-if="mode === 'learn'" :learned="learnedFlags" />
   </main>
 </template>
