@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 9: «Построй башню из девяти кубиков».
- * Тап по кубику: он летит на башню, на нём цифра по счёту. Наверху друг-тигрёнок
- * радуется, когда башня готова. Крокодил подбадривает.
+ * Кубик перетаскивают на башню (или тапают: он сам летит на башню), на нём цифра по счёту,
+ * кубики встают по порядку. Друг рядом радуется, когда башня готова. Крокодил подбадривает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -35,10 +36,23 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-async function place(i: number): Promise<void> {
-  if (order.value[i]) return
+const svg = ref<SVGSVGElement | null>(null)
+
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !order.value[i],
+  onDrop: (i, p) => near(p, towerPos(count.value), 90) && place(i),
+  onTap: (i) => void place(i),
+})
+
+function place(i: number): boolean {
+  if (order.value[i] || count.value >= 9) return false
   const n = count.value + 1
   order.value[i] = n
+  void finish(n)
+  return true
+}
+
+async function finish(n: number): Promise<void> {
   const said = sayNumber(n)
   if (n < 9) return
   await said
@@ -53,24 +67,27 @@ function pos(i: number): { x: number; y: number } {
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Построй башню из девяти кубиков">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Построй башню из девяти кубиков">
     <rect x="-20" y="262" width="480" height="70" fill="#4ade80" />
     <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
 
     <Crocodile x="-14" y="150" width="140" height="102" :mood="count >= 9 ? 'happy' : 'idle'" :mouth="count >= 9 ? 0.4 : 0" :look="1" class="pointer-events-none" />
 
-    <!-- Друг на вершине -->
-    <g :style="{ transform: `translate(${TOWER_X - 24}px, ${towerPos(count).y - SIZE / 2 - 44}px)`, transition: 'transform .6s cubic-bezier(.4,1.4,.5,1)' }">
-      <g transform="scale(.48)" :class="{ cheer: count >= 9 }"><AnimalHead :kind="level.animal" /></g>
+    <!-- Друг наблюдает за стройкой -->
+    <AnimalFigure :kind="level.animal" :mood="count >= 9 ? 'happy' : 'idle'" x="140" y="14" width="150" height="109" class="pointer-events-none" />
+
+    <!-- Куда ставить: следующее место на башне -->
+    <g v-if="count < 9" :style="{ transform: `translate(${towerPos(count).x}px, ${towerPos(count).y}px)`, transition: 'transform .4s' }" class="pointer-events-none">
+      <rect :x="-SIZE / 2 - 4" :y="-SIZE / 2 - 4" :width="SIZE + 8" :height="SIZE + 8" rx="8" fill="#fff" fill-opacity=".35" stroke="#fff" stroke-width="4" stroke-dasharray="6 6" class="target" />
     </g>
 
     <!-- Кубики -->
     <g
       v-for="(c, i) in COLORS"
       :key="i"
-      :class="{ idle: !order[i] }"
-      :style="{ transform: `translate(${pos(i).x}px, ${pos(i).y}px)`, transition: 'transform .6s cubic-bezier(.4,1.3,.5,1)' }"
-      @click="place(i)"
+      :style="drag.style(i, pos(i))"
+      :class="{ placed: order[i] }"
+      @pointerdown="drag.start($event, i, pos(i))"
     >
       <rect :x="-SIZE / 2" :y="-SIZE / 2" :width="SIZE" :height="SIZE" rx="5" :fill="c" stroke="#0f172a" stroke-opacity=".4" stroke-width="3" />
       <rect :x="-SIZE / 2 + 4" :y="-SIZE / 2 + 4" :width="SIZE - 8" height="5" rx="2" fill="#fff" opacity=".4" />
@@ -84,15 +101,20 @@ function pos(i: number): { x: number; y: number } {
 g {
   transform-box: view-box;
 }
-.idle {
-  cursor: pointer;
+.placed {
+  pointer-events: none;
 }
-.cheer {
-  animation: hop 0.5s ease-in-out infinite;
+.target {
+  animation: blink 0.9s ease-in-out infinite;
 }
-@keyframes hop {
+@keyframes blink {
   50% {
-    translate: 0 -10px;
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .target {
+    animation: none;
   }
 }
 </style>

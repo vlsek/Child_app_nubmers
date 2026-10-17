@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 9: «Крокодил ловит девять рыбок».
- * Тап по рыбке: она выпрыгивает из пруда в ведёрко, где сидит друг-тигрёнок, голос считает.
+ * Рыбку перетаскивают в ведёрко друга (или тапают: она сама летит в ведёрко), голос считает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -35,10 +36,36 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
+const svg = ref<SVGSVGElement | null>(null)
+/** Рыбка в полёте к ведёрку. */
+const flying = ref<number | null>(null)
+
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !caught.value[i] && flying.value === null,
+  onDrop: (i, p) => near(p, BUCKET, 85) && start(i),
+  onTap: (i) => void start(i),
+})
+
+function start(i: number): boolean {
+  if (caught.value[i] || flying.value !== null) return false
+  flying.value = i
+  void catchFish(i)
+  return true
+}
+
+function fishStyle(i: number): Record<string, string> {
+  if (flying.value === i) {
+    return { transform: `translate(${BUCKET.x}px, ${BUCKET.y - 6}px) scale(.5)`, transition: 'transform .42s ease-in' }
+  }
+  return drag.style(i, FISH[i]!)
+}
+
 async function catchFish(i: number): Promise<void> {
-  if (caught.value[i]) return
+  await sleep(420)
+  if (!alive) return
   const n = count.value + 1
   caught.value[i] = n
+  flying.value = null
   mouth.value = 0.4
   setTimeout(() => (mouth.value = 0), 400)
   const said = sayNumber(n)
@@ -50,7 +77,7 @@ async function catchFish(i: number): Promise<void> {
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Поймай девять рыбок">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Поймай девять рыбок">
     <!-- Берега и пруд -->
     <rect x="-20" y="206" width="480" height="130" fill="#4ade80" />
     <path d="M92 212 H368 V300 Q368 318 350 318 H110 Q92 318 92 300Z" fill="#38bdf8" stroke="#0284c7" stroke-width="4" />
@@ -63,27 +90,32 @@ async function catchFish(i: number): Promise<void> {
     </g>
 
     <!-- Друг и ведёрко -->
-    <g transform="translate(362 100) scale(.6)" :class="count ? 'cheer' : ''"><AnimalHead :kind="level.animal" /></g>
-    <g :transform="`translate(${BUCKET.x} ${BUCKET.y})`">
+    <AnimalFigure :kind="level.animal" flip :mood="count >= 9 ? 'happy' : 'idle'" x="296" y="70" width="144" height="105" class="pointer-events-none" />
+    <circle v-if="count < 9" :cx="BUCKET.x" :cy="BUCKET.y" r="36" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
+    <g :transform="`translate(${BUCKET.x} ${BUCKET.y})`" class="pointer-events-none">
       <path d="M-24 -6 H24 L18 24 H-18Z" fill="#94a3b8" stroke="#475569" stroke-width="4" stroke-linejoin="round" />
       <ellipse cy="-6" rx="24" ry="6" fill="#38bdf8" stroke="#475569" stroke-width="3" />
     </g>
 
     <!-- Рыбки -->
-    <g v-for="(f, i) in FISH" :key="i" :transform="`translate(${f.x} ${f.y})`">
-      <g :class="caught[i] ? 'jump' : 'swim'" :style="{ '--dx': `${BUCKET.x - f.x}px`, '--dy': `${BUCKET.y - 8 - f.y}px`, animationDelay: caught[i] ? '0s' : `${-i * 0.37}s` }" @click="catchFish(i)">
+    <template v-for="(f, i) in FISH" :key="i">
+    <g v-if="!caught[i]" class="dragger" :style="fishStyle(i)" @pointerdown="drag.start($event, i, f)">
+      <g class="swim" :style="{ animationDelay: `${-i * 0.37}s` }">
         <ellipse rx="22" ry="13" :fill="f.color" stroke="#0f172a" stroke-opacity=".35" stroke-width="3" />
         <path d="M20 0 L36 -12 V12Z" :fill="f.color" stroke="#0f172a" stroke-opacity=".35" stroke-width="3" stroke-linejoin="round" />
         <circle cx="-10" cy="-3" r="3.5" fill="#fff" /><circle cx="-11" cy="-3" r="1.6" fill="#1e293b" />
-        <circle r="34" fill="transparent" />
       </g>
+      <circle r="34" fill="transparent" />
     </g>
+    </template>
   </svg>
 </template>
 
 <style scoped>
+.dragger {
+  transform-box: view-box;
+}
 .swim {
-  cursor: pointer;
   animation: swim 2s ease-in-out infinite;
 }
 @keyframes swim {
@@ -91,40 +123,17 @@ async function catchFish(i: number): Promise<void> {
     transform: translate(8px, -5px);
   }
 }
-.jump {
-  pointer-events: none;
-  animation: jump 0.9s ease-in-out forwards;
+.target {
+  animation: blink 0.9s ease-in-out infinite;
 }
-@keyframes jump {
-  0% {
-    transform: translate(0, 0);
-    opacity: 1;
-  }
+@keyframes blink {
   50% {
-    transform: translate(calc(var(--dx) * 0.5), calc(var(--dy) - 90px)) rotate(-20deg);
-  }
-  90% {
-    transform: translate(var(--dx), var(--dy)) rotate(20deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--dx), var(--dy));
-    opacity: 0;
-  }
-}
-.cheer {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: hop 0.8s ease-in-out infinite;
-}
-@keyframes hop {
-  50% {
-    translate: 0 -6px;
+    opacity: 0.35;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .swim,
-  .cheer {
+  .target {
     animation: none;
   }
 }
