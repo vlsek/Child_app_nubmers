@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 3: «Крокодил лопает три шарика».
- * Друг держит три шарика. Тап по шарику: крокодил открывает пасть, шарик лопается, голос считает.
+ * Друг держит три шарика. Лопнуть шарик это не «перенести», поэтому остаётся ТАП по шарику: крокодил открывает пасть, шарик лопается, голос считает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -74,7 +74,7 @@ async function pop(i: number): Promise<void> {
     </g>
 
     <!-- Друг -->
-    <g transform="translate(362 218) scale(.62)" class="friend"><AnimalHead :kind="level.animal" /></g>
+    <AnimalFigure :kind="level.animal" flip :mood="count >= 3 ? 'happy' : 'idle'" x="296" y="166" width="140" height="102" class="pointer-events-none" />
 
     <!-- Крокодил -->
     <Crocodile x="-8" y="168" width="200" height="146" :mood="count >= 3 ? 'happy' : 'idle'" :mouth="mouth" :look="1" class="pointer-events-none" />
@@ -118,19 +118,8 @@ async function pop(i: number): Promise<void> {
     opacity: 0;
   }
 }
-.friend {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: cheer 1.2s ease-in-out infinite;
-}
-@keyframes cheer {
-  50% {
-    translate: 0 -5px;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .balloon,
-  .friend {
+  .balloon {
     animation: none;
   }
 }

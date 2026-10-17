@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 2: «Крокодил на велосипеде перепрыгивает два пенька».
- * Пенёк подъезжает и ждёт. Тап: велосипед подпрыгивает, пенёк уезжает под ним, голос считает.
+ * Пенёк подъезжает и ждёт. Здесь ничего не переносят (прыжок это действие), поэтому остаётся ТАП: велосипед подпрыгивает, пенёк уезжает под ним, голос считает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -57,7 +57,7 @@ async function jump(): Promise<void> {
     <path d="M0 304 H440" stroke="#fff" stroke-width="4" stroke-dasharray="26 22" />
 
     <!-- Друг машет с горки -->
-    <g transform="translate(350 120) scale(.7)" class="cheer"><AnimalHead :kind="level.animal" /></g>
+    <AnimalFigure :kind="level.animal" flip :mood="done ? 'happy' : 'idle'" x="306" y="150" width="140" height="102" class="pointer-events-none" />
 
     <!-- Пеньки -->
     <g v-for="(x, i) in stumps" :key="i" :style="{ transform: `translate(${x}px, 282px)`, transition: x === STOP_X && !jumping && cur === i && i > 0 ? 'transform .8s ease-out' : x === -80 ? 'transform .9s linear' : 'none' }">
@@ -97,21 +97,6 @@ async function jump(): Promise<void> {
   }
   100% {
     transform: translateY(0) rotate(0);
-  }
-}
-.cheer {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: bob 1.2s ease-in-out infinite;
-}
-@keyframes bob {
-  50% {
-    translate: 0 -5px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cheer {
-    animation: none;
   }
 }
 </style>

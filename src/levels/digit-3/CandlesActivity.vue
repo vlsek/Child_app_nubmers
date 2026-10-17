@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 3: «Крокодил задувает три свечки на торте друга».
- * Тап по свечке: крокодил дует, огонёк гаснет, голос считает.
+ * Задуть свечку это не «перенести», поэтому остаётся ТАП по свечке: крокодил дует, огонёк гаснет, голос считает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -60,10 +60,10 @@ async function blow(i: number): Promise<void> {
     <rect x="-20" y="258" width="480" height="8" fill="#fbbf24" />
 
     <!-- Друг в колпаке -->
-    <g transform="translate(330 14) scale(.62)" class="friend">
-      <AnimalHead :kind="level.animal" />
-      <polygon points="50,-34 24,10 76,10" fill="#f472b6" stroke="#be185d" stroke-width="4" stroke-linejoin="round" />
-      <circle cx="50" cy="-36" r="6" fill="#facc15" />
+    <AnimalFigure :kind="level.animal" flip :mood="count >= 3 ? 'happy' : 'idle'" x="296" y="2" width="136" height="99" class="pointer-events-none" />
+    <g transform="translate(358 24)" class="pointer-events-none">
+      <polygon points="0,-30 -20,14 20,14" fill="#f472b6" stroke="#be185d" stroke-width="4" stroke-linejoin="round" />
+      <circle cx="0" cy="-32" r="6" fill="#facc15" />
     </g>
 
     <!-- Торт -->
@@ -131,19 +131,8 @@ async function blow(i: number): Promise<void> {
     stroke-dashoffset: 0;
   }
 }
-.friend {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: cheer 1.2s ease-in-out infinite;
-}
-@keyframes cheer {
-  50% {
-    translate: 0 -5px;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .flame,
-  .friend {
+  .flame {
     animation: none;
   }
 }
