@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 5: «Крокодил поливает пять цветочков».
- * Тап по бутону: лейка плывёт к нему, льётся вода, цветок распускается, голос считает.
- * Друг-панда радуется распустившимся цветам.
+ * Лейку перетаскивают к бутону (или тапают по лейке/бутону, тогда она плывёт сама):
+ * льётся вода, цветок распускается, голос считает. Друг радуется распустившимся цветам.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -16,7 +17,9 @@ const emit = defineEmits<{ complete: [] }>()
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
 const FLOWERS = [178, 234, 290, 346, 402].map((x, i) => ({ x, color: ['#ef4444', '#f97316', '#facc15', '#ec4899', '#a855f7'][i]! }))
-const CAN_HOME = { x: 120, y: 214 }
+/** Центр лейки дома и над цветком (носик смотрит на бутон). */
+const CAN_HOME = { x: 122, y: 226 }
+const potPos = (i: number) => ({ x: FLOWERS[i]!.x - 22, y: 180 })
 
 /** bloom[i] — каким по счёту расцвёл цветок i (0 — бутон). */
 const bloom = ref<number[]>([0, 0, 0, 0, 0])
@@ -24,11 +27,11 @@ const count = computed(() => bloom.value.filter(Boolean).length)
 /** Над каким цветком лейка (-1 — у крокодила) и льётся ли вода. */
 const at = ref(-1)
 const pouring = ref(false)
-let busy = false
+const busy = ref(false)
+const svg = ref<SVGSVGElement | null>(null)
 let alive = true
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
-const canPos = computed(() => (at.value < 0 ? CAN_HOME : { x: FLOWERS[at.value]!.x - 44, y: 168 }))
 
 onMounted(() => void sayLine('flowers-intro', 'Полей цветочки!'))
 onBeforeUnmount(() => {
@@ -36,9 +39,35 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-async function water(i: number): Promise<void> {
-  if (bloom.value[i] || busy) return
-  busy = true
+/** Ближайший нераспустившийся бутон к лейке в точке p (в радиусе 75), иначе -1. */
+function budNear(p: { x: number; y: number }): number {
+  let best = -1
+  let bd = Infinity
+  FLOWERS.forEach((_, i) => {
+    const d = Math.hypot(p.x - potPos(i).x, p.y - potPos(i).y)
+    if (!bloom.value[i] && d < bd) {
+      bd = d
+      best = i
+    }
+  })
+  return bd <= 75 ? best : -1
+}
+
+const drag = useDrag<number>(svg, {
+  canGrab: () => !busy.value,
+  onDrop: (_, p) => water(budNear(p)),
+  // Тап по лейке: она плывёт к первому нераспустившемуся цветку.
+  onTap: () => void water(bloom.value.findIndex((b) => !b)),
+})
+
+function water(i: number): boolean {
+  if (i < 0 || bloom.value[i] || busy.value) return false
+  busy.value = true
+  void pour(i)
+  return true
+}
+
+async function pour(i: number): Promise<void> {
   at.value = i
   await sleep(450)
   pouring.value = true
@@ -49,21 +78,27 @@ async function water(i: number): Promise<void> {
   const said = sayNumber(n)
   pouring.value = false
   at.value = -1
-  busy = false
+  busy.value = false
   if (n < 5) return
   await said
   await sleep(500)
   if (alive) emit('complete')
 }
+
+const canStyle = computed(() =>
+  at.value >= 0
+    ? { transform: `translate(${potPos(at.value).x}px, ${potPos(at.value).y}px)`, transition: 'transform .45s ease-in-out' }
+    : drag.style(0, CAN_HOME),
+)
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Полей пять цветочков">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Полей пять цветочков">
     <rect x="-20" y="262" width="480" height="70" fill="#4ade80" />
     <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
 
     <!-- Друг радуется -->
-    <g transform="translate(356 36) scale(.6)" :class="count ? 'cheer' : 'idle'"><AnimalHead :kind="level.animal" /></g>
+    <AnimalFigure :kind="level.animal" flip :mood="count >= 5 ? 'happy' : 'idle'" x="300" y="62" width="140" height="102" class="pointer-events-none" />
 
     <Crocodile x="-14" y="174" width="170" height="124" :mood="count >= 5 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
 
@@ -81,16 +116,19 @@ async function water(i: number): Promise<void> {
       <rect x="-28" y="-100" width="56" height="106" fill="transparent" />
     </g>
 
-    <!-- Лейка -->
-    <g :style="{ transform: `translate(${canPos.x}px, ${canPos.y}px)`, transition: 'transform .45s ease-in-out' }">
+    <!-- Лейка (рисуем с центром в 0,0) -->
+    <g :style="canStyle" @pointerdown="drag.start($event, 0, CAN_HOME)">
       <g :style="{ transform: `rotate(${pouring ? 24 : 0}deg)`, transition: 'transform .25s' }">
-        <path d="M0 0 H34 L30 30 H4Z" fill="#38bdf8" stroke="#0369a1" stroke-width="3.5" stroke-linejoin="round" />
-        <path d="M34 8 L52 -2 L54 4 L34 16" fill="#38bdf8" stroke="#0369a1" stroke-width="3" stroke-linejoin="round" />
-        <path d="M2 8 q-16 -2 -10 14 q4 6 10 4" fill="none" stroke="#0369a1" stroke-width="4" stroke-linecap="round" />
-        <g v-if="pouring" fill="#7dd3fc" stroke="none">
-          <circle v-for="k in 5" :key="k" r="3.5" :cx="56" :cy="4" class="drop" :style="{ animationDelay: `${k * 0.1}s` }" />
+        <g transform="translate(-22 -15)">
+          <path d="M0 0 H34 L30 30 H4Z" fill="#38bdf8" stroke="#0369a1" stroke-width="3.5" stroke-linejoin="round" />
+          <path d="M34 8 L52 -2 L54 4 L34 16" fill="#38bdf8" stroke="#0369a1" stroke-width="3" stroke-linejoin="round" />
+          <path d="M2 8 q-16 -2 -10 14 q4 6 10 4" fill="none" stroke="#0369a1" stroke-width="4" stroke-linecap="round" />
+          <g v-if="pouring" fill="#7dd3fc" stroke="none">
+            <circle v-for="k in 5" :key="k" r="3.5" :cx="56" :cy="4" class="drop" :style="{ animationDelay: `${k * 0.1}s` }" />
+          </g>
         </g>
       </g>
+      <circle r="46" fill="transparent" />
     </g>
   </svg>
 </template>
@@ -128,22 +166,8 @@ async function water(i: number): Promise<void> {
     opacity: 0;
   }
 }
-.cheer,
-.idle {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-}
-.cheer {
-  animation: hop 0.8s ease-in-out infinite;
-}
-@keyframes hop {
-  50% {
-    translate: 0 -8px;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .bud,
-  .cheer {
+  .bud {
     animation: none;
   }
 }
