@@ -38,7 +38,7 @@ const vehicles: { kind: VehicleKind; color: string; shade: string }[] = [
     <h2 class="mb-2 text-xl font-bold">Звери в полный рост</h2>
     <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
       <AnimalFigure v-for="k in animals" :key="k" :kind="k" class="w-full rounded-2xl bg-white/70" />
-      <AnimalFigure v-for="k in animals.slice(0, 5)" :key="'f' + k" :kind="k" flip mood="happy" class="w-full rounded-2xl bg-white/70" />
+      <AnimalFigure v-for="k in animals" :key="'f' + k" :kind="k" flip mood="happy" class="w-full rounded-2xl bg-white/70" />
     </div>
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
       <VehicleArt
