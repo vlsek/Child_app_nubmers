@@ -3,11 +3,12 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { inRect, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 10: «Крокодил возит десять цыплят на автобусе».
- * Тап по цыплёнку на остановке: он запрыгивает в окошко автобуса, голос считает.
+ * Цыплёнка на остановке перетаскивают в автобус (или тапают: он сам запрыгивает в окошко), голос считает.
  * Когда все десять внутри, автобус уезжает.
  */
 defineProps<{ level: NumberLevel }>()
@@ -30,10 +31,39 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
+const svg = ref<SVGSVGElement | null>(null)
+/** Цыплёнок в полёте к окошку. */
+const flying = ref<number | null>(null)
+/** Зона посадки: весь автобус с запасом. */
+const BUS = { x: 186, y: 80, w: 250, h: 176 }
+
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !boarded.value[i] && flying.value === null,
+  onDrop: (i, p) => inRect(p, BUS) && start(i),
+  onTap: (i) => void start(i),
+})
+
+function start(i: number): boolean {
+  if (boarded.value[i] || flying.value !== null) return false
+  flying.value = i
+  void board(i)
+  return true
+}
+
+function chickStyle(i: number): Record<string, string> {
+  if (flying.value === i) {
+    const w = WIN(count.value)
+    return { transform: `translate(${w.x}px, ${w.y}px)`, transition: 'transform .42s ease-in' }
+  }
+  return drag.style(i, SPOTS[i]!)
+}
+
 async function board(i: number): Promise<void> {
-  if (boarded.value[i]) return
+  await sleep(420)
+  if (!alive) return
   const n = count.value + 1
   boarded.value[i] = n
+  flying.value = null
   const said = sayNumber(n)
   if (n < 10) return
   await said
@@ -45,7 +75,7 @@ async function board(i: number): Promise<void> {
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Посади десять цыплят в автобус">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Посади десять цыплят в автобус">
     <rect x="-20" y="290" width="480" height="40" fill="#64748b" />
     <rect x="-20" y="224" width="200" height="12" fill="#94a3b8" />
 
@@ -63,11 +93,16 @@ async function board(i: number): Promise<void> {
       </template>
     </g>
 
+    <!-- Куда сажать: автобус -->
+    <rect v-if="count < 10 && !leaving" :x="BUS.x + 4" :y="BUS.y + 4" :width="BUS.w - 8" :height="BUS.h - 8" rx="30" fill="#fff" fill-opacity=".12" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
+
     <!-- Цыплята на остановке -->
     <template v-for="(s, i) in SPOTS" :key="'w' + i">
-      <g v-if="!boarded[i]" :transform="`translate(${s.x - 17} ${s.y - 17}) scale(.34)`" class="wait" :style="{ animationDelay: `${-i * 0.2}s` }" @click="board(i)">
-        <AnimalHead :kind="level.animal" />
-        <circle cx="50" cy="50" r="70" fill="transparent" />
+      <g v-if="!boarded[i]" class="dragger" :style="chickStyle(i)" @pointerdown="drag.start($event, i, s)">
+        <g class="wait" :style="{ animationDelay: `${-i * 0.2}s` }">
+          <g transform="translate(-17 -17) scale(.34)"><AnimalHead :kind="level.animal" /></g>
+        </g>
+        <circle r="26" fill="transparent" />
       </g>
     </template>
   </svg>
@@ -77,12 +112,20 @@ async function board(i: number): Promise<void> {
 g {
   transform-box: fill-box;
 }
+.dragger {
+  transform-box: view-box;
+}
 .wait {
-  cursor: pointer;
   animation: bob 1.1s ease-in-out infinite;
 }
 @keyframes bob {
-  50% { translate: 0 -40px; }
+  50% { translate: 0 -5px; }
+}
+.target {
+  animation: blink 0.9s ease-in-out infinite;
+}
+@keyframes blink {
+  50% { opacity: .35; }
 }
 .seat {
   animation: seat 0.4s cubic-bezier(.3,1.6,.5,1) both;
@@ -97,6 +140,6 @@ g {
   to { translate: 460px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .wait { animation: none; }
+  .wait, .target { animation: none; }
 }
 </style>
