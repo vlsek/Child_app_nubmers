@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 4: «Накорми крокодила четырьмя пончиками».
- * На тарелке шесть пончиков, а крокодил хочет ровно четыре: тап по пончику — он летит
- * в пасть, голос считает. После четвёртого крокодил сыт, оставшиеся пончики тускнеют.
+ * На тарелке шесть пончиков, а крокодил хочет ровно четыре: пончик перетаскивают ко рту
+ * (или тапают, тогда он сам летит в пасть), голос считает. После четвёртого крокодил сыт, оставшиеся пончики тускнеют.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -53,16 +54,29 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-async function feed(i: number): Promise<void> {
-  if (eaten.value[i] || flying.value !== null) return
+const svg = ref<SVGSVGElement | null>(null)
+
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !eaten.value[i] && flying.value === null,
+  onDrop: (i, p) => near(p, MOUTH, 85) && feed(i),
+  onTap: (i) => void feed(i),
+})
+
+function feed(i: number): boolean {
+  if (eaten.value[i] || flying.value !== null) return false
   if (full.value) {
     // Крокодил сыт: мягко отказывается.
     shake.value = true
     setTimeout(() => (shake.value = false), 500)
     void sayLine('donuts-full', 'Хватит, я наелся!')
-    return
+    return false
   }
   flying.value = i
+  void eat(i)
+  return true
+}
+
+async function eat(i: number): Promise<void> {
   void tweenMouth(1, 350)
   await sleep(420)
   if (!alive) return
@@ -78,20 +92,19 @@ async function feed(i: number): Promise<void> {
 }
 
 function flightStyle(i: number): Record<string, string> {
-  const p = PLATE[i]!
   if (flying.value === i) {
     return { transform: `translate(${MOUTH.x}px, ${MOUTH.y}px) scale(.45)`, transition: 'transform .42s ease-in' }
   }
-  return { transform: `translate(${p.x}px, ${p.y}px) scale(1)`, transition: 'none' }
+  return drag.style(i, PLATE[i]!)
 }
 
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Накорми крокодила четырьмя пончиками">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Накорми крокодила четырьмя пончиками">
     <!-- Табло: сколько уже съедено из четырёх -->
     <g>
-      <g v-for="k in WANT" :key="k" :transform="`translate(${110 + (k - 1) * 62} 40)`">
+      <g v-for="k in WANT" :key="k" :transform="`translate(${84 + (k - 1) * 56} 40)`">
         <circle r="22" fill="#fff" opacity=".6" stroke="#94a3b8" stroke-width="3" stroke-dasharray="5 5" />
         <g v-if="eatenCount >= k" class="pop">
           <circle r="18" fill="#f9a8d4" stroke="#be185d" stroke-width="3" />
@@ -106,10 +119,13 @@ function flightStyle(i: number): Record<string, string> {
     </g>
 
     <!-- Друг приносит пончики -->
-    <g transform="translate(346 14) scale(.62)" class="friend"><AnimalHead :kind="level.animal" /></g>
+    <AnimalFigure :kind="level.animal" flip :mood="full ? 'happy' : 'idle'" x="296" y="2" width="144" height="105" class="pointer-events-none" />
 
     <!-- Тарелка -->
     <rect x="262" y="110" width="176" height="180" rx="34" fill="#fff" opacity=".85" stroke="#cbd5e1" stroke-width="4" />
+
+    <!-- Куда нести: рот крокодила -->
+    <circle v-if="!full" :cx="MOUTH.x" :cy="MOUTH.y" r="52" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
 
     <!-- Пончики -->
     <g
@@ -119,7 +135,7 @@ function flightStyle(i: number): Record<string, string> {
       class="donut"
       :class="{ 'donut--off': full && flying !== i }"
       :style="flightStyle(i)"
-      @click="feed(i)"
+      @pointerdown="drag.start($event, i, PLATE[i]!)"
     >
       <circle r="27" fill="#d9954f" stroke="#8a4b16" stroke-width="3.5" />
       <path d="M0 -23 a23 23 0 1 0 .01 0Z M0 -8 a8 8 0 1 1 -.01 0Z" fill-rule="evenodd" :fill="d.color" stroke="#8a4b16" stroke-width="2.5" />
@@ -137,8 +153,15 @@ function flightStyle(i: number): Record<string, string> {
 
 <style scoped>
 .donut {
-  cursor: pointer;
   transform-box: view-box;
+}
+.target {
+  animation: blink 0.9s ease-in-out infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
 }
 .donut--off {
   opacity: 0.35;
@@ -163,16 +186,6 @@ function flightStyle(i: number): Record<string, string> {
   }
   75% {
     transform: translateX(8px);
-  }
-}
-.friend {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: cheer 1.2s ease-in-out infinite;
-}
-@keyframes cheer {
-  50% {
-    translate: 0 -5px;
   }
 }
 </style>
