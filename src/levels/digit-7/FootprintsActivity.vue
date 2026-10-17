@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
@@ -51,7 +51,7 @@ async function stamp(i: number): Promise<void> {
 
     <!-- Куст с обезьянкой -->
     <g transform="translate(360 170)">
-      <g v-if="count >= 7" class="peek"><g transform="translate(-30 -44) scale(.6)"><AnimalHead :kind="level.animal" /></g></g>
+      <g v-if="count >= 7" class="peek"><AnimalFigure :kind="level.animal" flip mood="happy" x="-62" y="-60" width="110" height="80" /></g>
       <g :class="{ shake: count >= 7 }" fill="#22c55e" stroke="#15803d" stroke-width="4">
         <circle cx="-26" cy="26" r="30" /><circle cx="22" cy="20" r="34" /><circle cx="0" cy="40" r="32" />
       </g>
