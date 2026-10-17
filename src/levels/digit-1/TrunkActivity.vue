@@ -2,12 +2,14 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 1: «Крокодил тянет слонёнка за хобот».
- * Зажми крокодила, и он тянет хобот всё длиннее. Дотянул до конца, хобот «бум!» возвращается,
- * слонёнок смеётся, голос говорит «один». Отпустил раньше, хобот мягко возвращается, можно ещё.
+ * Крокодила тянут пальцем вправо, и хобот становится всё длиннее. Дотянул до конца: хобот «бум!»
+ * возвращается, слонёнок смеётся, голос говорит «один». Отпустил раньше: хобот мягко возвращается.
+ * Если просто ткнуть в крокодила, он тянет сам.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -15,7 +17,10 @@ const emit = defineEmits<{ complete: [] }>()
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
 const stretch = ref(0)
-const holding = ref(false)
+const pulling = ref(false) // крокодил тянет сам (после тапа)
+const svg = ref<SVGSVGElement | null>(null)
+const HOME = { x: 268, y: 188 } // где крокодил стоит, пока хобот не тянут
+const REACH = 132 // на сколько единиц надо утащить крокодила вправо
 const happy = ref(false)
 const done = ref(false)
 let raf = 0
@@ -33,8 +38,12 @@ function tick(now: number): void {
   if (done.value) {
     // «Бум!»: быстро возвращается
     stretch.value = Math.max(0, stretch.value - dt * 4)
-  } else if (holding.value) {
-    stretch.value = Math.min(1, stretch.value + dt * 0.5)
+  } else if (drag.active.value) {
+    const dx = drag.active.value.x - HOME.x
+    stretch.value = Math.max(0, Math.min(1, dx / REACH))
+    if (stretch.value >= 1) void finish()
+  } else if (pulling.value) {
+    stretch.value = Math.min(1, stretch.value + dt * 0.9)
     if (stretch.value >= 1) void finish()
   } else {
     stretch.value = Math.max(0, stretch.value - dt * 1.5)
@@ -45,7 +54,7 @@ function tick(now: number): void {
 async function finish(): Promise<void> {
   if (done.value) return
   done.value = true
-  holding.value = false
+  pulling.value = false
   happy.value = true
   const said = sayNumber(1)
   await said
@@ -64,16 +73,20 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-const down = (e: PointerEvent) => {
-  if (done.value) return
-  holding.value = true
-  ;(e.currentTarget as Element).setPointerCapture?.(e.pointerId)
-}
-const up = () => (holding.value = false)
+const drag = useDrag<number>(svg, {
+  canGrab: () => {
+    pulling.value = false
+    return !done.value
+  },
+  onDrop: () => false, // отпустил раньше: хобот возвращается сам (см. tick)
+  onTap: () => {
+    pulling.value = true
+  },
+})
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Потяни хобот слонёнка вместе с крокодилом" @pointerup="up" @pointercancel="up">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Потяни хобот слонёнка вместе с крокодилом">
     <rect x="-20" y="276" width="480" height="60" fill="#4ade80" />
     <rect x="-20" y="272" width="480" height="8" fill="#22c55e" />
 
@@ -102,8 +115,8 @@ const up = () => (holding.value = false)
     </g>
 
     <!-- Крокодил зубами держит кончик хобота и тянет вправо -->
-    <g :transform="`translate(${tip + 150} 188) scale(-1 1)`" class="croc" @pointerdown="down">
-      <Crocodile width="170" height="124" :mood="happy ? 'happy' : 'idle'" :mouth="holding ? 0.1 : done ? 0.5 : 0.35" :look="1" />
+    <g :transform="`translate(${tip + 150} 188) scale(-1 1)`" class="croc" @pointerdown="drag.start($event, 0, HOME)">
+      <Crocodile width="170" height="124" :mood="happy ? 'happy' : 'idle'" :mouth="drag.active.value || pulling ? 0.1 : done ? 0.5 : 0.35" :look="1" />
       <rect x="-10" y="-10" width="190" height="144" fill="transparent" />
     </g>
 
