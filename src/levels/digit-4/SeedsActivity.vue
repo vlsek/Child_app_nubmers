@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -23,15 +24,9 @@ const HOMES = [
   { x: 196, y: 222 },
 ]
 
-interface Seed {
-  x: number
-  y: number
-  /** 0 — на арбузе, n — в ведре под номером n. */
-  gone: number
-  dragging: boolean
-}
-const seeds = ref<Seed[]>(HOMES.map((h) => ({ ...h, gone: 0, dragging: false })))
-const removed = computed(() => seeds.value.filter((s) => s.gone).length)
+/** gone[i]: 0 — косточка на арбузе, n — в ведре под номером n. */
+const gone = ref<number[]>(HOMES.map(() => 0))
+const removed = computed(() => gone.value.filter(Boolean).length)
 const lid = ref(false)
 
 const svg = ref<SVGSVGElement | null>(null)
@@ -44,56 +39,24 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-function toSvg(e: PointerEvent): { x: number; y: number } {
-  const m = svg.value?.getScreenCTM()
-  if (!m) return { x: 0, y: 0 }
-  const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse())
-  return { x: p.x, y: p.y }
-}
+/** Перетащили косточку в ведро или просто тапнули: тогда она долетает сама. */
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !gone.value[i],
+  onDrop: (i, p) => near(p, BIN, 80) && drop(i),
+  onTap: (i) => void drop(i),
+})
 
-let grab: { i: number; dx: number; dy: number; sx: number; sy: number; moved: number } | null = null
-
-function down(i: number, e: PointerEvent): void {
-  const s = seeds.value[i]!
-  if (s.gone) return
-  const p = toSvg(e)
-  grab = { i, dx: s.x - p.x, dy: s.y - p.y, sx: p.x, sy: p.y, moved: 0 }
-  s.dragging = true
-  ;(e.currentTarget as Element).setPointerCapture?.(e.pointerId)
-}
-
-function move(e: PointerEvent): void {
-  if (!grab) return
-  const p = toSvg(e)
-  const s = seeds.value[grab.i]!
-  grab.moved = Math.max(grab.moved, Math.hypot(p.x - grab.sx, p.y - grab.sy))
-  s.x = p.x + grab.dx
-  s.y = p.y + grab.dy
-}
-
-async function up(): Promise<void> {
-  if (!grab) return
-  const { i, moved } = grab
-  grab = null
-  const s = seeds.value[i]!
-  s.dragging = false
-  const near = Math.hypot(s.x - BIN.x, s.y - BIN.y) < 60
-  if (near || moved < 8) await drop(i)
-  else {
-    s.x = HOMES[i]!.x
-    s.y = HOMES[i]!.y
-  }
-}
-
-async function drop(i: number): Promise<void> {
-  const s = seeds.value[i]!
-  if (s.gone) return
-  s.x = BIN.x
-  s.y = BIN.y - 8
-  s.gone = removed.value + 1
-  const n = s.gone
+function drop(i: number): boolean {
+  if (gone.value[i] || removed.value >= 4) return false
+  const n = removed.value + 1
+  gone.value[i] = n
   lid.value = true
   setTimeout(() => (lid.value = false), 350)
+  void finish(n)
+  return true
+}
+
+async function finish(n: number): Promise<void> {
   const said = sayNumber(n)
   if (n < 4) return
   await said
@@ -109,9 +72,6 @@ async function drop(i: number): Promise<void> {
     class="mx-auto h-full max-h-[34rem] w-full touch-none"
     role="img"
     aria-label="Убери из арбуза четыре косточки в ведро"
-    @pointermove="move"
-    @pointerup="up"
-    @pointercancel="up"
   >
     <!-- Ломтик арбуза -->
     <path d="M52 110 A138 138 0 0 0 328 110Z" fill="#16a34a" stroke="#14532d" stroke-width="5" stroke-linejoin="round" />
@@ -120,7 +80,10 @@ async function drop(i: number): Promise<void> {
     <path d="M52 110 H328" stroke="#14532d" stroke-width="5" stroke-linecap="round" />
 
     <!-- Друг держит ведро -->
-    <g transform="translate(340 112) scale(.6)" class="friend"><AnimalHead :kind="level.animal" /></g>
+    <AnimalFigure :kind="level.animal" flip :mood="removed >= 4 ? 'happy' : 'idle'" x="306" y="116" width="134" height="98" class="pointer-events-none" />
+
+    <!-- Ведро: большая мигающая зона, куда нести косточки -->
+    <circle v-if="removed < 4" :cx="BIN.x" :cy="BIN.y + 22" r="52" fill="#fff" fill-opacity=".25" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
 
     <!-- Ведро -->
     <g :style="{ transform: `translate(${BIN.x}px, ${BIN.y + 20}px)`, transformOrigin: '0 0' }">
@@ -135,12 +98,12 @@ async function drop(i: number): Promise<void> {
 
     <!-- Косточки -->
     <g
-      v-for="(s, i) in seeds"
+      v-for="(_, i) in HOMES"
       :key="i"
       class="seed"
-      :class="{ 'seed--gone': s.gone }"
-      :style="{ transform: `translate(${s.x}px, ${s.y}px)`, transition: s.dragging ? 'none' : 'transform .35s ease-out, opacity .3s .25s' }"
-      @pointerdown="down(i, $event)"
+      :class="{ 'seed--gone': gone[i] }"
+      :style="gone[i] ? { transform: `translate(${BIN.x}px, ${BIN.y - 8}px)`, transition: 'transform .35s ease-out, opacity .3s .25s' } : drag.style(i, HOMES[i]!)"
+      @pointerdown="drag.start($event, i, HOMES[i]!)"
     >
       <ellipse rx="9" ry="14" transform="rotate(25)" fill="#1f2937" stroke="#0f172a" stroke-width="2" />
       <ellipse cx="-3" cy="-4" rx="2" ry="4" transform="rotate(25)" fill="#fff" opacity=".4" />
@@ -153,8 +116,15 @@ async function drop(i: number): Promise<void> {
 </template>
 
 <style scoped>
+.target {
+  animation: blink 0.9s ease-in-out infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
 .seed {
-  cursor: grab;
   transform-box: view-box;
   animation: wobble 1.6s ease-in-out infinite;
 }
@@ -169,18 +139,9 @@ async function drop(i: number): Promise<void> {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .seed {
+  .seed,
+  .target {
     animation: none;
-  }
-}
-.friend {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: cheer 1.2s ease-in-out infinite;
-}
-@keyframes cheer {
-  50% {
-    translate: 0 -5px;
   }
 }
 </style>
