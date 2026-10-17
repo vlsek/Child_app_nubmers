@@ -3,11 +3,12 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 6: «Собери шесть яблок в корзинку».
- * Крокодил держит корзинку, лягушонок смотрит. Тап по яблоку: оно падает в корзинку, голос считает.
+ * Крокодил держит корзинку, лягушонок смотрит. Яблоко перетаскивают в корзинку (или тапают: тогда оно само летит), голос считает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -27,6 +28,7 @@ const APPLES = [
 /** got[i] — каким по счёту собрано яблоко i (0 — висит). */
 const got = ref<number[]>(APPLES.map(() => 0))
 const count = computed(() => got.value.filter(Boolean).length)
+const svg = ref<SVGSVGElement | null>(null)
 let alive = true
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -36,8 +38,19 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-async function pick(i: number): Promise<void> {
-  if (got.value[i]) return
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !got.value[i],
+  onDrop: (i, p) => near(p, BASKET, 85) && pick(i),
+  onTap: (i) => void pick(i),
+})
+
+function pick(i: number): boolean {
+  if (got.value[i]) return false
+  void collect(i)
+  return true
+}
+
+async function collect(i: number): Promise<void> {
   const n = count.value + 1
   got.value[i] = n
   const said = sayNumber(n)
@@ -51,7 +64,7 @@ async function pick(i: number): Promise<void> {
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Собери шесть яблок">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Собери шесть яблок">
     <rect x="-20" y="262" width="480" height="70" fill="#4ade80" />
     <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
 
@@ -74,39 +87,37 @@ async function pick(i: number): Promise<void> {
       <path d="M-34 -4 H34 L26 24 H-26Z" fill="#d6a56b" stroke="#7c4a1e" stroke-width="4" stroke-linejoin="round" />
     </g>
 
+    <!-- Корзинка: большая зона цели -->
+    <ellipse :cx="BASKET.x" :cy="BASKET.y" rx="62" ry="40" fill="#fde68a" fill-opacity=".45" stroke="#f59e0b" stroke-width="3" stroke-dasharray="8 6" class="pointer-events-none" />
+
     <!-- Яблоки -->
-    <g v-for="(a, i) in APPLES" :key="i" :transform="`translate(${a.x} ${a.y})`" @click="pick(i)">
-      <g :class="got[i] ? 'fall' : 'apple'" :style="{ '--dx': `${BASKET.x - a.x}px`, '--dy': `${BASKET.y - 8 - a.y}px` }">
+    <g
+      v-for="(a, i) in APPLES"
+      :key="i"
+      :style="
+        got[i]
+          ? { transform: `translate(${BASKET.x}px, ${BASKET.y - 8}px) scale(.5)`, opacity: 0, transition: 'transform .5s ease-in, opacity .2s .35s', pointerEvents: 'none' }
+          : drag.style(i, a)
+      "
+      @pointerdown="drag.start($event, i, a)"
+    >
+      <g :class="{ apple: !got[i] && drag.active.value?.id !== i }" :style="{ animationDelay: `${-i * 0.3}s` }">
         <circle r="15" fill="#ef4444" stroke="#7f1d1d" stroke-width="3.5" />
         <path d="M0 -14 q2 -8 8 -9" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" />
         <ellipse cx="-5" cy="-5" rx="3" ry="5" fill="#fff" opacity=".45" />
-        <circle r="30" fill="transparent" />
       </g>
+      <circle r="30" fill="transparent" />
     </g>
   </svg>
 </template>
 
 <style scoped>
 .apple {
-  cursor: pointer;
   animation: sway 1.6s ease-in-out infinite;
 }
 @keyframes sway {
   50% {
     transform: translateY(-3px);
-  }
-}
-.fall {
-  pointer-events: none;
-  animation: fall 0.5s ease-in forwards;
-}
-@keyframes fall {
-  from {
-    transform: translate(0, 0);
-  }
-  to {
-    transform: translate(var(--dx), var(--dy));
-    opacity: 0;
   }
 }
 .idle {
