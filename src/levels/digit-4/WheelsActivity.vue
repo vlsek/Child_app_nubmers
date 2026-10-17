@@ -3,12 +3,14 @@ import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { inRect, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 4: «Поставь машине четыре колеса».
- * Длинная машина с крокодилом за рулём стоит без колёс. Тап по колесу — оно катится
- * на ближайшее свободное место, голос считает «один, два, три, четыре».
+ * Длинная машина с крокодилом за рулём стоит без колёс. Колесо перетаскивают на машину
+ * (или просто тапают, тогда оно само катится) и оно встаёт на ближайшее свободное место,
+ * голос считает «один, два, три, четыре».
  * С четвёртым колесом машина поднимается и уезжает.
  */
 defineProps<{ level: NumberLevel }>()
@@ -34,10 +36,25 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-async function put(i: number): Promise<void> {
-  if (slot.value[i]! >= 0 || driving.value) return
+const svg = ref<SVGSVGElement | null>(null)
+/** Зона машины: сюда нужно донести колесо. */
+const CAR = { x: 10, y: 90, w: 420, h: 180 }
+
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => slot.value[i]! < 0 && !driving.value,
+  onDrop: (i, p) => inRect(p, CAR) && put(i),
+  onTap: (i) => void put(i),
+})
+
+function put(i: number): boolean {
+  if (slot.value[i]! >= 0 || driving.value) return false
   const n = placed.value
   slot.value[i] = n
+  void after(n)
+  return true
+}
+
+async function after(n: number): Promise<void> {
   const said = sayNumber(n + 1)
   if (n + 1 < 4) return
   await said
@@ -49,9 +66,10 @@ async function put(i: number): Promise<void> {
   if (alive) emit('complete')
 }
 
-function wheelPos(i: number): { x: number; y: number } {
+function wheelStyle(i: number): Record<string, string> {
   const s = slot.value[i]!
-  return s >= 0 ? SLOTS[s]! : TRAY[i]!
+  if (s < 0) return drag.style(i, TRAY[i]!)
+  return { transform: `translate(${SLOTS[s]!.x}px, ${SLOTS[s]!.y}px)`, transition: 'transform .7s cubic-bezier(.4,.1,.3,1)' }
 }
 
 /** Машина опускается ниже, пока колёс не хватает. */
@@ -61,7 +79,7 @@ const nextSlot = computed(() => SLOTS[placed.value])
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" aria-hidden="false" role="img" aria-label="Поставь машине четыре колеса">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" aria-hidden="false" role="img" aria-label="Поставь машине четыре колеса">
     <defs>
       <clipPath :id="clip"><rect x="30" y="150" width="380" height="66" rx="18" /></clipPath>
     </defs>
@@ -96,25 +114,26 @@ const nextSlot = computed(() => SLOTS[placed.value])
       </g>
 
       <!-- Пустые места: мигают, подсказывая, куда катить -->
-      <circle v-if="nextSlot && !driving" :cx="nextSlot.x" :cy="nextSlot.y" r="30" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="7 7" class="blink" />
+      <circle v-if="nextSlot && !driving" :cx="nextSlot.x" :cy="nextSlot.y" r="34" fill="#fff" fill-opacity=".18" stroke="#fff" stroke-width="4" stroke-dasharray="7 7" class="blink" />
 
       <!-- Колёса -->
       <g
         v-for="(s, i) in slot"
         :key="i"
         class="wheel"
-        :class="{ 'wheel--idle': s < 0 }"
-        :style="{ transform: `translate(${wheelPos(i).x}px, ${wheelPos(i).y}px)`, transition: 'transform .7s cubic-bezier(.4,.1,.3,1)' }"
-        @click="put(i)"
+        :style="wheelStyle(i)"
+        @pointerdown="drag.start($event, i, TRAY[i]!)"
       >
-        <g :style="{ transform: `rotate(${(s >= 0 ? 720 : 0) + (driving ? 2160 : 0)}deg)`, transition: `transform ${driving ? 1.7 : 0.7}s ${driving ? 'linear' : 'ease-out'}` }">
-          <circle r="28" fill="#1f2937" stroke="#0f172a" stroke-width="3" />
-          <circle r="16" fill="#cbd5e1" stroke="#64748b" stroke-width="3" />
-          <circle r="5" fill="#64748b" />
-          <path d="M0 -16 V16 M-16 0 H16" stroke="#64748b" stroke-width="3" />
+        <g :class="{ 'wheel--idle': s < 0 && drag.active.value?.id !== i }">
+          <g :style="{ transform: `rotate(${(s >= 0 ? 720 : 0) + (driving ? 2160 : 0)}deg)`, transition: `transform ${driving ? 1.7 : 0.7}s ${driving ? 'linear' : 'ease-out'}` }">
+            <circle r="28" fill="#1f2937" stroke="#0f172a" stroke-width="3" />
+            <circle r="16" fill="#cbd5e1" stroke="#64748b" stroke-width="3" />
+            <circle r="5" fill="#64748b" />
+            <path d="M0 -16 V16 M-16 0 H16" stroke="#64748b" stroke-width="3" />
+          </g>
         </g>
-        <!-- Невидимая большая зона для тапа маленьким пальцем -->
-        <circle r="40" fill="transparent" />
+        <!-- Невидимая большая зона для маленького пальца -->
+        <circle v-if="s < 0" r="42" fill="transparent" />
       </g>
     </g>
   </svg>
@@ -125,9 +144,6 @@ const nextSlot = computed(() => SLOTS[placed.value])
 .wheel {
   /* Двигаем по пользовательским единицам SVG */
   transform-box: view-box;
-}
-.wheel {
-  cursor: pointer;
 }
 .wheel--idle {
   animation: bounce 1.1s ease-in-out infinite;
