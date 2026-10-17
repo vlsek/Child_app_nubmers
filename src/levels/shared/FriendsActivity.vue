@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { animalColumns } from '@/data/numbersLevels'
@@ -43,13 +43,9 @@ async function greet(i: number): Promise<void> {
   if (alive) emit('complete')
 }
 
-const animalFont = computed(() => {
-  const n = total.value
-  if (n <= 3) return 'min(8rem, 12vh, 20vw)'
-  if (n <= 6) return 'min(6.5rem, 9.5vh, 15vw)'
-  return 'min(5rem, 7.5vh, 11vw)'
-})
 const columns = computed(() => animalColumns(total.value))
+/** Размер фигуры (em = ширина клетки / 1.3): по ширине экрана и высоте, чтобы ряды помещались. */
+const animalFont = computed(() => `min(9rem, 13vh, ${(88 / (columns.value * 1.3)).toFixed(1)}vw)`)
 </script>
 
 <template>
@@ -79,9 +75,7 @@ const columns = computed(() => animalColumns(total.value))
           :aria-label="order[n - 1] ? `Посчитан: ${order[n - 1]}` : 'Поздороваться'"
           @click="greet(n - 1)"
         >
-          <svg viewBox="0 0 100 100" class="block h-[1.15em] w-full" aria-hidden="true">
-            <AnimalHead :kind="level.animal" />
-          </svg>
+          <AnimalFigure :kind="level.animal" :mood="order[n - 1] ? 'happy' : 'idle'" class="block h-auto w-full" />
           <span
             v-if="order[n - 1]"
             class="absolute -right-[0.18em] -top-[0.18em] flex h-[1.6em] w-[1.6em] items-center justify-center rounded-full bg-white text-[0.28em] font-black leading-none text-slate-700 shadow-md"
