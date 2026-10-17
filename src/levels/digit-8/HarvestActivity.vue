@@ -3,18 +3,21 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 8: «Поросёнок на тракторе возит морковки, крокодил помогает».
- * Тап по морковке: она летит в прицеп, голос считает. Когда их восемь, трактор уезжает.
+ * Морковку перетаскивают в прицеп (или тапают: она сама летит в прицеп), голос считает. Когда их восемь, трактор уезжает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const SPOTS = Array.from({ length: 8 }, (_, i) => ({ x: 40 + (i % 4) * 52, y: i < 4 ? 238 : 282 }))
+const SPOTS = Array.from({ length: 8 }, (_, i) => ({ x: 134 + (i % 4) * 38, y: (i < 4 ? 238 : 282) + 8 }))
+/** Куда нести: прицеп трактора. */
+const TRAILER = { x: 321, y: 196 }
 const loaded = ref<number[]>(SPOTS.map(() => 0))
 const count = computed(() => loaded.value.filter(Boolean).length)
 const leaving = ref(false)
@@ -27,10 +30,36 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
+const svg = ref<SVGSVGElement | null>(null)
+/** Морковка в полёте к прицепу. */
+const flying = ref<number | null>(null)
+
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !loaded.value[i] && flying.value === null,
+  onDrop: (i, p) => near(p, TRAILER, 85) && start(i),
+  onTap: (i) => void start(i),
+})
+
+function start(i: number): boolean {
+  if (loaded.value[i] || flying.value !== null) return false
+  flying.value = i
+  void load(i)
+  return true
+}
+
+function carrotStyle(i: number): Record<string, string> {
+  if (flying.value === i) {
+    return { transform: `translate(${TRAILER.x}px, ${TRAILER.y}px) scale(.6)`, transition: 'transform .42s ease-in' }
+  }
+  return drag.style(i, SPOTS[i]!)
+}
+
 async function load(i: number): Promise<void> {
-  if (loaded.value[i]) return
+  await sleep(420)
+  if (!alive) return
   const n = count.value + 1
   loaded.value[i] = n
+  flying.value = null
   const said = sayNumber(n)
   if (n < 8) return
   await said
@@ -42,7 +71,7 @@ async function load(i: number): Promise<void> {
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Собери восемь морковок">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Собери восемь морковок">
     <rect x="-20" y="214" width="480" height="120" fill="#a16207" opacity=".55" />
     <rect x="-20" y="208" width="480" height="8" fill="#4ade80" />
     <Crocodile x="-6" y="120" width="130" height="95" :mood="count >= 8 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
@@ -61,12 +90,19 @@ async function load(i: number): Promise<void> {
       </template>
     </g>
 
+    <!-- Куда нести: прицеп -->
+    <rect v-if="count < 8 && !leaving" x="266" y="140" width="110" height="112" rx="24" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
+
     <!-- Морковки на грядке -->
     <template v-for="(s, i) in SPOTS" :key="'c' + i">
-      <g v-if="!loaded[i]" :transform="`translate(${s.x + 130} ${s.y})`" class="carrot" :style="{ animationDelay: `${-i * 0.25}s` }" @click="load(i)">
-        <path d="M-12 -4 L0 34 L12 -4Z" fill="#f97316" stroke="#c2410c" stroke-width="3" stroke-linejoin="round" />
-        <path d="M0 -4 l-7 -14 M0 -4 l7 -14 M0 -4 v-16" stroke="#16a34a" stroke-width="4" stroke-linecap="round" />
-        <rect x="-28" y="-26" width="56" height="64" fill="transparent" />
+      <g v-if="!loaded[i]" class="dragger" :style="carrotStyle(i)" @pointerdown="drag.start($event, i, s)">
+        <g class="carrot" :style="{ animationDelay: `${-i * 0.25}s` }">
+          <g transform="translate(0 -8)">
+            <path d="M-12 -4 L0 34 L12 -4Z" fill="#f97316" stroke="#c2410c" stroke-width="3" stroke-linejoin="round" />
+            <path d="M0 -4 l-7 -14 M0 -4 l7 -14 M0 -4 v-16" stroke="#16a34a" stroke-width="4" stroke-linecap="round" />
+          </g>
+        </g>
+        <circle r="21" fill="transparent" />
       </g>
     </template>
   </svg>
@@ -76,8 +112,16 @@ async function load(i: number): Promise<void> {
 g {
   transform-box: fill-box;
 }
+.dragger {
+  transform-box: view-box;
+}
+.target {
+  animation: blink 0.9s ease-in-out infinite;
+}
+@keyframes blink {
+  50% { opacity: .35; }
+}
 .carrot {
-  cursor: pointer;
   animation: sway 1.4s ease-in-out infinite;
 }
 @keyframes sway {
@@ -96,6 +140,6 @@ g {
   to { translate: 300px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .carrot { animation: none; }
+  .carrot, .target { animation: none; }
 }
 </style>
