@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import Crocodile from '@/components/art/Crocodile.vue'
 import Icon from '@/components/common/Icon.vue'
 import VehicleArt from '@/components/art/VehicleArt.vue'
 import { useAudio } from '@/composables/useAudio'
@@ -10,10 +11,19 @@ import type { GameMode } from '@/types/game'
 
 const router = useRouter()
 const game = useGameStore()
-const { greetOnce } = useAudio()
+const { greetOnce, sayLine } = useAudio()
 
 const car = getNumberLevel(3)!
 const bus = getNumberLevel(10)!
+
+/** Крокодил здоровается по тапу: открывает пасть и радуется. */
+const hello = ref(false)
+function wave(): void {
+  if (hello.value) return
+  hello.value = true
+  void sayLine('hello', 'Привет! Давай играть!')
+  setTimeout(() => (hello.value = false), 1800)
+}
 
 function open(mode: GameMode): void {
   void greetOnce()
@@ -45,6 +55,10 @@ onMounted(() => game.setMode(null))
         <Icon :name="game.sound.muted ? 'mute' : 'sound'" />
       </button>
     </header>
+
+    <button type="button" class="mx-auto -mb-2 mt-1 block w-44 shrink-0 sm:w-56" aria-label="Крокодил" @click="wave">
+      <Crocodile :mood="hello ? 'happy' : 'idle'" :mouth="hello ? 0.6 : 0" :look="0.6" class="w-full" />
+    </button>
 
     <div class="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 content-center gap-6 p-4 sm:grid-cols-2 sm:gap-8 sm:p-8">
       <button type="button" class="mode bg-grass" aria-label="Учим цифры" @click="open('learn')">
