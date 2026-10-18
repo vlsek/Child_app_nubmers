@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import AnimalHead from './AnimalHead.vue'
+import AnimalFigure from './AnimalFigure.vue'
 import type { AnimalKind } from '@/types/art'
 import { animalColumns } from '@/data/numbersLevels'
 
@@ -62,11 +62,11 @@ const slots = computed<Slot[]>(() => {
     <g
       v-for="(slot, i) in slots"
       :key="i"
-      :transform="`translate(${slot.x} ${slot.y}) scale(${(slot.size / 100) * 0.94})`"
+      :transform="`translate(${slot.x} ${slot.y})`"
     >
       <!-- Каждый пассажир чуть покачивается, в своём темпе -->
       <g class="bob" :style="{ animationDelay: `${-(i * 0.37) % 1.8}s` }">
-        <AnimalHead :kind="animal" />
+        <AnimalFigure :kind="animal" :x="-slot.size * 0.1" :y="0" :width="slot.size * 1.2" :height="slot.size * 0.895" crop />
       </g>
     </g>
   </g>

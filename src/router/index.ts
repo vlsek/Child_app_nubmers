@@ -33,12 +33,6 @@ const router = createRouter({
         return value >= 1 && value <= FIND_LEVELS.length ? true : { name: 'levels', params: { mode: 'find' } }
       },
     },
-    {
-      // Отдельные мини-игры агента 8; существующий экран счёта зверей остаётся без изменений.
-      path: '/adventure/8',
-      name: 'level-8-activities',
-      component: () => import('@/views/Level8ActivitiesView.vue'),
-    },
     // Галерея рисунков для разработки: в готовую сборку не попадает.
     ...(import.meta.env.DEV
       ? [{ path: '/art', name: 'art', component: () => import('@/views/ArtView.vue') }]

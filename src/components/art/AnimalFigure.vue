@@ -16,11 +16,12 @@ import Tiger from './animals/Tiger.vue'
  * Зверь «в полный рост» (голова и плечи, как у крокодила): холст 220×160, смотрит вправо.
  * Корневой <svg>: ставьте как есть или вкладывайте в другой <svg> через x y width height.
  * `flip` — развернуть влево (друг стоит справа и смотрит на крокодила).
+ * `crop` — показать только голову и плечи (для окон машин): viewBox 62 0 158 118.
  * `mood`: idle / happy (радуется, подпрыгивает).
  * Рисунки лежат в `animals/<Вид>.vue`; общие классы анимации: .fig-blink, .fig-breathe, .fig-tail
  * (см. src/style.css).
  */
-const props = withDefaults(defineProps<{ kind: AnimalKind; flip?: boolean; mood?: 'idle' | 'happy' }>(), { mood: 'idle' })
+const props = withDefaults(defineProps<{ kind: AnimalKind; flip?: boolean; mood?: 'idle' | 'happy'; crop?: boolean }>(), { mood: 'idle' })
 
 const parts = { bear: Bear, bunny: Bunny, cat: Cat, chick: Chick, dog: Dog, frog: Frog, monkey: Monkey, panda: Panda, pig: Pig, tiger: Tiger }
 const part = computed(() => parts[props.kind])
@@ -29,7 +30,7 @@ const phase = `${-(Math.random() * 4).toFixed(2)}s`
 </script>
 
 <template>
-  <svg viewBox="0 0 220 160" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round" :class="{ 'fig-happy': mood === 'happy' }" :style="{ '--phase': phase }">
+  <svg :viewBox="crop ? (flip ? '0 0 158 118' : '62 0 158 118') : '0 0 220 160'" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round" :class="{ 'fig-happy': mood === 'happy' }" :style="{ '--phase': phase }">
     <g :transform="flip ? 'translate(220 0) scale(-1 1)' : undefined">
       <component :is="part" />
     </g>

@@ -83,7 +83,7 @@ void props
     <rect x="-20" y="270" width="480" height="7" fill="#78350f" />
     <path d="M-20 266 H460" stroke="#475569" stroke-width="5" />
 
-    <g :style="{ transform: driving ? 'translateX(560px)' : 'translateX(0)', transition: driving ? 'transform 1.9s cubic-bezier(.5,0,.9,.6)' : 'none' }">
+    <g :style="{ transform: driving ? 'translateX(-560px)' : 'translateX(0)', transition: driving ? 'transform 1.9s cubic-bezier(.5,0,.9,.6)' : 'none' }">
       <!-- Паровозик с крокодилом-машинистом -->
       <g transform="translate(8 0)">
         <rect x="0" y="206" width="90" height="48" rx="8" :fill="level.color" :stroke="level.shade" stroke-width="4" />
@@ -91,7 +91,7 @@ void props
         <rect x="58" y="180" width="26" height="22" rx="4" fill="#d4ecfb" />
         <rect x="10" y="184" width="16" height="26" rx="3" fill="#475569" stroke="#1e293b" stroke-width="3" />
         <rect x="6" y="178" width="24" height="10" rx="4" fill="#64748b" />
-        <Crocodile x="56" y="178" width="30" height="22" mood="happy" :mouth="driving ? 0.5 : 0" :look="1" />
+        <g transform="translate(142 0) scale(-1 1)"><Crocodile x="56" y="178" width="30" height="22" mood="happy" :mouth="driving ? 0.5 : 0" :look="1" /></g>
         <g class="puff" fill="#fff" opacity=".85"><circle cx="18" cy="168" r="7" /><circle cx="26" cy="156" r="5" /></g>
         <g v-for="x in [22, 62]" :key="x" :transform="`translate(${x} 262)`"><circle r="11" fill="#1f2937" /><circle r="4" fill="#cbd5e1" /></g>
       </g>
