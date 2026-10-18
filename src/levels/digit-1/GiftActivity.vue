@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { useDrag } from '@/composables/useDrag'
@@ -66,7 +65,7 @@ async function open(): Promise<void> {
 
     <!-- Цыплёнок выпрыгивает -->
     <g transform="translate(222 200)">
-      <g v-if="opened" class="chick"><g transform="translate(-34 -34) scale(.68)"><AnimalHead kind="chick" /></g></g>
+      <g v-if="opened" class="chick"><g transform="translate(-34 -34) scale(.68)"><AnimalFigure kind="chick" :x="-10" :y="0" :width="120" :height="89.5" crop /></g></g>
     </g>
 
     <!-- Подарок -->

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { inRect, useDrag } from '@/composables/useDrag'
@@ -112,7 +112,7 @@ void props
             <rect x="-6" y="244" width="10" height="6" fill="#475569" />
             <rect x="0" y="214" width="62" height="44" rx="6" :fill="c" stroke="#0f172a" stroke-opacity=".4" stroke-width="3.5" />
             <rect x="6" y="220" width="30" height="24" rx="4" fill="#d4ecfb" />
-            <g v-if="hooked[i]" transform="translate(7 221) scale(.22)"><AnimalHead :kind="level.animal" /></g>
+            <g v-if="hooked[i]" transform="translate(7 221) scale(.22)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
             <circle v-if="hooked[i]" cx="48" cy="236" r="9" fill="#fff" />
             <text v-if="hooked[i]" x="48" y="241" text-anchor="middle" font-size="14" font-weight="900" fill="#334155">{{ hooked[i] }}</text>
             <g v-for="x in [14, 48]" :key="x" :transform="`translate(${x} 262)`"><circle r="9" fill="#1f2937" /><circle r="3" fill="#cbd5e1" /></g>

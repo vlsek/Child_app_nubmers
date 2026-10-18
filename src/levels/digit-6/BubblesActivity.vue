@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
@@ -71,7 +71,7 @@ async function pop(i: number): Promise<void> {
     </g>
 
     <!-- Друг на краю ванны -->
-    <g transform="translate(360 168) scale(.6)" class="laugh"><AnimalHead :kind="level.animal" /></g>
+    <g transform="translate(360 168) scale(.6)" class="laugh"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
 
     <!-- Пузыри -->
     <g v-for="(b, i) in BUBBLES" :key="i" :transform="`translate(${b.x} ${b.y})`">

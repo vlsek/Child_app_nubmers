@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useId } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { inRect, useDrag } from '@/composables/useDrag'
@@ -95,7 +95,7 @@ const nextSlot = computed(() => SLOTS[placed.value])
         <path d="M60 152 L84 100 Q88 94 96 94 H312 Q322 94 326 102 L352 152Z" :fill="level.color" :stroke="level.shade" stroke-width="5" />
         <path d="M92 148 L108 108 H316 L336 148Z" fill="#d4ecfb" :stroke="level.shade" stroke-width="3" />
         <!-- Друзья едут вместе с крокодилом -->
-        <g v-for="x in [112, 160]" :key="x" :transform="`translate(${x} 108) scale(.4)`"><AnimalHead :kind="level.animal" /></g>
+        <g v-for="x in [112, 160]" :key="x" :transform="`translate(${x} 108) scale(.4)`"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
         <!-- Крокодил за рулём -->
         <Crocodile x="226" y="96" width="104" height="76" :mood="driving ? 'happy' : 'idle'" :mouth="mouth" :look="1" />
         <path d="M92 148 L108 108 H316 L336 148Z" fill="none" :stroke="level.shade" stroke-width="3" />

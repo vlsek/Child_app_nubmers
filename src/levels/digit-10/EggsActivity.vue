@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
@@ -50,7 +50,7 @@ async function hatch(i: number): Promise<void> {
 
     <g v-for="(e, i) in EGGS" :key="i" :transform="`translate(${e.x} ${e.y})`">
       <!-- Цыплёнок -->
-      <g v-if="hatched[i]" class="pop"><g transform="translate(-22 -50) scale(.44)"><AnimalHead :kind="level.animal" /></g></g>
+      <g v-if="hatched[i]" class="pop"><g transform="translate(-22 -50) scale(.44)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g></g>
       <g :class="hatched[i] ? 'shell' : 'egg'" @click="hatch(i)">
         <path d="M0 -30 C22 -30 30 0 30 14 C30 30 16 38 0 38 C-16 38 -30 30 -30 14 C-30 0 -22 -30 0 -30Z" :fill="e.color" stroke="#0f172a" stroke-opacity=".35" stroke-width="3" />
         <path v-if="hatched[i]" d="M-30 6 L-16 -6 L-6 8 L6 -6 L16 8 L30 -4" fill="none" stroke="#0f172a" stroke-opacity=".5" stroke-width="3" stroke-linejoin="round" />

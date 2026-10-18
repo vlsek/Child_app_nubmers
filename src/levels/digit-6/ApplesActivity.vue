@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { near, useDrag } from '@/composables/useDrag'
@@ -75,7 +75,7 @@ async function collect(i: number): Promise<void> {
     </g>
 
     <!-- Лягушонок под деревом -->
-    <g transform="translate(364 202) scale(.6)" class="idle"><AnimalHead :kind="level.animal" /></g>
+    <g transform="translate(364 202) scale(.6)" class="idle"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
 
     <Crocodile x="-14" y="176" width="170" height="124" :mood="count >= 6 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
 

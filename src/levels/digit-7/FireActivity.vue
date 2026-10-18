@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import type { NumberLevel } from '@/types/game'
@@ -71,7 +71,7 @@ async function extinguish(i: number): Promise<void> {
       <rect x="298" y="224" width="44" height="38" rx="4" fill="#b9793a" />
     </g>
     <!-- Обезьянка в окошке -->
-    <g transform="translate(305 180) scale(.3)"><AnimalHead :kind="level.animal" /></g>
+    <g transform="translate(305 180) scale(.3)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
 
     <Crocodile x="-14" y="170" width="170" height="124" :mood="count >= 7 ? 'happy' : 'idle'" :mouth="spraying !== null ? 0.35 : 0" :look="1" class="pointer-events-none" />
     <!-- Каска -->

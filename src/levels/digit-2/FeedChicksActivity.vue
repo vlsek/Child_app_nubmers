@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { near, useDrag } from '@/composables/useDrag'
@@ -107,7 +107,7 @@ const drag = useDrag<number>(svg, {
       <ellipse cx="0" cy="48" rx="46" ry="14" fill="#b9793a" stroke="#7c4a1e" stroke-width="4" />
       <circle v-if="!fed[i]" cy="-4" r="44" fill="#fde68a" fill-opacity=".35" stroke="#f59e0b" stroke-width="3.5" stroke-dasharray="9 8" class="pointer-events-none" />
       <g :class="fed[i] ? 'happy' : 'hungry'" @click="feed(target.findIndex((t) => t < 0), i)">
-        <g transform="translate(-42 -42) scale(.84)"><AnimalHead kind="chick" /></g>
+        <g transform="translate(-42 -42) scale(.84)"><AnimalFigure kind="chick" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
         <circle r="54" fill="transparent" />
       </g>
       <!-- Желание: ягодка в облачке; после еды сердечко -->

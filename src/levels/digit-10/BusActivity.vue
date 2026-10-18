@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { inRect, useDrag } from '@/composables/useDrag'
@@ -89,7 +89,7 @@ async function board(i: number): Promise<void> {
       <Crocodile x="196" y="14" width="120" height="88" :mood="count >= 10 ? 'happy' : 'idle'" :mouth="0" :look="-1" class="pointer-events-none" />
       <!-- Пассажиры внутри автобуса -->
       <template v-for="(_, i) in SPOTS" :key="i">
-        <g v-if="boarded[i]" :transform="`translate(${WIN(boarded[i]! - 1).x - 17} ${WIN(boarded[i]! - 1).y - 17}) scale(.34)`" class="seat"><AnimalHead :kind="level.animal" /></g>
+        <g v-if="boarded[i]" :transform="`translate(${WIN(boarded[i]! - 1).x - 17} ${WIN(boarded[i]! - 1).y - 17}) scale(.34)`" class="seat"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
       </template>
     </g>
 
@@ -100,7 +100,7 @@ async function board(i: number): Promise<void> {
     <template v-for="(s, i) in SPOTS" :key="'w' + i">
       <g v-if="!boarded[i]" class="dragger" :style="chickStyle(i)" @pointerdown="drag.start($event, i, s)">
         <g class="wait" :style="{ animationDelay: `${-i * 0.2}s` }">
-          <g transform="translate(-17 -17) scale(.34)"><AnimalHead :kind="level.animal" /></g>
+          <g transform="translate(-17 -17) scale(.34)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
         </g>
         <circle r="26" fill="transparent" />
       </g>

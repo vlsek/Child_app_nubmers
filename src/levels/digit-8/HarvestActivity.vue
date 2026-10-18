@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import AnimalHead from '@/components/art/AnimalHead.vue'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { near, useDrag } from '@/composables/useDrag'
@@ -81,7 +81,7 @@ async function load(i: number): Promise<void> {
       <rect x="276" y="176" width="90" height="46" rx="6" fill="#fbbf24" stroke="#92400e" stroke-width="4" />
       <circle cx="296" cy="228" r="14" fill="#1e293b" /><circle cx="346" cy="228" r="14" fill="#1e293b" />
       <rect x="368" y="160" width="62" height="54" rx="8" :fill="level.color" stroke="#0f172a" stroke-opacity=".35" stroke-width="4" />
-      <g transform="translate(373 150) scale(.46)"><AnimalHead :kind="level.animal" /></g>
+      <g transform="translate(373 150) scale(.46)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
       <circle cx="404" cy="226" r="24" fill="#1e293b" /><circle cx="404" cy="226" r="9" fill="#cbd5e1" />
       <template v-for="(_, i) in SPOTS" :key="i">
         <g v-if="loaded[i]" :transform="`translate(${286 + ((loaded[i]! - 1) % 4) * 20} ${i >= 0 && loaded[i]! > 4 ? 178 : 190})`" class="seat">

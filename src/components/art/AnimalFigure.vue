@@ -24,13 +24,15 @@ import Tiger from './animals/Tiger.vue'
 const props = withDefaults(defineProps<{ kind: AnimalKind; flip?: boolean; mood?: 'idle' | 'happy'; crop?: boolean }>(), { mood: 'idle' })
 
 const parts = { bear: Bear, bunny: Bunny, cat: Cat, chick: Chick, dog: Dog, frog: Frog, monkey: Monkey, panda: Panda, pig: Pig, tiger: Tiger }
+/** Для окон: голова и плечи. У цыплёнка тело круглое, его не обрезаем. */
+const box = computed(() => (props.crop && props.kind !== 'chick' ? (props.flip ? '0 0 158 118' : '62 0 158 118') : '0 0 220 160'))
 const part = computed(() => parts[props.kind])
 /** Своя фаза анимации у каждой фигуры, чтобы не двигались хором. */
 const phase = `${-(Math.random() * 4).toFixed(2)}s`
 </script>
 
 <template>
-  <svg :viewBox="crop ? (flip ? '0 0 158 118' : '62 0 158 118') : '0 0 220 160'" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round" :class="{ 'fig-happy': mood === 'happy' }" :style="{ '--phase': phase }">
+  <svg :viewBox="box" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round" :class="{ 'fig-happy': mood === 'happy' }" :style="{ '--phase': phase }">
     <g :transform="flip ? 'translate(220 0) scale(-1 1)' : undefined">
       <component :is="part" />
     </g>
