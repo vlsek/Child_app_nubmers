@@ -26,6 +26,7 @@ const props = withDefaults(defineProps<{ kind: AnimalKind; flip?: boolean; mood?
 const parts = { bear: Bear, bunny: Bunny, cat: Cat, chick: Chick, dog: Dog, frog: Frog, monkey: Monkey, panda: Panda, pig: Pig, tiger: Tiger }
 /** Для окон: голова и плечи. У цыплёнка тело круглое, его не обрезаем. */
 const box = computed(() => (props.crop && props.kind !== 'chick' ? (props.flip ? '0 0 158 118' : '62 0 158 118') : '0 0 220 160'))
+const roundCrop = computed(() => props.crop && props.kind === 'bear')
 const part = computed(() => parts[props.kind])
 /** Своя фаза анимации у каждой фигуры, чтобы не двигались хором. */
 const phase = `${-(Math.random() * 4).toFixed(2)}s`
@@ -33,8 +34,10 @@ const phase = `${-(Math.random() * 4).toFixed(2)}s`
 
 <template>
   <svg :viewBox="box" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round" :class="{ 'fig-happy': mood === 'happy' }" :style="{ '--phase': phase }">
+    <!-- У медведя в окне плечо обрезалось по прямой: подрезаем овалом вокруг головы -->
+    <defs v-if="roundCrop"><clipPath id="fig-bear-crop"><ellipse cx="125" cy="64" rx="68" ry="62" /></clipPath></defs>
     <g :transform="flip ? 'translate(220 0) scale(-1 1)' : undefined">
-      <component :is="part" />
+      <g :clip-path="roundCrop ? 'url(#fig-bear-crop)' : undefined"><component :is="part" /></g>
     </g>
   </svg>
 </template>
