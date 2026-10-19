@@ -112,6 +112,16 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
+/** Просим браузер развернуть экран: работает на Android в полноэкранном режиме, на iOS молча ничего не делает. */
+async function rotateScreen(): Promise<void> {
+  try {
+    await document.documentElement.requestFullscreen?.()
+    await (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock?.('landscape')
+  } catch {
+    /* не поддерживается: ребёнок (или родитель) повернёт телефон сам */
+  }
+}
+
 const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
 </script>
 
@@ -161,6 +171,23 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       </div>
     </div>
 
+    <!-- В портрете сцены мелкие: значок «поверни телефон» (на Android ещё и пробует развернуть экран сам) -->
+    <button
+      v-if="!finished"
+      type="button"
+      class="btn-round absolute bottom-6 left-4 z-30 hidden [@media(orientation:portrait)_and_(max-width:700px)]:flex"
+      aria-label="Повернуть экран"
+      @click="rotateScreen"
+    >
+      <svg viewBox="0 0 48 48" class="h-9 w-9" aria-hidden="true">
+        <g class="rotate-hint">
+          <rect x="15" y="8" width="18" height="32" rx="4" fill="#38bdf8" stroke="#0369a1" stroke-width="3" />
+          <rect x="19" y="13" width="10" height="20" rx="1.5" fill="#e0f2fe" />
+        </g>
+        <path d="M6 14 q-2 10 6 14 M12 28 l-1 -7 M12 28 l7 -1" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+
     <!-- Не получается: можно пропустить задание -->
     <Transition name="page">
       <button
@@ -175,3 +202,26 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
     </Transition>
   </main>
 </template>
+
+<style scoped>
+.rotate-hint {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: rotate-hint 2.4s ease-in-out infinite;
+}
+@keyframes rotate-hint {
+  0%,
+  25% {
+    transform: rotate(0);
+  }
+  60%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rotate-hint {
+    animation: none;
+  }
+}
+</style>
