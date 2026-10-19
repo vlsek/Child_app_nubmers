@@ -86,3 +86,18 @@
 @media (prefers-reduced-motion: reduce) {
   .fig-blink, .fig-breathe, .fig-tail, .fig-happy { animation: none; }
 }
+
+/* Подсказка малышу: если долго не трогает, предметы, которые можно взять, мягко светятся. */
+.hint-idle svg g[style*='grab'] {
+  animation: hint-glow 1.1s ease-in-out infinite;
+}
+@keyframes hint-glow {
+  50% {
+    filter: drop-shadow(0 0 7px #fde047) drop-shadow(0 0 3px #fff);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hint-idle svg g[style*='grab'] {
+    animation: none;
+  }
+}

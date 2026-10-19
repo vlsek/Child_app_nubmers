@@ -15,6 +15,8 @@ import { useGameStore } from '@/stores/useGameStore'
  * Сами задания — компоненты из реестра (`src/levels/registry.ts`), им нужно лишь `emit('complete')`.
  */
 const SKIP_AFTER_MS = 20_000
+/** Через столько без касаний предметы начинают подсвечиваться: «возьми меня». */
+const HINT_AFTER_MS = 6_000
 
 const route = useRoute()
 const router = useRouter()
@@ -35,10 +37,19 @@ const showSkip = ref(false)
 const round = ref(0)
 
 let timer: ReturnType<typeof setTimeout> | undefined
+let hintTimer: ReturnType<typeof setTimeout> | undefined
+const hint = ref(false)
 let runId = 0
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
+function armHint(): void {
+  clearTimeout(hintTimer)
+  hint.value = false
+  hintTimer = setTimeout(() => (hint.value = true), HINT_AFTER_MS)
+}
+
 function armSkip(): void {
+  armHint()
   clearTimeout(timer)
   showSkip.value = false
   timer = setTimeout(() => (showSkip.value = true), SKIP_AFTER_MS)
@@ -97,6 +108,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   runId++
   clearTimeout(timer)
+  clearTimeout(hintTimer)
   stopVoice()
 })
 
@@ -131,7 +143,7 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       />
     </div>
 
-    <div v-if="!finished" class="relative min-h-0 flex-1">
+    <div v-if="!finished" class="relative min-h-0 flex-1" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint">
       <Transition name="page" mode="out-in">
         <component :is="views[step]" :key="`${round}-${step}`" :level="level" @complete="onComplete" />
       </Transition>
