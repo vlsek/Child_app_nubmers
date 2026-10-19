@@ -19,7 +19,8 @@ const { sayNumber, sayLine, stopVoice } = useAudio()
 const FLOWERS = [178, 234, 290, 346, 402].map((x, i) => ({ x, color: ['#ef4444', '#f97316', '#facc15', '#ec4899', '#a855f7'][i]! }))
 /** Центр лейки дома и над цветком (носик смотрит на бутон). */
 const CAN_HOME = { x: 122, y: 226 }
-const potPos = (i: number) => ({ x: FLOWERS[i]!.x - 22, y: 180 })
+/** Лейка висит левее и выше цветка: носик (≈ +50, +4 после наклона) прямо над бутоном. */
+const potPos = (i: number) => ({ x: FLOWERS[i]!.x - 50, y: 128 })
 
 /** bloom[i] — каким по счёту расцвёл цветок i (0 — бутон). */
 const bloom = ref<number[]>([0, 0, 0, 0, 0])
@@ -50,7 +51,7 @@ function budNear(p: { x: number; y: number }): number {
       best = i
     }
   })
-  return bd <= 75 ? best : -1
+  return bd <= 90 ? best : -1
 }
 
 const drag = useDrag<number>(svg, {
@@ -85,6 +86,13 @@ async function pour(i: number): Promise<void> {
   if (alive) emit('complete')
 }
 
+/** Над каким бутоном несут лейку прямо сейчас (-1, если ни над каким): она наклоняется и льёт. */
+const hover = computed(() => {
+  const a = drag.active.value
+  return a ? budNear({ x: a.x, y: a.y }) : -1
+})
+const tilted = computed(() => pouring.value || hover.value >= 0)
+
 const canStyle = computed(() =>
   at.value >= 0
     ? { transform: `translate(${potPos(at.value).x}px, ${potPos(at.value).y}px)`, transition: 'transform .45s ease-in-out' }
@@ -116,16 +124,35 @@ const canStyle = computed(() =>
       <rect x="-28" y="-100" width="56" height="106" fill="transparent" />
     </g>
 
-    <!-- Лейка (рисуем с центром в 0,0) -->
+    <!-- Лейка (рисуем с центром в 0,0, носик справа) -->
     <g :style="canStyle" @pointerdown="drag.start($event, 0, CAN_HOME)">
-      <g :style="{ transform: `rotate(${pouring ? 24 : 0}deg)`, transition: 'transform .25s' }">
-        <g transform="translate(-22 -15)">
-          <path d="M0 0 H34 L30 30 H4Z" fill="#38bdf8" stroke="#0369a1" stroke-width="3.5" stroke-linejoin="round" />
-          <path d="M34 8 L52 -2 L54 4 L34 16" fill="#38bdf8" stroke="#0369a1" stroke-width="3" stroke-linejoin="round" />
-          <path d="M2 8 q-16 -2 -10 14 q4 6 10 4" fill="none" stroke="#0369a1" stroke-width="4" stroke-linecap="round" />
-          <g v-if="pouring" fill="#7dd3fc" stroke="none">
-            <circle v-for="k in 5" :key="k" r="3.5" :cx="56" :cy="4" class="drop" :style="{ animationDelay: `${k * 0.1}s` }" />
-          </g>
+      <ellipse cx="0" cy="26" rx="34" ry="5" fill="#0f172a" opacity=".15" />
+      <g :style="{ transform: `rotate(${tilted ? 28 : 0}deg)`, transition: 'transform .25s' }">
+        <!-- задняя ручка -->
+        <path d="M-24 -8 C-50 -10 -50 22 -22 16" fill="none" stroke="#0369a1" stroke-width="9" stroke-linecap="round" />
+        <path d="M-24 -8 C-50 -10 -50 22 -22 16" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" />
+        <!-- носик с трубкой -->
+        <path d="M18 14 L44 -14 L50 -9 L24 22Z" fill="#0ea5e9" stroke="#0369a1" stroke-width="3.5" stroke-linejoin="round" />
+        <!-- розетка (насадка) -->
+        <path d="M40 -22 L56 -10 L52 -4 L38 -16Z" fill="#fbbf24" stroke="#b45309" stroke-width="3" stroke-linejoin="round" />
+        <circle cx="53" cy="-5" r="1.4" fill="#92400e" /><circle cx="49" cy="-8" r="1.4" fill="#92400e" /><circle cx="55" cy="-9" r="1.4" fill="#92400e" />
+        <!-- корпус -->
+        <path d="M-26 -16 H22 L26 22 Q26 28 20 28 H-20 Q-26 28 -26 22Z" fill="#38bdf8" stroke="#0369a1" stroke-width="3.5" stroke-linejoin="round" />
+        <path d="M-26 6 H25 M-26 -5 H24" stroke="#0284c7" stroke-width="2.5" opacity=".7" />
+        <path d="M-19 -9 V19" stroke="#e0f2fe" stroke-width="4" stroke-linecap="round" opacity=".8" />
+        <!-- горловина с водой -->
+        <ellipse cx="-2" cy="-16" rx="24" ry="5.5" fill="#0369a1" />
+        <ellipse cx="-2" cy="-16.5" rx="19" ry="3.6" fill="#7dd3fc" />
+        <!-- верхняя ручка -->
+        <path d="M-15 -17 C-15 -46 11 -46 11 -17" fill="none" stroke="#0369a1" stroke-width="8" stroke-linecap="round" />
+        <path d="M-15 -17 C-15 -46 11 -46 11 -17" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" />
+        <!-- заклёпки -->
+        <circle cx="-22" cy="-8" r="1.8" fill="#0369a1" /><circle cx="19" cy="-8" r="1.8" fill="#0369a1" />
+        <!-- струя из насадки -->
+        <g v-if="tilted" fill="none" stroke-linecap="round" class="pointer-events-none">
+          <template v-for="(dx, k) in [-8, 0, 8]" :key="k">
+            <path :d="`M${47 + dx * 0.4} -13 q${dx * 0.7} 26 ${dx * 1.1} 50`" stroke="#38bdf8" stroke-width="4" stroke-dasharray="9 7" class="stream" :style="{ animationDelay: `${k * 0.08}s` }" transform="rotate(-28 47 -13)" />
+          </template>
         </g>
       </g>
       <circle r="46" fill="transparent" />
@@ -153,17 +180,12 @@ const canStyle = computed(() =>
     transform: scale(0);
   }
 }
-.drop {
-  animation: drop 0.5s ease-in infinite;
+.stream {
+  animation: stream 0.35s linear infinite;
 }
-@keyframes drop {
-  from {
-    transform: translate(0, 0);
-    opacity: 1;
-  }
+@keyframes stream {
   to {
-    transform: translate(10px, 90px);
-    opacity: 0;
+    stroke-dashoffset: -16;
   }
 }
 @media (prefers-reduced-motion: reduce) {
