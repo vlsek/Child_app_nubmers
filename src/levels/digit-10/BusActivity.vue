@@ -16,7 +16,7 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const SPOTS = Array.from({ length: 10 }, (_, i) => ({ x: 26 + (i % 5) * 36, y: i < 5 ? 236 : 266 }))
+const SPOTS = Array.from({ length: 10 }, (_, i) => ({ x: 24 + (i % 5) * 36, y: i < 5 ? 232 : 268 }))
 const WIN = (k: number) => ({ x: 214 + (k % 5) * 40, y: k < 5 ? 128 : 172 })
 
 const boarded = ref<number[]>(SPOTS.map(() => 0))
@@ -89,7 +89,7 @@ async function board(i: number): Promise<void> {
       <Crocodile x="196" y="14" width="120" height="88" :mood="count >= 10 ? 'happy' : 'idle'" :mouth="0" :look="-1" class="pointer-events-none" />
       <!-- Пассажиры внутри автобуса -->
       <template v-for="(_, i) in SPOTS" :key="i">
-        <g v-if="boarded[i]" :transform="`translate(${WIN(boarded[i]! - 1).x - 17} ${WIN(boarded[i]! - 1).y - 17}) scale(.34)`" class="seat"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
+        <g v-if="boarded[i]" :transform="`translate(${WIN(boarded[i]! - 1).x - 21} ${WIN(boarded[i]! - 1).y - 19}) scale(.4)`" class="seat"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
       </template>
     </g>
 
@@ -100,7 +100,7 @@ async function board(i: number): Promise<void> {
     <template v-for="(s, i) in SPOTS" :key="'w' + i">
       <g v-if="!boarded[i]" class="dragger" :style="chickStyle(i)" @pointerdown="drag.start($event, i, s)">
         <g class="wait" :style="{ animationDelay: `${-i * 0.2}s` }">
-          <g transform="translate(-17 -17) scale(.34)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
+          <g transform="translate(-24 -22) scale(.46)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
         </g>
         <circle r="26" fill="transparent" />
       </g>

@@ -74,7 +74,7 @@ function pos(i: number): { x: number; y: number } {
     <Crocodile x="-14" y="150" width="140" height="102" :mood="count >= 9 ? 'happy' : 'idle'" :mouth="count >= 9 ? 0.4 : 0" :look="1" class="pointer-events-none" />
 
     <!-- Друг наблюдает за стройкой -->
-    <AnimalFigure :kind="level.animal" :mood="count >= 9 ? 'happy' : 'idle'" x="140" y="14" width="150" height="109" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" :mood="count >= 9 ? 'happy' : 'idle'" x="290" y="248" width="84" height="61" class="pointer-events-none" />
 
     <!-- Куда ставить: следующее место на башне -->
     <g v-if="count < 9" :style="{ transform: `translate(${towerPos(count).x}px, ${towerPos(count).y}px)`, transition: 'transform .4s' }" class="pointer-events-none">
