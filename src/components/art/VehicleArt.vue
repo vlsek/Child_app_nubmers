@@ -51,7 +51,7 @@ const SEDAN = 'M44 232 V186 Q44 154 78 154 H236 L260 164 H326 Q358 168 358 200 V
 const CONFIG: Record<VehicleKind, Config> = {
   hatch: {
     pass: [{ x: 50, y: 34, w: 130, h: 128 }],
-    driver: { x: 156, bottom: 164, size: 68 },
+    driver: { x: 150, bottom: 164, size: 80 },
     wheel: { x: 248, y: 140 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 288, cy: 232, r: 30 }],
     badge: { x: 176, y: 200, r: 24 },
@@ -59,7 +59,7 @@ const CONFIG: Record<VehicleKind, Config> = {
   },
   convertible: {
     pass: [{ x: 50, y: 34, w: 130, h: 128 }],
-    driver: { x: 156, bottom: 164, size: 68 },
+    driver: { x: 150, bottom: 164, size: 80 },
     wheel: { x: 248, y: 138 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 288, cy: 232, r: 30 }],
     badge: { x: 176, y: 202, r: 24 },
@@ -67,7 +67,7 @@ const CONFIG: Record<VehicleKind, Config> = {
   },
   taxi: {
     pass: [{ x: 50, y: 34, w: 130, h: 128 }],
-    driver: { x: 156, bottom: 164, size: 68 },
+    driver: { x: 150, bottom: 164, size: 80 },
     wheel: { x: 248, y: 140 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 288, cy: 232, r: 30 }],
     badge: { x: 176, y: 208, r: 20 },
