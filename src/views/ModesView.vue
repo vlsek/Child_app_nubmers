@@ -35,9 +35,9 @@ onMounted(() => game.setMode(null))
 
 <template>
   <main class="flex h-full flex-col overflow-y-auto">
-    <header class="flex shrink-0 items-center justify-between gap-4 p-4 sm:p-8 sm:pb-2">
+    <header class="flex shrink-0 items-center justify-between gap-4 p-4 sm:p-8 sm:pb-2 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:pb-0">
       <div
-        class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg"
+        class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg [@media(max-height:500px)]:h-14"
         :aria-label="`Звёзд: ${game.totalStars}`"
       >
         <span class="text-4xl"><Icon name="star" /></span>
@@ -56,17 +56,17 @@ onMounted(() => game.setMode(null))
       </button>
     </header>
 
-    <button type="button" class="mx-auto -mb-2 mt-1 block w-44 shrink-0 sm:w-56" aria-label="Крокодил" @click="wave">
+    <button type="button" class="mx-auto -mb-2 mt-1 block w-44 shrink-0 sm:w-56 [@media(max-height:500px)]:mt-0 [@media(max-height:500px)]:w-24 [@media(max-height:500px)]:sm:w-24" aria-label="Крокодил" @click="wave">
       <Crocodile :mood="hello ? 'happy' : 'idle'" :mouth="hello ? 0.6 : 0" :look="0.6" class="w-full" />
     </button>
 
-    <div class="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 content-center gap-6 p-4 sm:grid-cols-2 sm:gap-8 sm:p-8">
+    <div class="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 content-center gap-6 p-4 sm:grid-cols-2 sm:gap-8 sm:p-8 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:sm:p-2 [@media(max-height:500px)]:sm:gap-4">
       <button type="button" class="mode bg-grass" aria-label="Учим цифры" @click="open('learn')">
-        <VehicleArt :kind="car.vehicle" :color="car.color" :shade="car.shade" :animal="car.animal" :count="3" :digit="3" class="w-full max-w-[16rem]" />
+        <VehicleArt :kind="car.vehicle" :color="car.color" :shade="car.shade" :animal="car.animal" :count="3" :digit="3" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[8.5rem]" />
         <span class="mode-title">Учим цифры</span>
       </button>
       <button type="button" class="mode bg-sky-kid" aria-label="Найди цифру" @click="open('find')">
-        <VehicleArt :kind="bus.vehicle" :color="bus.color" :shade="bus.shade" :animal="bus.animal" :count="5" :digit="5" class="w-full max-w-[16rem]" />
+        <VehicleArt :kind="bus.vehicle" :color="bus.color" :shade="bus.shade" :animal="bus.animal" :count="5" :digit="5" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[8.5rem]" />
         <span class="mode-title">Найди цифру</span>
       </button>
     </div>
@@ -93,5 +93,15 @@ onMounted(() => game.setMode(null))
   font-weight: 900;
   color: #fff;
   text-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+@media (max-height: 500px) {
+  .mode {
+    padding: 0.5rem 0.75rem 0.75rem;
+    border-radius: 1.75rem;
+    gap: 0.25rem;
+  }
+  .mode-title {
+    font-size: 1.35rem;
+  }
 }
 </style>

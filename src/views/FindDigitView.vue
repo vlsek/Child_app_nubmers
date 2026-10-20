@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main v-if="level && current" class="relative mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-center gap-6 px-4 pt-32 pb-12">
+  <main v-if="level && current" class="relative mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-center gap-6 px-4 pt-32 pb-12 [@media(max-height:500px)]:gap-2 [@media(max-height:500px)]:pt-20 [@media(max-height:500px)]:pb-3">
     <Confetti :burst="burst" :big="done" />
     <button type="button" class="btn-round absolute left-4 top-4 sm:left-8 sm:top-8" aria-label="К машинкам" @click="back">
       <Icon name="back" />
@@ -119,7 +119,7 @@ onBeforeUnmount(() => {
     </button>
 
     <!-- Прогресс: звёздочки по числу раундов -->
-    <div class="absolute left-1/2 top-28 flex -translate-x-1/2 gap-2 text-4xl sm:top-10" aria-hidden="true">
+    <div class="absolute left-1/2 top-28 flex -translate-x-1/2 gap-2 text-4xl sm:top-10 [@media(max-height:500px)]:top-4 [@media(max-height:500px)]:sm:top-4 [@media(max-height:500px)]:text-3xl" aria-hidden="true">
       <span
         v-for="r in FIND_ROUNDS"
         :key="r"
@@ -134,13 +134,13 @@ onBeforeUnmount(() => {
       :mood="solved || done ? 'happy' : 'idle'"
       :mouth="solved ? 0.5 : 0"
       :look="0"
-      class="pointer-events-none -mb-2 w-36 shrink-0 sm:w-52"
+      class="pointer-events-none -mb-2 w-36 shrink-0 sm:w-52 [@media(max-height:500px)]:w-20 [@media(max-height:500px)]:sm:w-20 [@media(max-height:500px)]:mb-0"
     />
 
     <template v-if="!done">
       <!-- Повтор вопроса: большая кнопка с динамиком -->
-      <button type="button" class="btn-kid bg-tangerine shadow-kid-yellow !px-8 !py-5 !text-3xl" aria-label="Повторить вопрос" @click="ask(++runId)">
-        <span class="text-5xl"><Icon name="sound" /></span>
+      <button type="button" class="btn-kid bg-tangerine shadow-kid-yellow !px-8 !py-5 !text-3xl [@media(max-height:500px)]:!py-2 [@media(max-height:500px)]:!px-6" aria-label="Повторить вопрос" @click="ask(++runId)">
+        <span class="text-5xl [@media(max-height:500px)]:text-4xl"><Icon name="sound" /></span>
       </button>
 
       <ul class="flex w-full flex-wrap items-center justify-center gap-4 sm:gap-8">
@@ -164,7 +164,7 @@ onBeforeUnmount(() => {
 
     <!-- Уровень пройден -->
     <template v-else>
-      <div class="animate-pop text-[8rem] leading-none"><Icon name="star" /></div>
+      <div class="animate-pop text-[8rem] leading-none [@media(max-height:500px)]:text-[5rem]"><Icon name="star" /></div>
       <div class="flex items-center gap-6">
         <button type="button" class="btn-round" aria-label="Ещё раз" @click="start"><Icon name="again" /></button>
         <button type="button" class="btn-kid bg-grass shadow-kid-green !px-8 !py-5" aria-label="К машинкам" @click="back">
@@ -200,6 +200,15 @@ onBeforeUnmount(() => {
   line-height: 1;
   text-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
   transition: transform 0.1s, opacity 0.2s;
+}
+@media (max-height: 500px) {
+  .digit {
+    width: min(8rem, 26vw, 30vh);
+    height: min(8rem, 26vw, 30vh);
+    min-width: 5rem;
+    min-height: 5rem;
+    font-size: min(4.5rem, 15vw);
+  }
 }
 .digit:active {
   transform: translateY(8px);
