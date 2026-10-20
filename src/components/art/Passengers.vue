@@ -24,6 +24,10 @@ const props = defineProps<{
   cols?: number
   /** Сколько показать (по умолчанию все `count`): автобус делит зверей по этажам. */
   n?: number
+  /** Ровная посадка в ряд с малым перекрытием (автобус). */
+  spread?: boolean
+  /** Прижать зверей к правому краю области (к водителю). */
+  right?: boolean
 }>()
 
 interface Slot {
@@ -33,36 +37,37 @@ interface Slot {
 }
 
 /** Звери сидят «толпой»: ряды и соседи перекрывают друг друга, нижний ряд опирается на борт. */
-const PITCH_X = 0.88
 const PITCH_Y = 0.68
 const W = 1.25
 const H = W * (138 / 196)
 
-function grid(rect: Rect, n: number, cols: number): Slot[] {
+function grid(rect: Rect, n: number, cols: number, pitchX: number, right: boolean): Slot[] {
   const rows = Math.ceil(n / cols)
-  const size = Math.min(rect.w / (W + PITCH_X * (cols - 1)), rect.h / (H + PITCH_Y * (rows - 1)))
+  const size = Math.min(rect.w / (W + pitchX * (cols - 1)), rect.h / (H + PITCH_Y * (rows - 1)))
   const bottom = rect.y + rect.h
   const slots: Slot[] = []
   for (let r = 0; r < rows; r++) {
     const inRow = r < rows - 1 ? cols : n - cols * (rows - 1)
-    const total = size * (W + PITCH_X * (inRow - 1))
-    const left = rect.x + (rect.w - total) / 2
+    const total = size * (W + pitchX * (inRow - 1))
+    const left = rect.x + (right ? rect.w - total : (rect.w - total) / 2)
     const y = bottom - size * H - (rows - 1 - r) * PITCH_Y * size
-    for (let c = 0; c < inRow; c++) slots.push({ x: left + c * PITCH_X * size, y, size })
+    for (let c = 0; c < inRow; c++) slots.push({ x: left + c * pitchX * size, y, size })
   }
   return slots
 }
 
+const pitch = computed(() => (props.spread ? 1.05 : 0.88))
+
 const slots = computed<Slot[]>(() => {
   const { rects } = props
   const count = props.n ?? props.count
-  if (rects.length === 1) return grid(rects[0]!, count, props.cols ?? animalColumns(count))
+  if (rects.length === 1) return grid(rects[0]!, count, props.cols ?? animalColumns(count), pitch.value, !!props.right)
   const out: Slot[] = []
   let left = count
   rects.forEach((rect, i) => {
     const n = Math.ceil(left / (rects.length - i))
     left -= n
-    out.push(...grid(rect, n, n))
+    out.push(...grid(rect, n, n, pitch.value, !!props.right))
   })
   return out
 })

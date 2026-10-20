@@ -62,11 +62,11 @@ onMounted(() => game.setMode(null))
 
     <div class="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 content-center gap-6 p-4 sm:grid-cols-2 sm:gap-8 sm:p-8 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:sm:p-2 [@media(max-height:500px)]:sm:gap-4">
       <button type="button" class="mode bg-grass" aria-label="Учим цифры" @click="open('learn')">
-        <VehicleArt :kind="car.vehicle" :color="car.color" :shade="car.shade" :animal="car.animal" :count="3" :digit="3" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[8.5rem]" />
+        <VehicleArt :kind="car.vehicle" :color="car.color" :shade="car.shade" :animal="car.animal" :count="3" :digit="3" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[11rem]" />
         <span class="mode-title">Учим цифры</span>
       </button>
       <button type="button" class="mode bg-sky-kid" aria-label="Найди цифру" @click="open('find')">
-        <VehicleArt :kind="bus.vehicle" :color="bus.color" :shade="bus.shade" :animal="bus.animal" :count="5" :digit="5" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[8.5rem]" />
+        <VehicleArt :kind="bus.vehicle" :color="bus.color" :shade="bus.shade" :animal="bus.animal" :count="5" :digit="5" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[11rem]" />
         <span class="mode-title">Найди цифру</span>
       </button>
     </div>

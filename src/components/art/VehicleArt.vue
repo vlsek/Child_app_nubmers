@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import type { AnimalKind, VehicleKind } from '@/types/art'
+import AnimalFigure from './AnimalFigure.vue'
 import Passengers, { type Rect } from './Passengers.vue'
 
 /**
@@ -35,6 +36,12 @@ interface Config {
   clip?: Rect[]
   wheels: { cx: number; cy: number; r: number }[]
   badge: { x: number; y: number; r: number }
+  /** Водитель (входит в счёт зверей): `x` слева, `bottom` — низ рисунка, `size` — масштаб как у пассажиров. */
+  driver?: { x: number; bottom: number; size: number }
+  /** Руль (центр кольца). */
+  wheel?: { x: number; y: number }
+  /** Окно кабины (path): водитель виден в нём поверх борта, а не над ним. */
+  cab?: string
   shadow: { cx: number; rx: number }
 }
 
@@ -43,49 +50,68 @@ const SEDAN = 'M44 232 V186 Q44 154 78 154 H236 L260 164 H326 Q358 168 358 200 V
 
 const CONFIG: Record<VehicleKind, Config> = {
   hatch: {
-    pass: [{ x: 58, y: 34, w: 180, h: 128 }],
+    pass: [{ x: 50, y: 34, w: 130, h: 128 }],
+    driver: { x: 156, bottom: 164, size: 68 },
+    wheel: { x: 248, y: 140 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 288, cy: 232, r: 30 }],
     badge: { x: 176, y: 200, r: 24 },
     shadow: { cx: 200, rx: 168 },
   },
   convertible: {
-    pass: [{ x: 58, y: 34, w: 180, h: 128 }],
+    pass: [{ x: 50, y: 34, w: 130, h: 128 }],
+    driver: { x: 156, bottom: 164, size: 68 },
+    wheel: { x: 248, y: 138 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 288, cy: 232, r: 30 }],
     badge: { x: 176, y: 202, r: 24 },
     shadow: { cx: 200, rx: 168 },
   },
   taxi: {
-    pass: [{ x: 58, y: 34, w: 180, h: 128 }],
+    pass: [{ x: 50, y: 34, w: 130, h: 128 }],
+    driver: { x: 156, bottom: 164, size: 68 },
+    wheel: { x: 248, y: 140 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 288, cy: 232, r: 30 }],
     badge: { x: 176, y: 208, r: 20 },
     shadow: { cx: 200, rx: 168 },
   },
   jeep: {
-    pass: [{ x: 74, y: 40, w: 160, h: 112 }],
+    pass: [{ x: 62, y: 36, w: 140, h: 116 }],
+    cols: 2,
+    driver: { x: 164, bottom: 152, size: 64 },
+    wheel: { x: 250, y: 122 },
     wheels: [{ cx: 118, cy: 224, r: 36 }, { cx: 292, cy: 224, r: 36 }],
     badge: { x: 190, y: 190, r: 24 },
     shadow: { cx: 200, rx: 176 },
   },
   police: {
-    pass: [{ x: 58, y: 34, w: 180, h: 128 }],
+    pass: [{ x: 58, y: 66, w: 112, h: 96 }],
+    driver: { x: 170, bottom: 166, size: 56 },
+    wheel: { x: 250, y: 144 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 288, cy: 232, r: 30 }],
     badge: { x: 176, y: 208, r: 20 },
     shadow: { cx: 200, rx: 168 },
   },
   ambulance: {
     pass: [{ x: 52, y: 30, w: 196, h: 114 }],
+    cab: 'M258 130 H298 Q306 130 312 138 L330 164 H258 Z',
+    driver: { x: 260, bottom: 166, size: 40 },
+    wheel: { x: 318, y: 150 },
     wheels: [{ cx: 112, cy: 232, r: 30 }, { cx: 292, cy: 232, r: 30 }],
     badge: { x: 176, y: 214, r: 18 },
     shadow: { cx: 200, rx: 172 },
   },
   firetruck: {
     pass: [{ x: 52, y: 30, w: 196, h: 114 }],
+    cab: 'M258 132 H306 Q314 132 320 140 L336 164 H258 Z',
+    driver: { x: 260, bottom: 166, size: 40 },
+    wheel: { x: 322, y: 152 },
     wheels: [{ cx: 104, cy: 232, r: 30 }, { cx: 300, cy: 232, r: 30 }],
     badge: { x: 176, y: 212, r: 18 },
     shadow: { cx: 200, rx: 172 },
   },
   tractor: {
     pass: [{ x: 30, y: 34, w: 172, h: 104 }],
+    driver: { x: 246, bottom: 152, size: 48 },
+    wheel: { x: 306, y: 126 },
     wheels: [{ cx: 72, cy: 232, r: 30 }, { cx: 160, cy: 232, r: 30 }, { cx: 272, cy: 216, r: 44 }, { cx: 340, cy: 236, r: 26 }],
     badge: { x: 116, y: 176, r: 20 },
     shadow: { cx: 200, rx: 176 },
@@ -93,13 +119,17 @@ const CONFIG: Record<VehicleKind, Config> = {
   pickup: {
     pass: [{ x: 52, y: 24, w: 176, h: 138 }],
     cols: 3,
+    cab: 'M270 108 H322 L342 146 H252 Z',
+    driver: { x: 258, bottom: 148, size: 46 },
+    wheel: { x: 324, y: 128 },
     wheels: [{ cx: 100, cy: 230, r: 32 }, { cx: 302, cy: 230, r: 32 }],
     badge: { x: 168, y: 206, r: 20 },
     shadow: { cx: 204, rx: 174 },
   },
   bus: {
-    pass: [{ x: 40, y: 34, w: 320, h: 92 }],
-    pass2: [{ x: 50, y: 138, w: 300, h: 66 }],
+    pass: [{ x: 40, y: 30, w: 320, h: 88 }],
+    pass2: [{ x: 44, y: 138, w: 292, h: 66 }],
+    wheel: { x: 348, y: 176 },
     clip: [{ x: 20, y: 0, w: 360, h: 128 }],
     wheels: [{ cx: 100, cy: 232, r: 30 }, { cx: 300, cy: 232, r: 30 }],
     badge: { x: 200, y: 216, r: 16 },
@@ -108,6 +138,9 @@ const CONFIG: Record<VehicleKind, Config> = {
 }
 
 const cfg = computed(() => CONFIG[props.kind])
+/** Водитель входит в счёт: «пять» значит пять зверей вместе с ним. Автобус делит всех по этажам. */
+const passengers = computed(() => (cfg.value.pass2 ? Math.ceil(props.count / 2) : cfg.value.driver ? Math.max(props.count - 1, 0) : props.count))
+const driverH = computed(() => (cfg.value.driver ? cfg.value.driver.size * 1.25 * (138 / 196) : 0))
 
 /** Очень светлый оттенок цвета кузова (внутренность кузова пикапа, борта автобуса). */
 const tint = computed(() => {
@@ -120,6 +153,7 @@ const tint = computed(() => {
 <template>
   <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
     <defs>
+      <clipPath v-if="cfg.cab" :id="`${uid}-cab`"><path :d="cfg.cab" /></clipPath>
       <clipPath :id="`${uid}-low`"><rect x="40" y="136" width="320" height="68" rx="14" /></clipPath>
       <clipPath v-if="cfg.clip" :id="`${uid}-clip`">
         <rect v-for="(r, i) in cfg.clip" :key="i" :x="r.x" :y="r.y" :width="r.w" :height="r.h" :rx="i ? 12 : 0" />
@@ -134,9 +168,18 @@ const tint = computed(() => {
 
     <g :stroke="shade" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
       <!-- ===== Задний план: то, что за спинами зверей ===== -->
-      <template v-if="kind === 'hatch' || kind === 'taxi' || kind === 'police'">
+      <template v-if="kind === 'police'">
+        <rect x="54" y="116" width="190" height="48" rx="14" :fill="shade" stroke="none" opacity=".9" />
+        <!-- стойки и крыша с мигалками -->
+        <path d="M62 66 V156 M270 66 V160" fill="none" :stroke="shade" stroke-width="7" />
+        <rect x="50" y="52" width="236" height="16" rx="8" :fill="color" />
+        <path d="M144 52 V46 H204 V52 Z" fill="#64748b" stroke-width="3.5" />
+        <path d="M148 46 Q148 30 163 30 Q178 30 178 46 Z" fill="#ef4444" stroke-width="3.5" />
+        <path d="M178 46 Q178 30 193 30 Q208 30 208 46 Z" fill="#38bdf8" stroke-width="3.5" />
+      </template>
+      <template v-else-if="kind === 'hatch' || kind === 'taxi'">
         <!-- спинка сиденья -->
-        <rect x="54" y="104" width="190" height="60" rx="14" :fill="shade" stroke="none" opacity=".9" />
+        <rect x="54" y="116" width="190" height="48" rx="14" :fill="shade" stroke="none" opacity=".9" />
       </template>
       <template v-else-if="kind === 'convertible'">
         <rect x="52" y="100" width="194" height="64" rx="20" :fill="shade" stroke="none" />
@@ -175,7 +218,27 @@ const tint = computed(() => {
 
       <!-- ===== Пассажиры ===== -->
       <g :clip-path="cfg.clip ? `url(#${uid}-clip)` : undefined" stroke="none">
-        <Passengers :rects="cfg.pass" :count="count" :n="cfg.pass2 ? Math.ceil(count / 2) : undefined" :animal="animal" :cols="cfg.cols" />
+        <Passengers
+          v-if="passengers > 0"
+          :rects="cfg.pass"
+          :count="count"
+          :n="passengers"
+          :animal="animal"
+          :cols="cfg.pass2 ? 5 : cfg.cols"
+          :spread="!!cfg.pass2"
+          :right="!!cfg.driver"
+        />
+        <!-- Водитель (открытые машины): сидит у руля, борт закроет его снизу -->
+        <template v-if="cfg.driver && !cfg.cab && count > 0">
+          <g :transform="`translate(${cfg.driver.x} ${cfg.driver.bottom - driverH})`">
+            <AnimalFigure :kind="animal" x="0" y="0" :width="cfg.driver.size * 1.25" :height="driverH" seated />
+          </g>
+          <g :transform="`translate(${cfg.wheel!.x} ${cfg.wheel!.y})`">
+            <path d="M-3 12 L-16 34" fill="none" stroke="#1f2937" stroke-width="5" />
+            <ellipse rx="6" ry="14" fill="none" stroke="#334155" stroke-width="5.5" />
+            <ellipse rx="1.8" ry="3" fill="#94a3b8" stroke="none" />
+          </g>
+        </template>
       </g>
 
       <!-- ===== Передний план: борт и детали поверх зверей ===== -->
@@ -226,11 +289,8 @@ const tint = computed(() => {
       <template v-else-if="kind === 'police'">
         <path :d="SEDAN" :fill="color" />
         <path d="M44 194 H358 V232 H44 Z" fill="#fff" stroke="none" />
-        <path :d="SEDAN" fill="none" />
-        <path d="M240 154 L262 112 L276 112 L268 164 Z" :fill="glassColor" stroke-width="4" opacity=".9" />
-        <path d="M244 112 V104 H292 V112 Z" fill="#64748b" stroke-width="3.5" />
-        <path d="M248 104 Q248 90 260 90 Q272 90 272 104 Z" fill="#ef4444" stroke-width="3.5" />
-        <path d="M272 104 Q272 90 284 90 Q296 90 296 104 Z" fill="#38bdf8" stroke-width="3.5" />
+        <!-- лобовое стекло до самой крыши -->
+        <path d="M244 156 L266 66 L276 66 L268 164 Z" :fill="glassColor" stroke-width="4" opacity=".9" />
         <ellipse cx="346" cy="186" rx="8" ry="11" fill="#fde68a" stroke-width="3.5" />
         <ellipse cx="52" cy="186" rx="7" ry="11" fill="#fca5a5" stroke-width="3.5" />
       </template>
@@ -286,13 +346,33 @@ const tint = computed(() => {
         <rect x="22" y="118" width="356" height="116" rx="22" :fill="color" />
         <rect x="40" y="136" width="320" height="68" rx="14" :fill="glassColor" stroke-width="4" />
         <g :clip-path="`url(#${uid}-low)`" stroke="none">
-          <Passengers :rects="cfg.pass2!" :count="count" :n="Math.floor(count / 2)" :animal="animal" />
+          <Passengers v-if="Math.floor(count / 2) > 0" :rects="cfg.pass2!" :count="count" :n="Math.floor(count / 2)" :animal="animal" :cols="5" spread right />
+        </g>
+        <!-- водитель — крайний справа внизу -->
+        <g v-if="count > 1" :transform="`translate(${cfg.wheel!.x} ${cfg.wheel!.y})`">
+          <path d="M-3 12 L-10 28" fill="none" stroke="#1f2937" stroke-width="5" />
+          <ellipse rx="5" ry="13" fill="none" stroke="#334155" stroke-width="5" />
         </g>
         <path d="M60 136 L96 136 L72 204 L40 204 Z" fill="#fff" opacity=".22" stroke="none" />
         <rect x="22" y="112" width="356" height="12" rx="6" :fill="shade" stroke="none" />
         <rect x="42" y="204" width="316" height="5" :fill="shade" opacity=".4" stroke="none" />
         <ellipse cx="372" cy="216" rx="7" ry="10" fill="#fde68a" stroke-width="3.5" />
         <ellipse cx="28" cy="216" rx="6" ry="10" fill="#fca5a5" stroke-width="3.5" />
+      </template>
+
+      <!-- Водитель в кабине (скорая, пожарная, пикап): виден в окне -->
+      <template v-if="cfg.driver && cfg.cab && count > 0">
+        <g :clip-path="`url(#${uid}-cab)`" stroke="none">
+          <g :transform="`translate(${cfg.driver.x} ${cfg.driver.bottom - driverH})`">
+            <AnimalFigure :kind="animal" x="0" y="0" :width="cfg.driver.size * 1.25" :height="driverH" seated />
+          </g>
+          <path :d="cfg.cab" fill="#fff" opacity=".18" />
+        </g>
+        <path :d="cfg.cab" fill="none" stroke-width="4" />
+        <g :transform="`translate(${cfg.wheel!.x} ${cfg.wheel!.y})`">
+          <path d="M-3 10 L-12 22" fill="none" stroke="#1f2937" stroke-width="4" />
+          <ellipse rx="4.5" ry="11" fill="none" stroke="#334155" stroke-width="4.5" />
+        </g>
       </template>
 
       <!-- ===== Колёса ===== -->
