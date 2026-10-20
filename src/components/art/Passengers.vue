@@ -37,9 +37,9 @@ interface Slot {
 }
 
 /** Звери сидят «толпой»: ряды и соседи перекрывают друг друга, нижний ряд опирается на борт. */
-const PITCH_Y = 0.68
-const W = 1.25
-const H = W * (138 / 196)
+const PITCH_Y = 0.79
+const W = 1.4
+const H = W * (160 / 220)
 
 function grid(rect: Rect, n: number, cols: number, pitchX: number, right: boolean): Slot[] {
   const rows = Math.ceil(n / cols)
@@ -56,7 +56,7 @@ function grid(rect: Rect, n: number, cols: number, pitchX: number, right: boolea
   return slots
 }
 
-const pitch = computed(() => (props.spread ? 1.05 : 0.88))
+const pitch = computed(() => (props.spread ? 1.18 : 0.98))
 
 const slots = computed<Slot[]>(() => {
   const { rects } = props
@@ -82,7 +82,7 @@ const slots = computed<Slot[]>(() => {
     >
       <!-- Каждый пассажир чуть покачивается, в своём темпе -->
       <g class="bob" :style="{ animationDelay: `${-(i * 0.37) % 1.8}s` }">
-        <AnimalFigure :kind="animal" :x="0" :y="slot.size * 0.08" :width="slot.size * 1.25" :height="slot.size * 1.25 * (138 / 196)" seated />
+        <AnimalFigure :kind="animal" :x="0" :y="0" :width="slot.size * W" :height="slot.size * H" seated />
       </g>
     </g>
   </g>

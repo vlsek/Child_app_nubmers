@@ -255,8 +255,8 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
 /* Низкий экран (телефон лёжа): машинка крупнее, запас под шапку и кружки меньше */
 @media (max-height: 500px) {
   .scroller {
-    --slide-w: min(60vw, 34rem, calc((100dvh - 8.5rem) * 4 / 3));
-    padding-block: 0.5rem;
+    --slide-w: min(60vw, 34rem, calc((100dvh - 10rem) * 4 / 3));
+    padding-block: 1.6rem 1.4rem;
   }
   .road {
     height: min(9rem, 34vh);

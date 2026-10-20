@@ -140,7 +140,7 @@ const CONFIG: Record<VehicleKind, Config> = {
 const cfg = computed(() => CONFIG[props.kind])
 /** Водитель входит в счёт: «пять» значит пять зверей вместе с ним. Автобус делит всех по этажам. */
 const passengers = computed(() => (cfg.value.pass2 ? Math.ceil(props.count / 2) : cfg.value.driver ? Math.max(props.count - 1, 0) : props.count))
-const driverH = computed(() => (cfg.value.driver ? cfg.value.driver.size * 1.25 * (138 / 196) : 0))
+const driverH = computed(() => (cfg.value.driver ? cfg.value.driver.size * 1.4 * (160 / 220) : 0))
 
 /** Очень светлый оттенок цвета кузова (внутренность кузова пикапа, борта автобуса). */
 const tint = computed(() => {
@@ -231,7 +231,7 @@ const tint = computed(() => {
         <!-- Водитель (открытые машины): сидит у руля, борт закроет его снизу -->
         <template v-if="cfg.driver && !cfg.cab && count > 0">
           <g :transform="`translate(${cfg.driver.x} ${cfg.driver.bottom - driverH})`">
-            <AnimalFigure :kind="animal" x="0" y="0" :width="cfg.driver.size * 1.25" :height="driverH" seated />
+            <AnimalFigure :kind="animal" x="0" y="0" :width="cfg.driver.size * 1.4" :height="driverH" seated />
           </g>
           <g :transform="`translate(${cfg.wheel!.x} ${cfg.wheel!.y})`">
             <path d="M-3 12 L-16 34" fill="none" stroke="#1f2937" stroke-width="5" />
@@ -364,7 +364,7 @@ const tint = computed(() => {
       <template v-if="cfg.driver && cfg.cab && count > 0">
         <g :clip-path="`url(#${uid}-cab)`" stroke="none">
           <g :transform="`translate(${cfg.driver.x} ${cfg.driver.bottom - driverH})`">
-            <AnimalFigure :kind="animal" x="0" y="0" :width="cfg.driver.size * 1.25" :height="driverH" seated />
+            <AnimalFigure :kind="animal" x="0" y="0" :width="cfg.driver.size * 1.4" :height="driverH" seated />
           </g>
           <path :d="cfg.cab" fill="#fff" opacity=".18" />
         </g>
