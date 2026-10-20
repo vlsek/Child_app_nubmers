@@ -140,7 +140,7 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
 
 <template>
   <section
-    class="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-6 pb-6"
+    class="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-6 pb-6 [@media(max-height:500px)]:gap-1 [@media(max-height:500px)]:pb-2"
     aria-roledescription="карусель"
     aria-label="Выбор уровня"
   >
@@ -212,7 +212,7 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
 
     <div
       v-if="showHint"
-      class="pointer-events-none absolute bottom-24 left-1/2 z-[150] -translate-x-1/2 text-7xl"
+      class="pointer-events-none absolute bottom-24 [@media(max-height:500px)]:bottom-10 left-1/2 z-[150] -translate-x-1/2 text-7xl"
       aria-hidden="true"
     >
       <span class="inline-block animate-swipe drop-shadow-[0_6px_0_rgba(0,0,0,0.25)]"><Icon name="hand" /></span>
@@ -251,6 +251,16 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
     repeating-linear-gradient(to right, #fde047 0 36px, transparent 36px 76px) var(--shift, 0) 50% / auto 6px repeat-x,
     linear-gradient(180deg, #4b5563 0%, #374151 100%);
   box-shadow: inset 0 6px 0 0 #1f2937, inset 0 -6px 0 0 #1f2937;
+}
+/* Низкий экран (телефон лёжа): машинка крупнее, запас под шапку и кружки меньше */
+@media (max-height: 500px) {
+  .scroller {
+    --slide-w: min(60vw, 34rem, calc((100dvh - 8.5rem) * 4 / 3));
+    padding-block: 0.5rem;
+  }
+  .road {
+    height: min(9rem, 34vh);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .slide-inner {
