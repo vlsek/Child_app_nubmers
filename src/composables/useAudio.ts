@@ -1,3 +1,4 @@
+import { ding, setSynthMuted } from './synth'
 import { ref, watch } from 'vue'
 import musicUrl from '@/assets/audio/music/bouncy-piano-groove.mp3'
 import {
@@ -87,6 +88,7 @@ function stopVoice(): void {
 
 // Mute и громкость применяются сразу к тому, что играет сейчас.
 watch(muted, (value) => {
+  setSynthMuted(value)
   if (music) music.muted = value
   if (voice) voice.muted = value
   if (value) stopSpeech()
@@ -199,6 +201,7 @@ export function useAudio() {
   }
 
   function sayNumber(value: number): Promise<void> {
+    ding(value)
     return say(numberKey(value))
   }
 

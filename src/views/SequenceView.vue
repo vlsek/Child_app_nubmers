@@ -5,6 +5,7 @@ import Crocodile from '@/components/art/Crocodile.vue'
 import Confetti from '@/components/common/Confetti.vue'
 import Icon from '@/components/common/Icon.vue'
 import { useAudio } from '@/composables/useAudio'
+import { fanfare } from '@/composables/synth'
 import { getNumberLevel } from '@/data/numbersLevels'
 import { activitiesFor } from '@/levels/registry'
 import { useGameStore } from '@/stores/useGameStore'
@@ -85,6 +86,7 @@ async function onComplete(): Promise<void> {
   const id = ++runId
   solved.value[step.value] = true
   burst.value++
+  fanfare()
   game.completeActivity(value.value, list.value[step.value]!.id)
   clearTimeout(timer)
   showSkip.value = false
