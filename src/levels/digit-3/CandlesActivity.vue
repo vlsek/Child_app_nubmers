@@ -3,11 +3,13 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { drop, pop } from '@/composables/synth'
+import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 3: «Крокодил задувает три свечки на торте друга».
- * Задуть свечку это не «перенести», поэтому остаётся ТАП по свечке: крокодил дует, огонёк гаснет, голос считает.
+ * Сначала свечки ПЕРЕТАСКИВАЮТ в торт (тап: свечка встаёт сама), потом ТАП по огоньку: крокодил дует, огонёк гаснет, голос считает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -19,7 +21,11 @@ const CANDLES = [
   { x: 308, color: '#f472b6' },
   { x: 364, color: '#a3e635' },
 ]
+const SLOT_Y = 157
 const FLAME_Y = 128
+const HOMES = [{ x: 56, y: 96 }, { x: 116, y: 96 }, { x: 176, y: 96 }]
+const placed = ref<boolean[]>([false, false, false])
+const svg = ref<SVGSVGElement | null>(null)
 const MOUTH = { x: 178, y: 236 }
 
 /** out[i] — каким по счёту погасла свечка i (0 — горит). */
@@ -35,6 +41,27 @@ onBeforeUnmount(() => {
   alive = false
   stopVoice()
 })
+
+const drag = useDrag<number>(svg, {
+  canGrab: (j) => !placed.value[j],
+  onDrop: (j, p) => {
+    const k = CANDLES.findIndex((c, idx) => !slotTaken(idx) && near(p, { x: c.x, y: SLOT_Y }, 56))
+    if (k < 0) return false
+    put(j, k)
+    return true
+  },
+  onTap: (j) => put(j, CANDLES.findIndex((_, idx) => !slotTaken(idx))),
+})
+/** taken[k] — слот k торта занят какой-то свечкой. */
+const taken = ref<boolean[]>([false, false, false])
+const slotTaken = (k: number): boolean => !!taken.value[k]
+function put(j: number, k: number): void {
+  if (k < 0 || placed.value[j] || taken.value[k]) return
+  placed.value[j] = true
+  taken.value[k] = true
+  drop()
+  pop()
+}
 
 async function blow(i: number): Promise<void> {
   if (out.value[i] || blowing.value !== null) return
@@ -55,7 +82,7 @@ async function blow(i: number): Promise<void> {
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Задуй три свечки">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Задуй три свечки">
     <rect x="-20" y="262" width="480" height="70" fill="#fde68a" />
     <rect x="-20" y="258" width="480" height="8" fill="#fbbf24" />
 
@@ -72,15 +99,29 @@ async function blow(i: number): Promise<void> {
       <rect x="226" y="172" width="166" height="44" rx="10" fill="#fde68a" stroke="#b45309" stroke-width="4" />
       <path d="M226 190 q10 14 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" />
       <g v-for="(c, i) in CANDLES" :key="i">
-        <rect :x="c.x - 7" y="140" width="14" height="34" rx="3" :fill="c.color" stroke="#0f172a" stroke-opacity=".4" stroke-width="2.5" />
-        <path :d="`M${c.x} 140 v-8`" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+        <circle v-if="!taken[i]" :cx="c.x" :cy="SLOT_Y" r="9" fill="none" stroke="#be185d" stroke-opacity=".5" stroke-width="3" stroke-dasharray="4 4" />
+        <g v-if="taken[i]">
+          <rect :x="c.x - 7" y="140" width="14" height="34" rx="3" :fill="c.color" stroke="#0f172a" stroke-opacity=".4" stroke-width="2.5" />
+          <path :d="`M${c.x} 140 v-8`" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+        </g>
         <!-- Огонёк / дымок -->
-        <g v-if="!out[i]" class="flame" :style="{ animationDelay: `${-i * 0.2}s` }" @click="blow(i)">
+        <g v-if="taken[i] && !out[i]" class="flame" :style="{ animationDelay: `${-i * 0.2}s` }" @click="blow(i)">
           <path :d="`M${c.x} ${FLAME_Y - 14} q14 18 0 30 q-14 -12 0 -30Z`" fill="#fb923c" stroke="#ea580c" stroke-width="2.5" />
           <path :d="`M${c.x} ${FLAME_Y + 2} q6 8 0 14 q-6 -6 0 -14Z`" fill="#fef08a" />
           <circle :cx="c.x" :cy="FLAME_Y + 4" r="34" fill="transparent" />
         </g>
-        <path v-else class="smoke" :d="`M${c.x} ${FLAME_Y + 10} q-8 -14 0 -26 t0 -26`" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+        <path v-else-if="out[i]" class="smoke" :d="`M${c.x} ${FLAME_Y + 10} q-8 -14 0 -26 t0 -26`" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+      </g>
+    </g>
+
+    <!-- Свечки на столе: тащить в торт -->
+    <g v-for="(h, j) in HOMES" :key="`h${j}`">
+      <g v-if="!placed[j]" :style="drag.style(j, h)" @pointerdown="drag.start($event, j, h)">
+        <g class="bob" :style="{ animationDelay: `${-j * 0.25}s` }">
+          <rect x="-7" y="-17" width="14" height="34" rx="3" :fill="CANDLES[j]!.color" stroke="#0f172a" stroke-opacity=".4" stroke-width="2.5" />
+          <path d="M0 -17 v-8" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+        </g>
+        <circle r="38" fill="transparent" />
       </g>
     </g>
 
@@ -104,6 +145,14 @@ async function blow(i: number): Promise<void> {
 @keyframes flicker {
   50% {
     transform: scale(1.12, 0.94) rotate(3deg);
+  }
+}
+.bob {
+  animation: bob 1.3s ease-in-out infinite;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-4px);
   }
 }
 .smoke {
@@ -132,7 +181,8 @@ async function blow(i: number): Promise<void> {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .flame {
+  .flame,
+  .bob {
     animation: none;
   }
 }

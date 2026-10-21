@@ -2,12 +2,14 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { boing } from '@/composables/synth'
+import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 4: «Крокодил засыпает и считает барашков».
- * Четыре барашка ждут у заборчика. Тап по барашку, он перепрыгивает забор и улетает
- * в облачко-сон над крокодилом, голос считает. Четвёртый барашек, и крокодил засыпает.
+ * Четыре барашка ждут у заборчика. Барашка ПЕРЕТАСКИВАЮТ через забор (тап: прыгает сам),
+ * он прыгает к крокодилу и улетает в облачко-сон, голос считает. Четвёртый барашек, и крокодил засыпает.
  */
 defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
@@ -17,6 +19,9 @@ const { sayNumber, sayLine, stopVoice } = useAudio()
 const FENCE_X = 215
 const LAND_X = 150
 const STARTS = [282, 322, 362, 402]
+const svg = ref<SVGSVGElement | null>(null)
+/** from[i] — откуда барашек i начал прыжок (точка отпускания или его место). */
+const from = ref<{ x: number; y: number }[]>(STARTS.map((x) => ({ x, y: 240 })))
 
 /** jumped[i] — каким по счёту прыгнул барашек i (0 — ждёт). */
 const jumped = ref<number[]>([0, 0, 0, 0])
@@ -31,8 +36,20 @@ onBeforeUnmount(() => {
   stopVoice()
 })
 
-async function jump(i: number): Promise<void> {
+const drag = useDrag<number>(svg, {
+  canGrab: (i) => !jumped.value[i],
+  onDrop: (i, p) => {
+    if (p.x > FENCE_X - 24) return false
+    void jump(i, p)
+    return true
+  },
+  onTap: (i) => void jump(i),
+})
+
+async function jump(i: number, at?: { x: number; y: number }): Promise<void> {
   if (jumped.value[i]) return
+  from.value[i] = at ? { x: at.x, y: Math.min(at.y, 240) } : { x: STARTS[i]!, y: 240 }
+  boing()
   const n = count.value + 1
   jumped.value[i] = n
   const said = sayNumber(n)
@@ -44,7 +61,7 @@ async function jump(i: number): Promise<void> {
 </script>
 
 <template>
-  <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Посчитай барашков, пока крокодил засыпает">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Посчитай барашков, пока крокодил засыпает">
     <defs>
       <g id="sheep-shape">
         <g stroke="#94a3b8" stroke-width="3" fill="#fff">
@@ -92,16 +109,18 @@ async function jump(i: number): Promise<void> {
       <rect x="-10" y="244" width="170" height="10" rx="5" fill="#c4b5fd" />
     </g>
 
-    <!-- Барашки -->
-    <g v-for="(x, i) in STARTS" :key="i" :transform="`translate(${x} 240)`">
-      <g
-        class="lamb"
-        :class="{ jump: jumped[i], wait: !jumped[i] }"
-        :style="{ '--dx': `${LAND_X - x}px`, animationDelay: jumped[i] ? '0s' : `${-i * 0.3}s` }"
-        @click="jump(i)"
-      >
-        <use href="#sheep-shape" transform="scale(1.15)" />
-        <circle r="38" fill="transparent" />
+    <!-- Барашки: ждут справа, тащить через забор -->
+    <g v-for="(x, i) in STARTS" :key="i">
+      <g v-if="!jumped[i]" :style="drag.style(i, { x, y: 240 })" @pointerdown="drag.start($event, i, { x, y: 240 })">
+        <g class="wait" :style="{ animationDelay: `${-i * 0.3}s` }">
+          <use href="#sheep-shape" transform="scale(1.15)" />
+        </g>
+        <circle r="40" fill="transparent" />
+      </g>
+      <g v-else :transform="`translate(${from[i]!.x} ${from[i]!.y})`" class="pointer-events-none">
+        <g class="lamb jump" :style="{ '--dx': `${LAND_X - from[i]!.x}px` }">
+          <use href="#sheep-shape" transform="scale(1.15)" />
+        </g>
       </g>
     </g>
   </svg>
