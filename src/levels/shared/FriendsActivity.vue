@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { boing } from '@/composables/synth'
 import { animalColumns } from '@/data/numbersLevels'
 import type { NumberLevel } from '@/types/game'
 
@@ -36,6 +37,7 @@ async function greet(i: number): Promise<void> {
   hop.value++
   mouth.value = 0.5
   setTimeout(() => (mouth.value = 0), 300)
+  boing()
   const said = sayNumber(n)
   if (n < total.value) return
   await said
