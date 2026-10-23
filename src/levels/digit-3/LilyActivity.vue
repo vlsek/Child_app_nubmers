@@ -83,11 +83,11 @@ const crocStyle = computed(() => drag.style(0, { x: crocAt.value.x, y: crocAt.va
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Перепрыгни три кувшинки">
     <!-- пруд и берега -->
-    <path d="M-20 214 H460 V340 H-20Z" fill="#38bdf8" />
-    <path d="M-20 214 Q60 206 120 216 T260 214 T400 216 T460 214 V226 H-20Z" fill="#7dd3fc" />
+    <path d="M-800 214 H1240 V340 H-800Z" fill="#38bdf8" />
+    <path d="M-800 214 H-20 Q60 206 120 216 T260 214 T400 216 T460 214 H1240 V226 H-800Z" fill="#7dd3fc" />
     <g fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"><path d="M60 290 q14 -8 28 0 M300 296 q14 -8 28 0 M170 300 q12 -7 24 0" /></g>
-    <path d="M-20 204 H88 Q100 232 70 262 H-20Z" fill="#4ade80" stroke="#15803d" stroke-width="4" stroke-linejoin="round" />
-    <path d="M352 204 H460 V262 H380 Q336 250 352 204Z" fill="#4ade80" stroke="#15803d" stroke-width="4" stroke-linejoin="round" />
+    <path d="M-800 204 H88 Q100 232 70 262 H-800Z" fill="#4ade80" stroke="#15803d" stroke-width="4" stroke-linejoin="round" />
+    <path d="M352 204 H1240 V262 H380 Q336 250 352 204Z" fill="#4ade80" stroke="#15803d" stroke-width="4" stroke-linejoin="round" />
 
     <!-- круги по воде -->
     <ellipse v-for="r in rings" :key="r.id" :cx="r.x" :cy="r.y" rx="30" ry="9" fill="none" stroke="#fff" stroke-width="3.5" class="ring pointer-events-none" />

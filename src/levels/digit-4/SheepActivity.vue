@@ -93,8 +93,8 @@ async function jump(i: number, at?: { x: number; y: number }): Promise<void> {
     </g>
 
     <!-- Земля и забор -->
-    <rect x="-20" y="262" width="480" height="70" fill="#4ade80" />
-    <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
+    <rect x="-800" y="262" width="2040" height="70" fill="#4ade80" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#22c55e" />
     <g stroke="#7c4a1e" stroke-width="4" stroke-linecap="round" fill="#b9793a">
       <rect :x="FENCE_X - 22" y="196" width="12" height="68" rx="4" />
       <rect :x="FENCE_X + 10" y="196" width="12" height="68" rx="4" />

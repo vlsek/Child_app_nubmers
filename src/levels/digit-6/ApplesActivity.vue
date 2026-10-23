@@ -67,8 +67,8 @@ async function collect(i: number): Promise<void> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Собери шесть яблок">
-    <rect x="-20" y="262" width="480" height="70" fill="#4ade80" />
-    <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
+    <rect x="-800" y="262" width="2040" height="70" fill="#4ade80" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#22c55e" />
 
     <!-- Дерево -->
     <rect x="316" y="150" width="30" height="112" rx="8" fill="#b9793a" stroke="#7c4a1e" stroke-width="4" />

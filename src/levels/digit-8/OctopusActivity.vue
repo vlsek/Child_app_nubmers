@@ -99,8 +99,8 @@ function sockStyle(s: number): Record<string, string> {
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Надень восемь носков осьминогу">
     <!-- Подводный фон -->
-    <rect x="-20" y="286" width="480" height="50" fill="#fcd34d" />
-    <path d="M-20 286 Q60 274 130 286 T280 286 T440 286 T520 286" fill="#fde68a" />
+    <rect x="-800" y="286" width="2040" height="50" fill="#fcd34d" />
+    <path d="M-800 286 H-20 Q60 274 130 286 T280 286 T440 286 T520 286 H1240 V290 H-800Z" fill="#fde68a" />
 
     <!-- Верёвка с носками -->
     <path d="M10 40 Q220 62 430 40" fill="none" stroke="#7c4a1e" stroke-width="4" stroke-linecap="round" />

@@ -47,9 +47,9 @@ void props
 
 <template>
   <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Два барабана">
-    <rect x="-20" y="-20" width="480" height="290" fill="#fde68a" />
-    <path d="M-20 90 H460" stroke="#f59e0b" stroke-opacity=".5" stroke-width="2" />
-    <path d="M-20 250 H460 V340 H-20Z" fill="#92400e" /><path d="M-20 250 H460" stroke="#451a03" stroke-width="4" />
+    <rect x="-800" y="-20" width="2040" height="290" fill="#fde68a" />
+    <path d="M-800 90 H1240" stroke="#f59e0b" stroke-opacity=".5" stroke-width="2" />
+    <path d="M-800 250 H1240 V340 H-800Z" fill="#92400e" /><path d="M-800 250 H1240" stroke="#451a03" stroke-width="4" />
     <g fill="#f43f5e" class="pointer-events-none"><circle cx="40" cy="40" r="6" /><circle cx="400" cy="60" r="6" fill="#38bdf8" /><circle cx="210" cy="30" r="6" fill="#4ade80" /></g>
 
     <g :class="{ dance }" class="pointer-events-none"><Crocodile x="-4" y="150" width="110" height="80" :mood="dance ? 'happy' : 'idle'" :look="1" /></g>

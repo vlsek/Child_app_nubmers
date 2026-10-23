@@ -80,10 +80,10 @@ const rockStyle = (i: number): Record<string, string> =>
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Убери с дороги два камня">
     <!-- Обочина и дорога -->
-    <rect x="-20" y="236" width="480" height="48" fill="#4ade80" />
-    <rect x="-20" y="232" width="480" height="8" fill="#22c55e" />
-    <rect x="-20" y="282" width="480" height="50" fill="#9ca3af" />
-    <rect x="-20" y="278" width="480" height="8" fill="#6b7280" />
+    <rect x="-800" y="236" width="2040" height="48" fill="#4ade80" />
+    <rect x="-800" y="232" width="2040" height="8" fill="#22c55e" />
+    <rect x="-800" y="282" width="2040" height="50" fill="#9ca3af" />
+    <rect x="-800" y="278" width="2040" height="8" fill="#6b7280" />
     <path d="M0 306 H440" stroke="#fff" stroke-width="4" stroke-dasharray="26 22" />
 
     <!-- Друг стоит на обочине у тачки -->

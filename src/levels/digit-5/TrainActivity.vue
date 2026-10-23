@@ -79,11 +79,11 @@ void props
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Прицепи пять вагончиков">
-    <rect x="-20" y="270" width="480" height="70" fill="#a3a3a3" opacity=".0" />
-    <rect x="-20" y="276" width="480" height="60" fill="#4ade80" />
+    <rect x="-800" y="270" width="2040" height="70" fill="#a3a3a3" opacity=".0" />
+    <rect x="-800" y="276" width="2040" height="60" fill="#4ade80" />
     <!-- Рельсы -->
-    <rect x="-20" y="270" width="480" height="7" fill="#78350f" />
-    <path d="M-20 266 H460" stroke="#475569" stroke-width="5" />
+    <rect x="-800" y="270" width="2040" height="7" fill="#78350f" />
+    <path d="M-800 266 H1240" stroke="#475569" stroke-width="5" />
 
     <g :style="{ transform: driving ? 'translateX(-560px)' : 'translateX(0)', transition: driving ? 'transform 1.9s cubic-bezier(.5,0,.9,.6)' : 'none' }">
       <!-- Паровозик с крокодилом-машинистом -->

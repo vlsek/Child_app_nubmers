@@ -4,12 +4,6 @@
 
 <template>
   <g stroke="#1f6a34" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
-    <!-- Задняя лапа (согнутая) -->
-    <g>
-      <path d="M14 150 Q10 118 40 112 Q66 110 74 134 L76 152 Z" fill="#4fc45a" />
-      <path d="M12 154 Q22 146 30 154 M26 154 Q36 146 44 154 M40 154 Q50 146 58 154" fill="none" stroke-width="3" />
-      <path d="M26 128 Q34 118 48 120" fill="none" stroke="#7fe08a" stroke-width="4" opacity=".7" />
-    </g>
     <!-- Тело и голова дышат -->
     <g class="fig-breathe">
       <ellipse cx="82" cy="118" rx="54" ry="38" fill="#5fd068" />
@@ -41,6 +35,13 @@
       <circle cx="166" cy="72" r="2.4" fill="#1f6a34" stroke="none" />
       <path d="M100 90 Q136 112 184 86" fill="none" stroke-width="4" />
       <path d="M126 102 Q140 112 156 100 Q142 98 126 102Z" fill="#f472b6" stroke-width="2.5" />
+    </g>
+    <!-- Задняя лапа: бедро поверх тела, ступня с перепонками стоит на земле -->
+    <g>
+      <ellipse cx="46" cy="124" rx="31" ry="27" fill="#58c963" />
+      <path d="M30 108 Q42 102 56 108" fill="none" stroke="#7fe08a" stroke-width="4" opacity=".7" />
+      <path d="M8 156 Q8 142 26 144 L74 146 Q84 152 76 158 L14 158 Q8 158 8 156Z" fill="#4fc45a" />
+      <path d="M22 158 v-8 M38 158 v-8 M54 158 v-8" fill="none" stroke-width="3" />
     </g>
   </g>
 </template>

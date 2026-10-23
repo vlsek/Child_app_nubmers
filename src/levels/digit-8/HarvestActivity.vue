@@ -77,8 +77,8 @@ async function load(i: number): Promise<void> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Собери восемь морковок">
-    <rect x="-20" y="214" width="480" height="120" fill="#a16207" opacity=".55" />
-    <rect x="-20" y="208" width="480" height="8" fill="#4ade80" />
+    <rect x="-800" y="214" width="2040" height="120" fill="#a16207" opacity=".55" />
+    <rect x="-800" y="208" width="2040" height="8" fill="#4ade80" />
     <Crocodile x="-6" y="120" width="130" height="95" :mood="count >= 8 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
 
     <!-- Трактор с прицепом -->

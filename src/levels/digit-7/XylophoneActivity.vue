@@ -71,8 +71,8 @@ async function hit(i: number): Promise<void> {
 
 <template>
   <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Сыграй семь нот на ксилофоне">
-    <rect x="-20" y="262" width="480" height="70" fill="#fcd34d" />
-    <rect x="-20" y="258" width="480" height="8" fill="#f59e0b" />
+    <rect x="-800" y="262" width="2040" height="70" fill="#fcd34d" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#f59e0b" />
 
     <Crocodile :key="hop" x="-14" y="174" width="170" height="124" :mood="count >= N ? 'happy' : 'idle'" :mouth="mouth" :look="1" class="pointer-events-none animate-pop" />
 

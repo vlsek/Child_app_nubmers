@@ -60,10 +60,10 @@ async function place(j: number, w: number): Promise<void> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Зажги четыре окна">
-    <rect x="-20" y="-20" width="480" height="300" fill="#172554" />
+    <rect x="-800" y="-20" width="2040" height="300" fill="#172554" />
     <circle cx="380" cy="40" r="20" fill="#fef9c3" class="pointer-events-none" /><circle cx="388" cy="34" r="18" fill="#172554" class="pointer-events-none" />
     <g fill="#fef9c3" class="pointer-events-none"><circle cx="40" cy="30" r="2.5" /><circle cx="110" cy="62" r="2" /><circle cx="330" cy="28" r="2.5" /><circle cx="70" cy="110" r="2" /></g>
-    <path d="M-20 262 H460 V340 H-20Z" fill="#14532d" />
+    <path d="M-800 262 H1240 V340 H-800Z" fill="#14532d" />
 
     <!-- дом -->
     <g class="pointer-events-none">

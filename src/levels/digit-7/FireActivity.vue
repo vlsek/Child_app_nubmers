@@ -137,8 +137,8 @@ const nozzleStyle = computed(() => drag.style(0, held.value ?? HOME))
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Потуши семь огоньков">
-    <rect x="-20" y="262" width="480" height="70" fill="#9ca3af" />
-    <rect x="-20" y="258" width="480" height="8" fill="#6b7280" />
+    <rect x="-800" y="262" width="2040" height="70" fill="#9ca3af" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#6b7280" />
 
     <!-- Домик -->
     <g stroke-linejoin="round" stroke="#7c4a1e" stroke-width="4">

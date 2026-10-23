@@ -89,8 +89,8 @@ const drag = useDrag<number>(svg, {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Потяни хобот слонёнка вместе с крокодилом">
-    <rect x="-20" y="276" width="480" height="60" fill="#4ade80" />
-    <rect x="-20" y="272" width="480" height="8" fill="#22c55e" />
+    <rect x="-800" y="276" width="2040" height="60" fill="#4ade80" />
+    <rect x="-800" y="272" width="2040" height="8" fill="#22c55e" />
 
     <!-- Слонёнок -->
     <g stroke="#475569" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">

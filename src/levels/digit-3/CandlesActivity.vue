@@ -83,8 +83,8 @@ async function blow(i: number): Promise<void> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Задуй три свечки">
-    <rect x="-20" y="262" width="480" height="70" fill="#fde68a" />
-    <rect x="-20" y="258" width="480" height="8" fill="#fbbf24" />
+    <rect x="-800" y="262" width="2040" height="70" fill="#fde68a" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#fbbf24" />
 
     <!-- Друг в колпаке -->
     <AnimalFigure :kind="level.animal" flip hat="party" :mood="count >= 3 ? 'happy' : 'idle'" x="296" y="2" width="136" height="99" class="pointer-events-none" />

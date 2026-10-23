@@ -92,7 +92,7 @@ const drag = useDrag<number>(svg, {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Почисти восемь зубов крокодилу">
-    <rect x="-20" y="-20" width="480" height="350" fill="#bae6fd" />
+    <rect x="-800" y="-20" width="2040" height="350" fill="#bae6fd" />
 
     <!-- Нижняя челюсть, горло, язык -->
     <path d="M30 186 Q30 296 220 296 Q410 296 410 186Z" fill="#4cae45" stroke="#1f5a2a" stroke-width="5" stroke-linejoin="round" />

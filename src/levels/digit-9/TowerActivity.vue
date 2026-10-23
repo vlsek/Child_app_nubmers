@@ -70,8 +70,8 @@ function pos(i: number): { x: number; y: number } {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Построй башню из девяти кубиков">
-    <rect x="-20" y="262" width="480" height="70" fill="#4ade80" />
-    <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
+    <rect x="-800" y="262" width="2040" height="70" fill="#4ade80" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#22c55e" />
 
     <Crocodile x="-14" y="150" width="140" height="102" :mood="count >= 9 ? 'happy' : 'idle'" :mouth="count >= 9 ? 0.4 : 0" :look="1" class="pointer-events-none" />
 

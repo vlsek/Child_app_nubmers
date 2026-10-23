@@ -20,11 +20,11 @@ const { sayNumber, sayLine, stopVoice } = useAudio()
 const TOTAL = 5
 const MOUTH = { x: 196, y: 176 }
 const HOMES = [
-  { x: 318, y: 262 },
-  { x: 362, y: 270 },
-  { x: 406, y: 262 },
-  { x: 340, y: 232 },
-  { x: 384, y: 232 },
+  { x: 258, y: 262 },
+  { x: 302, y: 270 },
+  { x: 346, y: 262 },
+  { x: 280, y: 232 },
+  { x: 324, y: 232 },
 ]
 
 /** eaten[i] — каким по счёту съедено яблоко i (0 — лежит). */
@@ -92,11 +92,11 @@ function appleStyle(i: number): Record<string, string> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Покорми крокодила пятью яблоками">
-    <rect x="-20" y="262" width="480" height="70" fill="#4ade80" />
-    <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
+    <rect x="-800" y="262" width="2040" height="70" fill="#4ade80" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#22c55e" />
 
     <!-- Друг смотрит -->
-    <AnimalFigure :kind="level.animal" flip :mood="count >= TOTAL ? 'happy' : 'idle'" x="326" y="150" width="108" height="79" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" flip :mood="count >= TOTAL ? 'happy' : 'idle'" x="340" y="182" width="108" height="79" class="pointer-events-none" />
 
     <Crocodile x="0" y="84" width="250" height="183" :mood="count >= TOTAL ? 'happy' : 'idle'" :mouth="mouthOpen" :look="1" class="pointer-events-none" />
 

@@ -12,11 +12,13 @@ export interface DragOptions<T extends string | number> {
    */
   onDrop: (id: T, p: Pt) => boolean | void
   /**
-   * Лёгкий тап без перетаскивания. Малыш 3–4 лет часто просто тыкает пальцем,
-   * поэтому тап тоже должен засчитываться: предмет сам «долетает» до цели.
-   * Если не задан, тап считается броском в текущую точку (вызывается onDrop).
+   * Помощь, если малыш никак не может перетащить. Предметы НАДО перетаскивать: одиночный тап лишь
+   * подбрасывает предмет («тащи меня»), а после `tapAssist` тапов подряд (по умолчанию 3) вызывается onTap,
+   * и предмет сам «долетает» до цели. Если не задан, тап считается броском в текущую точку (onDrop).
    */
   onTap?: (id: T) => void
+  /** Сколько тапов подряд без перетаскивания нужно, чтобы сработала помощь onTap (по умолчанию 3). */
+  tapAssist?: number
   /** Сколько единиц viewBox пальцу надо пройти, чтобы это стало перетаскиванием (по умолчанию 8). */
   threshold?: number
   /** Можно ли сейчас брать предмет (например, он уже принят). */
@@ -39,6 +41,9 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
   const active = ref<{ id: T; x: number; y: number } | null>(null)
   /** Предмет, который только что отпустили мимо цели: возвращается плавно. */
   const returning = ref<T | null>(null)
+  /** Предмет, по которому просто тапнули: подпрыгивает («тащи меня»). */
+  const nudge = ref<T | null>(null)
+  let taps = 0
   let offset: Pt = { x: 0, y: 0 }
   let startPt: Pt = { x: 0, y: 0 }
   let moved = false
@@ -72,12 +77,22 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
       stop()
       if (!a) return
       if (!moved) {
-        if (opts.onTap) opts.onTap(id)
-        else if (opts.onDrop(id, home) === false) returning.value = id
+        if (opts.onTap) {
+          // Предмет нужно перетащить: тап лишь подсказывает. Если малыш никак не справляется (3 тапа подряд), помогаем.
+          taps++
+          if (taps >= (opts.tapAssist ?? 3)) {
+            taps = 0
+            opts.onTap(id)
+          } else {
+            nudge.value = id
+            setTimeout(() => (nudge.value = null), 380)
+          }
+        } else if (opts.onDrop(id, home) === false) returning.value = id
         return
       }
       const ok = opts.onDrop(id, { x: a.x, y: a.y })
       if (ok === false) returning.value = id
+      else taps = 0
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
@@ -103,8 +118,9 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
   function style(id: T, home: Pt, extra = ''): Record<string, string> {
     const p = pos(id, home)
     const lifted = active.value?.id === id
+    const hop = nudge.value === id ? ' translateY(-16px) scale(1.08)' : ''
     return {
-      transform: `translate(${p.x}px, ${p.y}px)${extra}${lifted ? ' scale(1.12)' : ''}`,
+      transform: `translate(${p.x}px, ${p.y}px)${extra}${lifted ? ' scale(1.12)' : ''}${hop}`,
       transition: lifted ? 'none' : 'transform .35s cubic-bezier(.3,1.4,.5,1)',
       cursor: lifted ? 'grabbing' : 'grab',
       touchAction: 'none',
@@ -112,7 +128,7 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
   }
 
   onBeforeUnmount(stop)
-  return { active, returning, start, pos, style }
+  return { active, returning, nudge, start, pos, style }
 }
 
 /** Точка p в круге радиуса r вокруг c. */
