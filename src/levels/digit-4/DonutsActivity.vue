@@ -121,7 +121,7 @@ function flightStyle(i: number): Record<string, string> {
     </g>
 
     <!-- Друг приносит пончики -->
-    <AnimalFigure :kind="level.animal" flip :mood="full ? 'happy' : 'idle'" x="296" y="2" width="144" height="105" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" flip hat="chef" :mood="full ? 'happy' : 'idle'" x="296" y="2" width="144" height="105" class="pointer-events-none" />
 
     <!-- Тарелка -->
     <rect x="262" y="110" width="176" height="180" rx="34" fill="#fff" opacity=".85" stroke="#cbd5e1" stroke-width="4" />

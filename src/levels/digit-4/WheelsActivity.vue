@@ -93,14 +93,10 @@ const nextSlot = computed(() => SLOTS[placed.value])
     <g class="scene" :style="{ transform: driving ? 'translateX(620px)' : 'translateX(0)', transition: driving ? 'transform 1.7s cubic-bezier(.5,0,.9,.6)' : 'none' }">
       <!-- Кузов (оседает, пока колёс мало) -->
       <g :style="{ transform: `translateY(${sag}px)`, transition: 'transform .45s ease-out' }" stroke-linejoin="round">
-        <!-- Крыша и стёкла -->
-        <path d="M60 152 L84 100 Q88 94 96 94 H312 Q322 94 326 102 L352 152Z" :fill="level.color" :stroke="level.shade" stroke-width="5" />
-        <path d="M92 148 L108 108 H316 L336 148Z" fill="#d4ecfb" :stroke="level.shade" stroke-width="3" />
-        <!-- Друзья едут вместе с крокодилом -->
-        <g v-for="x in [112, 160]" :key="x" :transform="`translate(${x} 108) scale(.4)`"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
-        <!-- Крокодил за рулём -->
-        <Crocodile x="226" y="96" width="104" height="76" :mood="driving ? 'happy' : 'idle'" :mouth="mouth" :look="1" />
-        <path d="M92 148 L108 108 H316 L336 148Z" fill="none" :stroke="level.shade" stroke-width="3" />
+        <!-- Открытая машина: друзья и крокодил сидят в полный рост, борт закрывает ноги -->
+        <AnimalFigure v-for="x in [52, 128]" :key="x" :kind="level.animal" seated :x="x" y="86" width="112" height="82" :mood="driving ? 'happy' : 'idle'" />
+        <Crocodile x="226" y="92" width="104" height="76" :mood="driving ? 'happy' : 'idle'" :mouth="mouth" :look="1" />
+        <path d="M338 152 L322 104 H308 L322 152Z" fill="#d4ecfb" :stroke="level.shade" stroke-width="4" />
         <!-- Нижняя часть -->
         <rect x="30" y="150" width="380" height="66" rx="18" :fill="level.color" :stroke="level.shade" stroke-width="5" />
         <rect x="46" y="160" width="60" height="6" rx="3" fill="#fff" opacity=".35" />

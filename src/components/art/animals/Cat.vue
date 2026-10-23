@@ -21,12 +21,12 @@
       <path d="M115 150 v5 M122 151 v5 M129 150 v5" stroke-width="2.5" fill="none" />
       <!-- Уши -->
       <g class="ear-near" style="transform-origin: 106px 50px">
-        <path d="M88 52 Q88 22 98 8 Q114 14 126 36Z" fill="#f59a3c" />
+        <path d="M88 60 Q86 22 98 8 Q114 14 128 44Z" fill="#f59a3c" />
         <path d="M95 44 Q96 28 100 20 Q108 24 114 36Z" fill="#ff9fb5" stroke="none" />
       </g>
       <g class="ear-far" style="transform-origin: 160px 44px">
-        <path d="M144 38 Q156 14 168 8 Q178 26 176 52Z" fill="#e8872a" />
-        <path d="M153 38 Q160 24 166 19 Q170 30 170 44Z" fill="#f78aa6" stroke="none" />
+        <path d="M140 44 Q154 14 168 8 Q182 28 172 68Z" fill="#e8872a" />
+        <path d="M152 42 Q160 26 166 19 Q172 32 167 54Z" fill="#f78aa6" stroke="none" />
       </g>
       <!-- Голова -->
       <ellipse cx="128" cy="78" rx="49" ry="40" fill="#f59a3c" />

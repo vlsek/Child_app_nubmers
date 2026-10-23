@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
-import { pop } from '@/composables/synth'
+import { chomp, pop } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -29,6 +29,8 @@ const HOMES = [
 const gone = ref<number[]>(HOMES.map(() => 0))
 const removed = computed(() => gone.value.filter(Boolean).length)
 const lid = ref(false)
+const eating = ref(false)
+const bite = ref(0)
 
 const svg = ref<SVGSVGElement | null>(null)
 let alive = true
@@ -62,7 +64,19 @@ async function finish(n: number): Promise<void> {
   const said = sayNumber(n)
   if (n < 4) return
   await said
-  await sleep(300)
+  await sleep(400)
+  if (!alive) return
+  // Крокодил съедает арбуз: ломтик летит в пасть, пасть жуёт
+  eating.value = true
+  bite.value = 0.9
+  for (let k = 0; k < 4; k++) {
+    await sleep(380)
+    if (!alive) return
+    chomp()
+    bite.value = k % 2 ? 0.9 : 0.15
+  }
+  bite.value = 0.2
+  await sleep(500)
   if (alive) emit('complete')
 }
 </script>
@@ -75,11 +89,13 @@ async function finish(n: number): Promise<void> {
     role="img"
     aria-label="Убери из арбуза четыре косточки в ведро"
   >
-    <!-- Ломтик арбуза -->
+    <!-- Ломтик арбуза (в конце летит в пасть крокодила) -->
+    <g :class="{ eat: eating }" class="slice">
     <path d="M52 110 A138 138 0 0 0 328 110Z" fill="#16a34a" stroke="#14532d" stroke-width="5" stroke-linejoin="round" />
     <path d="M64 110 A126 126 0 0 0 316 110Z" fill="#dcfce7" />
     <path d="M72 110 A118 118 0 0 0 308 110Z" fill="#ef4444" />
     <path d="M52 110 H328" stroke="#14532d" stroke-width="5" stroke-linecap="round" />
+    </g>
 
     <!-- Друг держит ведро -->
     <AnimalFigure :kind="level.animal" flip :mood="removed >= 4 ? 'happy' : 'idle'" x="306" y="116" width="134" height="98" class="pointer-events-none" />
@@ -113,11 +129,28 @@ async function finish(n: number): Promise<void> {
     </g>
 
     <!-- Крокодил ждёт арбуз -->
-    <Crocodile x="-12" y="196" width="150" height="110" :mood="removed >= 4 ? 'happy' : 'idle'" :mouth="removed >= 4 ? 0.4 : 0" :look="1" class="pointer-events-none" />
+    <Crocodile x="-12" y="196" width="150" height="110" :mood="removed >= 4 ? 'happy' : 'idle'" :mouth="eating ? bite : removed >= 4 ? 0.5 : 0" :look="1" class="pointer-events-none" />
   </svg>
 </template>
 
 <style scoped>
+.slice {
+  transform-box: view-box;
+  transform-origin: 190px 110px;
+}
+.eat {
+  animation: eat 1.5s ease-in forwards;
+}
+@keyframes eat {
+  60% {
+    transform: translate(-100px, 120px) scale(0.5) rotate(-20deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-110px, 150px) scale(0.05) rotate(-30deg);
+    opacity: 0;
+  }
+}
 .target {
   animation: blink 0.9s ease-in-out infinite;
 }

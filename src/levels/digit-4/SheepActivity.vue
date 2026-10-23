@@ -102,11 +102,17 @@ async function jump(i: number, at?: { x: number; y: number }): Promise<void> {
       <rect :x="FENCE_X - 34" y="238" width="80" height="10" rx="4" />
     </g>
 
-    <!-- Крокодил в кроватке -->
+    <!-- Кроватка: рама и матрас позади крокодила, одеяло только поверх хвоста и тела -->
     <g>
-      <Crocodile x="-8" y="168" width="170" height="124" :mood="asleep ? 'sleep' : 'idle'" :mouth="0" :look="1" />
-      <rect x="-10" y="244" width="170" height="30" rx="12" fill="#a78bfa" stroke="#6d28d9" stroke-width="4" />
-      <rect x="-10" y="244" width="170" height="10" rx="5" fill="#c4b5fd" />
+      <rect x="-12" y="268" width="14" height="24" rx="4" fill="#92400e" stroke="#451a03" stroke-width="3.5" />
+      <rect x="146" y="268" width="14" height="24" rx="4" fill="#92400e" stroke="#451a03" stroke-width="3.5" />
+      <rect x="-14" y="170" width="16" height="104" rx="6" fill="#b45309" stroke="#451a03" stroke-width="4" />
+      <rect x="-10" y="250" width="172" height="26" rx="10" fill="#92400e" stroke="#451a03" stroke-width="4" />
+      <rect x="-6" y="240" width="164" height="20" rx="9" fill="#ddd6fe" stroke="#6d28d9" stroke-width="3.5" />
+      <ellipse cx="96" cy="236" rx="30" ry="9" fill="#fff" stroke="#94a3b8" stroke-width="3" />
+      <Crocodile x="-4" y="126" width="168" height="124" :mood="asleep ? 'sleep' : 'idle'" :mouth="0" :look="1" />
+      <path d="M-8 232 Q10 218 30 230 T70 228 Q86 226 92 236 V264 H-8Z" fill="#a78bfa" stroke="#6d28d9" stroke-width="4" stroke-linejoin="round" />
+      <path d="M-4 246 H84" stroke="#c4b5fd" stroke-width="4" stroke-linecap="round" opacity=".7" />
     </g>
 
     <!-- Барашки: ждут справа, тащить через забор -->

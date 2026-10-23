@@ -87,11 +87,7 @@ async function blow(i: number): Promise<void> {
     <rect x="-20" y="258" width="480" height="8" fill="#fbbf24" />
 
     <!-- Друг в колпаке -->
-    <AnimalFigure :kind="level.animal" flip :mood="count >= 3 ? 'happy' : 'idle'" x="296" y="2" width="136" height="99" class="pointer-events-none" />
-    <g transform="translate(358 24)" class="pointer-events-none">
-      <polygon points="0,-30 -20,14 20,14" fill="#f472b6" stroke="#be185d" stroke-width="4" stroke-linejoin="round" />
-      <circle cx="0" cy="-32" r="6" fill="#facc15" />
-    </g>
+    <AnimalFigure :kind="level.animal" flip hat="party" :mood="count >= 3 ? 'happy' : 'idle'" x="296" y="2" width="136" height="99" class="pointer-events-none" />
 
     <!-- Торт -->
     <g stroke-linejoin="round">
