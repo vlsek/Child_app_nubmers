@@ -248,3 +248,9 @@
 - Земля, дорога и фоны в заданиях растянуты на всю ширину экрана (x от -800 до 1240): на горизонтальном экране больше нет «плашки» с краями посреди экрана. Новые сцены рисуйте так же.
 - `useDrag`: одиночный тап по предмету его только подбрасывает («тащи меня», `nudge`); помощь `onTap` срабатывает после 3 тапов подряд (`tapAssist`). Предметы надо перетаскивать, но малыш не застрянет.
 - Лягушка: заметная задняя лапа поверх тела; панда в «покорми» стоит на земле.
+
+## Свой APK (агент 1)
+
+- Capacitor: `capacitor.config.ts` (appId `com.vlsek.krokodil`), папка `android/` (всегда горизонтально `sensorLandscape`, на весь экран, экран не гаснет, см. `MainActivity.java`). Сборка: `npm run build && npx cap sync android`, затем в Android Studio (или `cd android && ./gradlew assembleDebug`).
+- Готовый APK без Android Studio: `android-ci/android.yml` скопировать в `.github/workflows/android.yml` (через сайт GitHub: токен без права `workflow` не может создать такой файл). Дальше Actions → Android APK → Artifacts → `krokodil-debug-apk`.
+- Не сделано: свой значок и заставка (сейчас стандартные Capacitor), шрифты с Google Fonts не работают без интернета (нужно положить Nunito в проект), подпись release-сборки для магазина.
