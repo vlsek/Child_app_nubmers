@@ -93,7 +93,9 @@ void props
         <rect x="58" y="180" width="26" height="22" rx="4" fill="#d4ecfb" />
         <rect x="10" y="184" width="16" height="26" rx="3" fill="#475569" stroke="#1e293b" stroke-width="3" />
         <rect x="6" y="178" width="24" height="10" rx="4" fill="#64748b" />
-        <g transform="translate(142 0) scale(-1 1)"><Crocodile x="56" y="178" width="30" height="22" mood="happy" :mouth="driving ? 0.5 : 0" :look="1" /></g>
+        <clipPath id="train-cab"><rect x="0" y="140" width="120" height="63" /></clipPath>
+        <g clip-path="url(#train-cab)"><g transform="translate(142 0) scale(-1 1)"><Crocodile x="48" y="166" width="68" height="50" mood="happy" :mouth="driving ? 0.5 : 0" :look="1" /></g></g>
+        <rect x="50" y="200" width="44" height="7" rx="3" :fill="level.shade" />
         <g class="puff" fill="#fff" opacity=".85"><circle cx="18" cy="168" r="7" /><circle cx="26" cy="156" r="5" /></g>
         <g v-for="x in [22, 62]" :key="x" :transform="`translate(${x} 262)`"><circle r="11" fill="#1f2937" /><circle r="4" fill="#cbd5e1" /></g>
       </g>

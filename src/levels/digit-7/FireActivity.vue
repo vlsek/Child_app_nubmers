@@ -155,7 +155,12 @@ const nozzleStyle = computed(() => drag.style(0, held.value ?? HOME))
 
     <Crocodile x="-14" y="170" width="170" height="124" :mood="count >= 7 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
     <!-- Каска -->
-    <path d="M24 196 q22 -26 50 -6 l-4 10 h-44Z" fill="#ef4444" stroke="#991b1b" stroke-width="4" stroke-linejoin="round" class="pointer-events-none" />
+    <g class="pointer-events-none" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M26 206 Q26 178 60 174 Q92 178 94 206Z" fill="#ef4444" stroke="#991b1b" stroke-width="4" />
+      <path d="M60 176 V204" stroke="#fca5a5" stroke-width="5" opacity=".7" />
+      <path d="M22 206 Q60 214 100 206 Q96 202 60 202 Q26 202 22 206Z" fill="#b91c1c" stroke="#7f1d1d" stroke-width="3.5" />
+      <path d="M48 186 h24 l-4 14 h-16Z" fill="#fde047" stroke="#a16207" stroke-width="2.5" />
+    </g>
 
     <!-- Шланг: от катушки у ног крокодила к брандспойту -->
     <g class="pointer-events-none">

@@ -77,7 +77,14 @@ const animalFont = computed(() => `min(9rem, 13vh, ${(88 / (columns.value * 1.3)
           :aria-label="order[n - 1] ? `Посчитан: ${order[n - 1]}` : 'Поздороваться'"
           @click="greet(n - 1)"
         >
-          <AnimalFigure :kind="level.animal" :mood="order[n - 1] ? 'happy' : 'idle'" class="block h-auto w-full" />
+          <AnimalFigure
+            :kind="level.animal"
+            :variant="n + level.value"
+            :flip="(n * 5) % 3 === 0"
+            :mood="order[n - 1] ? 'happy' : 'idle'"
+            class="block h-auto w-full"
+            :style="{ transform: `scale(${0.9 + ((n * 7) % 5) * 0.045})`, transformOrigin: '50% 100%' }"
+          />
           <span
             v-if="order[n - 1]"
             class="absolute -right-[0.18em] -top-[0.18em] flex h-[1.6em] w-[1.6em] items-center justify-center rounded-full bg-white text-[0.28em] font-black leading-none text-slate-700 shadow-md"

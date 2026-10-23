@@ -77,7 +77,7 @@ async function collect(i: number): Promise<void> {
     </g>
 
     <!-- Лягушонок под деревом -->
-    <g transform="translate(364 202) scale(.6)" class="idle"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
+    <g class="idle"><AnimalFigure :kind="level.animal" flip x="340" y="190" width="96" height="70" /></g>
 
     <Crocodile x="-14" y="176" width="170" height="124" :mood="count >= 6 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
 

@@ -18,12 +18,13 @@ import Tiger from './animals/Tiger.vue'
  * `flip` — развернуть влево (друг стоит справа и смотрит на крокодила).
  * `crop` — показать только голову и плечи (для окон машин): viewBox 62 0 158 118.
  * `seated` — зверь «сидит в машине»: весь рисунок целиком (низ закроет борт машины); отдельный флаг, чтобы звери не обрезались.
+ * `variant` — номер особи в толпе: чуть другой оттенок (размер и поворот задаёт родитель).
  * `hat` — колпак на голове: party (праздничный) или chef (поварской); сидит по макушке каждого зверя (таблица HEAD).
  * `mood`: idle / happy (радуется, подпрыгивает).
  * Рисунки лежат в `animals/<Вид>.vue`; общие классы анимации: .fig-blink, .fig-breathe, .fig-tail
  * (см. src/style.css).
  */
-const props = withDefaults(defineProps<{ kind: AnimalKind; flip?: boolean; mood?: 'idle' | 'happy'; crop?: boolean; seated?: boolean; hat?: 'party' | 'chef' }>(), { mood: 'idle' })
+const props = withDefaults(defineProps<{ kind: AnimalKind; flip?: boolean; mood?: 'idle' | 'happy'; crop?: boolean; seated?: boolean; hat?: 'party' | 'chef'; variant?: number }>(), { mood: 'idle' })
 
 /** Макушка каждого зверя в холсте 220×160 (смотрит вправо): центр головы по x и верхний край по y. */
 const HEAD: Record<AnimalKind, { cx: number; top: number }> = {
@@ -31,6 +32,14 @@ const HEAD: Record<AnimalKind, { cx: number; top: number }> = {
   frog: { cx: 120, top: 52 }, monkey: { cx: 128, top: 32 }, panda: { cx: 127, top: 30 }, pig: { cx: 128, top: 34 }, tiger: { cx: 124, top: 42 },
 }
 const head = computed(() => HEAD[props.kind])
+/** `variant` — номер особи: каждый зверь в толпе чуть другого оттенка (сдвиг тона ±14°, насыщенность). */
+const tint = computed(() => {
+  const v = props.variant
+  if (v === undefined) return undefined
+  const hue = ((v * 37 + 11) % 19) - 9
+  const sat = 0.88 + ((v * 13 + 3) % 6) * 0.05
+  return `hue-rotate(${hue}deg) saturate(${sat.toFixed(2)})`
+})
 
 const parts = { bear: Bear, bunny: Bunny, cat: Cat, chick: Chick, dog: Dog, frog: Frog, monkey: Monkey, panda: Panda, pig: Pig, tiger: Tiger }
 /** Для окон: голова и плечи. У цыплёнка тело круглое, его не обрезаем. */
@@ -42,7 +51,7 @@ const phase = `${-(Math.random() * 4).toFixed(2)}s`
 </script>
 
 <template>
-  <svg :viewBox="box" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round" :class="{ 'fig-happy': mood === 'happy' }" :style="{ '--phase': phase }">
+  <svg :viewBox="box" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round" :class="{ 'fig-happy': mood === 'happy' }" :style="{ '--phase': phase, filter: tint }">
     <!-- У медведя в окне плечо обрезалось по прямой: подрезаем овалом вокруг головы -->
     <defs v-if="roundCrop"><clipPath id="fig-bear-crop"><ellipse cx="125" cy="64" rx="68" ry="62" /></clipPath></defs>
     <g :transform="flip ? 'translate(220 0) scale(-1 1)' : undefined">

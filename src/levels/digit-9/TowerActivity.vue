@@ -19,7 +19,7 @@ const { sayNumber, sayLine, stopVoice } = useAudio()
 
 const COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#38bdf8', '#3b82f6', '#a855f7', '#ec4899', '#14b8a6']
 const SIZE = 28
-const TOWER_X = 366
+const TOWER_X = 316
 const homes = Array.from({ length: 9 }, (_, i) =>
   i < 5 ? { x: 128 + i * 32, y: 262 - SIZE / 2 } : { x: 144 + (i - 5) * 32, y: 262 - SIZE * 1.5 },
 )
@@ -76,7 +76,7 @@ function pos(i: number): { x: number; y: number } {
     <Crocodile x="-14" y="150" width="140" height="102" :mood="count >= 9 ? 'happy' : 'idle'" :mouth="count >= 9 ? 0.4 : 0" :look="1" class="pointer-events-none" />
 
     <!-- Друг наблюдает за стройкой -->
-    <AnimalFigure :kind="level.animal" :mood="count >= 9 ? 'happy' : 'idle'" x="290" y="248" width="84" height="61" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" :mood="count >= 9 ? 'happy' : 'idle'" x="364" y="212" width="76" height="55" class="pointer-events-none" />
 
     <!-- Куда ставить: следующее место на башне -->
     <g v-if="count < 9" :style="{ transform: `translate(${towerPos(count).x}px, ${towerPos(count).y}px)`, transition: 'transform .4s' }" class="pointer-events-none">

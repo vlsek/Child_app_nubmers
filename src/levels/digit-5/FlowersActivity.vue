@@ -17,9 +17,9 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const FLOWERS = [178, 234, 290, 346, 402].map((x, i) => ({ x, color: ['#ef4444', '#f97316', '#facc15', '#ec4899', '#a855f7'][i]! }))
+const FLOWERS = [196, 248, 300, 352, 404].map((x, i) => ({ x, color: ['#ef4444', '#f97316', '#facc15', '#ec4899', '#a855f7'][i]! }))
 /** Центр лейки дома и над цветком (носик смотрит на бутон). */
-const CAN_HOME = { x: 122, y: 226 }
+const CAN_HOME = { x: 112, y: 238 }
 /** Лейка висит левее и выше цветка: носик (≈ +50, +4 после наклона) прямо над бутоном. */
 const potPos = (i: number) => ({ x: FLOWERS[i]!.x - 50, y: 128 })
 
@@ -108,9 +108,9 @@ const canStyle = computed(() =>
     <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
 
     <!-- Друг радуется -->
-    <AnimalFigure :kind="level.animal" flip :mood="count >= 5 ? 'happy' : 'idle'" x="300" y="62" width="140" height="102" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" flip :mood="count >= 5 ? 'happy' : 'idle'" x="330" y="182" width="110" height="80" class="pointer-events-none" />
 
-    <Crocodile x="-14" y="174" width="170" height="124" :mood="count >= 5 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
+    <Crocodile x="-40" y="190" width="130" height="95" :mood="count >= 5 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
 
     <!-- Цветы -->
     <g v-for="(f, i) in FLOWERS" :key="i" :transform="`translate(${f.x} 262)`" @click="water(i)">

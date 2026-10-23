@@ -72,7 +72,7 @@ async function look(i: number): Promise<void> {
       <!-- Зверёк: за кустом, выскакивает вверх -->
       <g clip-path="url(#hs-clip)" class="pointer-events-none">
       <g :style="{ transform: `translateY(${found[i] ? -24 : 40}px)`, transition: 'transform .4s cubic-bezier(.3,1.7,.5,1)' }">
-        <AnimalFigure :kind="level.animal" :x="-46" :y="-62" :width="92" :height="67" :mood="found[i] ? 'happy' : 'idle'" />
+        <AnimalFigure :kind="level.animal" :variant="i + 3" :flip="i % 2 === 1" :x="-46 + (i % 3) * 2" :y="-62 + (i % 2) * 5" :width="80 + ((i * 7) % 5) * 5" :height="(80 + ((i * 7) % 5) * 5) * 0.727" :mood="found[i] ? 'happy' : 'idle'" />
       </g>
       </g>
       <!-- Куст -->

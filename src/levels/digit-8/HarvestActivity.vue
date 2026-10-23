@@ -34,6 +34,8 @@ onBeforeUnmount(() => {
 const svg = ref<SVGSVGElement | null>(null)
 /** Морковка в полёте к прицепу. */
 const flying = ref<number | null>(null)
+/** Место в прицепе: n-я морковка лежит в ряду, нижний ряд заполняется первым. */
+const slot = (n: number) => ({ x: 290 + ((n - 1) % 4) * 20, y: n > 4 ? 186 : 204 })
 
 const drag = useDrag<number>(svg, {
   canGrab: (i) => !loaded.value[i] && flying.value === null,
@@ -50,7 +52,8 @@ function start(i: number): boolean {
 
 function carrotStyle(i: number): Record<string, string> {
   if (flying.value === i) {
-    return { transform: `translate(${TRAILER.x}px, ${TRAILER.y}px) scale(.6)`, transition: 'transform .42s ease-in' }
+    const t = slot(count.value + 1)
+    return { transform: `translate(${t.x}px, ${t.y}px) scale(.5) rotate(-20deg)`, transition: 'transform .42s cubic-bezier(.3,.1,.6,1)' }
   }
   return drag.style(i, SPOTS[i]!)
 }
@@ -86,8 +89,11 @@ async function load(i: number): Promise<void> {
       <g transform="translate(373 150) scale(.46)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
       <circle cx="404" cy="226" r="24" fill="#1e293b" /><circle cx="404" cy="226" r="9" fill="#cbd5e1" />
       <template v-for="(_, i) in SPOTS" :key="i">
-        <g v-if="loaded[i]" :transform="`translate(${286 + ((loaded[i]! - 1) % 4) * 20} ${i >= 0 && loaded[i]! > 4 ? 178 : 190})`" class="seat">
-          <path d="M0 0 L8 -22 L16 0Z" fill="#f97316" stroke="#c2410c" stroke-width="2" stroke-linejoin="round" /><path d="M8 -22 l-4 -8 M8 -22 l4 -8" stroke="#16a34a" stroke-width="3" stroke-linecap="round" />
+        <g v-if="loaded[i]" :transform="`translate(${slot(loaded[i]!).x} ${slot(loaded[i]!).y}) scale(.5) rotate(-20)`">
+          <g transform="translate(0 -8)">
+            <path d="M-12 -4 L0 34 L12 -4Z" fill="#f97316" stroke="#c2410c" stroke-width="3" stroke-linejoin="round" />
+            <path d="M0 -4 l-7 -14 M0 -4 l7 -14 M0 -4 v-16" stroke="#16a34a" stroke-width="4" stroke-linecap="round" />
+          </g>
         </g>
       </template>
     </g>

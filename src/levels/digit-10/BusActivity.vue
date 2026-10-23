@@ -18,7 +18,9 @@ const emit = defineEmits<{ complete: [] }>()
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
 const SPOTS = Array.from({ length: 10 }, (_, i) => ({ x: 24 + (i % 5) * 36, y: i < 5 ? 232 : 268 }))
-const WIN = (k: number) => ({ x: 214 + (k % 5) * 40, y: k < 5 ? 128 : 172 })
+const WIN = (k: number) => ({ x: 224 + (k % 5) * 29, y: k < 5 ? 132 : 168 })
+/** Дверь автобуса: цыплёнок сначала подпрыгивает к ней, потом садится. */
+const DOOR = { x: 204, y: 226 }
 
 const boarded = ref<number[]>(SPOTS.map(() => 0))
 const count = computed(() => boarded.value.filter(Boolean).length)
@@ -53,8 +55,7 @@ function start(i: number): boolean {
 
 function chickStyle(i: number): Record<string, string> {
   if (flying.value === i) {
-    const w = WIN(count.value)
-    return { transform: `translate(${w.x}px, ${w.y}px)`, transition: 'transform .42s ease-in' }
+    return { transform: `translate(${DOOR.x}px, ${DOOR.y}px)`, transition: 'transform .42s ease-in-out' }
   }
   return drag.style(i, SPOTS[i]!)
 }
@@ -84,14 +85,17 @@ async function board(i: number): Promise<void> {
     <g :class="{ drive: leaving }">
       <!-- Автобус -->
       <rect x="196" y="92" width="228" height="150" rx="22" :fill="level.color" stroke="#0f172a" stroke-opacity=".35" stroke-width="4" />
-      <rect x="206" y="104" width="208" height="88" rx="12" fill="#e0f2fe" />
+      <rect x="206" y="104" width="148" height="88" rx="12" fill="#e0f2fe" />
+      <rect x="360" y="104" width="54" height="88" rx="12" fill="#bae6fd" />
+      <clipPath id="bus-cab"><rect x="360" y="104" width="54" height="88" rx="12" /></clipPath>
       <rect x="196" y="214" width="228" height="10" :fill="level.shade" />
       <circle cx="248" cy="250" r="22" fill="#1e293b" /><circle cx="248" cy="250" r="9" fill="#cbd5e1" />
       <circle cx="372" cy="250" r="22" fill="#1e293b" /><circle cx="372" cy="250" r="9" fill="#cbd5e1" />
-      <Crocodile x="196" y="14" width="120" height="88" :mood="count >= 10 ? 'happy' : 'idle'" :mouth="0" :look="-1" class="pointer-events-none" />
+      <g clip-path="url(#bus-cab)"><Crocodile x="342" y="126" width="84" height="62" :mood="count >= 10 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" /></g>
+      <path d="M366 190 q14 -18 40 -4" fill="none" stroke="#0f172a" stroke-width="5" stroke-linecap="round" class="pointer-events-none" />
       <!-- Пассажиры внутри автобуса -->
       <template v-for="(_, i) in SPOTS" :key="i">
-        <g v-if="boarded[i]" :transform="`translate(${WIN(boarded[i]! - 1).x - 21} ${WIN(boarded[i]! - 1).y - 19}) scale(.4)`" class="seat"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
+        <g v-if="boarded[i]" :transform="`translate(${WIN(boarded[i]! - 1).x - 18} ${WIN(boarded[i]! - 1).y - 14}) scale(.3)`" class="seat"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
       </template>
     </g>
 
@@ -101,7 +105,7 @@ async function board(i: number): Promise<void> {
     <!-- Цыплята на остановке -->
     <template v-for="(s, i) in SPOTS" :key="'w' + i">
       <g v-if="!boarded[i]" class="dragger" :style="chickStyle(i)" @pointerdown="drag.start($event, i, s)">
-        <g class="wait" :style="{ animationDelay: `${-i * 0.2}s` }">
+        <g :class="flying === i ? 'hop' : 'wait'" :style="{ animationDelay: flying === i ? '0s' : `${-i * 0.2}s` }">
           <g transform="translate(-24 -22) scale(.46)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
         </g>
         <circle r="26" fill="transparent" />
@@ -133,7 +137,13 @@ g {
   animation: seat 0.4s cubic-bezier(.3,1.6,.5,1) both;
 }
 @keyframes seat {
-  from { scale: .1; }
+  from { scale: .4; translate: 0 16px; opacity: 0; }
+}
+.hop {
+  animation: hop 0.42s ease-in-out;
+}
+@keyframes hop {
+  50% { translate: 0 -34px; }
 }
 .drive {
   animation: drive 1.6s ease-in forwards;
@@ -142,6 +152,6 @@ g {
   to { translate: 460px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .wait, .target { animation: none; }
+  .wait, .target, .hop, .seat { animation: none; }
 }
 </style>

@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import AnimalFigure from './AnimalFigure.vue'
 import type { AnimalKind } from '@/types/art'
-import { animalColumns } from '@/data/numbersLevels'
 
 export interface Rect {
   x: number
@@ -41,13 +40,42 @@ const PITCH_Y = 0.79
 const W = 1.4
 const H = W * (160 / 220)
 
-function grid(rect: Rect, n: number, cols: number, pitchX: number, right: boolean): Slot[] {
-  const rows = Math.ceil(n / cols)
-  const size = Math.min(rect.w / (W + pitchX * (cols - 1)), rect.h / (H + PITCH_Y * (rows - 1)))
+/** Звери по рядам поровну (лишние садятся в нижние ряды): 8 → 4+4, 7 → 3+4, 9 → 3+3+3. */
+function rowCounts(n: number, rows: number): number[] {
+  const base = Math.floor(n / rows)
+  const rem = n % rows
+  return Array.from({ length: rows }, (_, r) => base + (r >= rows - rem ? 1 : 0))
+}
+
+function sizeFor(rect: Rect, counts: number[], pitchX: number): number {
+  const cols = Math.max(...counts)
+  const rows = counts.length
+  return Math.min(rect.w / (W + pitchX * (cols - 1)), rect.h / (H + PITCH_Y * (rows - 1)))
+}
+
+function grid(rect: Rect, n: number, cols: number | undefined, pitchX: number, right: boolean): Slot[] {
+  // Сколько рядов: при заданных колонках считаем, иначе берём раскладку, где звери крупнее всего
+  let counts: number[]
+  if (cols) counts = rowCounts(n, Math.ceil(n / cols))
+  else {
+    counts = [n]
+    let best = sizeFor(rect, counts, pitchX)
+    // В каждом ряду минимум двое: одинокий зверь сверху выглядит случайным
+    for (let rows = 2; rows <= Math.min(Math.floor(n / 2), 4); rows++) {
+      const c = rowCounts(n, rows)
+      const sz = sizeFor(rect, c, pitchX)
+      if (sz > best * 1.04) {
+        best = sz
+        counts = c
+      }
+    }
+  }
+  const rows = counts.length
+  const size = sizeFor(rect, counts, pitchX)
   const bottom = rect.y + rect.h
   const slots: Slot[] = []
   for (let r = 0; r < rows; r++) {
-    const inRow = r < rows - 1 ? cols : n - cols * (rows - 1)
+    const inRow = counts[r]!
     const total = size * (W + pitchX * (inRow - 1))
     const left = rect.x + (right ? rect.w - total : (rect.w - total) / 2)
     const y = bottom - size * H - (rows - 1 - r) * PITCH_Y * size
@@ -61,7 +89,7 @@ const pitch = computed(() => (props.spread ? 1.18 : 0.98))
 const slots = computed<Slot[]>(() => {
   const { rects } = props
   const count = props.n ?? props.count
-  if (rects.length === 1) return grid(rects[0]!, count, props.cols ?? animalColumns(count), pitch.value, !!props.right)
+  if (rects.length === 1) return grid(rects[0]!, count, props.cols, pitch.value, !!props.right)
   const out: Slot[] = []
   let left = count
   rects.forEach((rect, i) => {
@@ -82,7 +110,7 @@ const slots = computed<Slot[]>(() => {
     >
       <!-- Каждый пассажир чуть покачивается, в своём темпе -->
       <g class="bob" :style="{ animationDelay: `${-(i * 0.37) % 1.8}s` }">
-        <AnimalFigure :kind="animal" :x="0" :y="0" :width="slot.size * W" :height="slot.size * H" seated />
+        <AnimalFigure :kind="animal" :variant="i" :x="0" :y="0" :width="slot.size * W" :height="slot.size * H" seated />
       </g>
     </g>
   </g>

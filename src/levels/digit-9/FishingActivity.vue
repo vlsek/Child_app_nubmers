@@ -16,7 +16,7 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const BUCKET = { x: 404, y: 196 }
+const BUCKET = { x: 50, y: 262 }
 const COLORS = ['#fb923c', '#f472b6', '#facc15', '#38bdf8', '#a3e635', '#f87171', '#c084fc', '#fb923c', '#2dd4bf']
 const FISH = Array.from({ length: 9 }, (_, i) => ({
   x: 120 + (i % 3) * 82 + (Math.floor(i / 3) % 2) * 20,
@@ -92,7 +92,7 @@ async function catchFish(i: number): Promise<void> {
     </g>
 
     <!-- Друг и ведёрко -->
-    <AnimalFigure :kind="level.animal" flip :mood="count >= 9 ? 'happy' : 'idle'" x="296" y="70" width="144" height="105" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" flip :mood="count >= 9 ? 'happy' : 'idle'" x="306" y="112" width="134" height="98" class="pointer-events-none" />
     <circle v-if="count < 9" :cx="BUCKET.x" :cy="BUCKET.y" r="36" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
     <g :transform="`translate(${BUCKET.x} ${BUCKET.y})`" class="pointer-events-none">
       <path d="M-24 -6 H24 L18 24 H-18Z" fill="#94a3b8" stroke="#475569" stroke-width="4" stroke-linejoin="round" />

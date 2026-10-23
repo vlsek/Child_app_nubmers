@@ -96,7 +96,7 @@ function appleStyle(i: number): Record<string, string> {
     <rect x="-20" y="258" width="480" height="8" fill="#22c55e" />
 
     <!-- Друг смотрит -->
-    <AnimalFigure :kind="level.animal" flip :mood="count >= TOTAL ? 'happy' : 'idle'" x="318" y="96" width="120" height="87" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" flip :mood="count >= TOTAL ? 'happy' : 'idle'" x="326" y="150" width="108" height="79" class="pointer-events-none" />
 
     <Crocodile x="0" y="84" width="250" height="183" :mood="count >= TOTAL ? 'happy' : 'idle'" :mouth="mouthOpen" :look="1" class="pointer-events-none" />
 

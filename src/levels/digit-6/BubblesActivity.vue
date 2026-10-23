@@ -58,7 +58,7 @@ async function pop(i: number): Promise<void> {
     <rect x="-20" y="290" width="480" height="40" fill="#bae6fd" />
 
     <!-- Крокодил в ванне -->
-    <Crocodile x="96" y="150" width="210" height="154" :mood="count >= 6 ? 'happy' : 'idle'" :mouth="surprise ? 0.5 : 0" :look="0" class="pointer-events-none" />
+    <Crocodile x="96" y="122" width="210" height="154" :mood="count >= 6 ? 'happy' : 'idle'" :mouth="surprise ? 0.5 : 0" :look="0" class="pointer-events-none" />
 
     <!-- Ванна: закрывает крокодила по пояс -->
     <g stroke-linejoin="round">
@@ -73,7 +73,7 @@ async function pop(i: number): Promise<void> {
     </g>
 
     <!-- Друг на краю ванны -->
-    <g transform="translate(360 168) scale(.6)" class="laugh"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
+    <g class="laugh"><AnimalFigure :kind="level.animal" flip x="322" y="166" width="88" height="64" /></g>
 
     <!-- Пузыри -->
     <g v-for="(b, i) in BUBBLES" :key="i" :transform="`translate(${b.x} ${b.y})`">

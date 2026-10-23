@@ -95,7 +95,7 @@ const drag = useDrag<number>(svg, {
     <rect x="-20" y="-20" width="480" height="350" fill="#bae6fd" />
 
     <!-- Нижняя челюсть, горло, язык -->
-    <path d="M30 186 Q30 296 220 296 Q410 296 410 186Z" fill="#4ade80" stroke="#15803d" stroke-width="5" stroke-linejoin="round" />
+    <path d="M30 186 Q30 296 220 296 Q410 296 410 186Z" fill="#4cae45" stroke="#1f5a2a" stroke-width="5" stroke-linejoin="round" />
     <path d="M52 186 Q60 268 220 268 Q380 268 388 186Z" fill="#7f1d1d" />
     <ellipse cx="220" cy="214" rx="46" ry="26" fill="#be123c" class="pointer-events-none" />
     <path d="M60 192 Q72 262 220 262 Q368 262 380 192Z" fill="#f87171" />
@@ -103,31 +103,31 @@ const drag = useDrag<number>(svg, {
     <g fill="#fecaca" opacity=".5"><circle cx="150" cy="232" r="5" /><circle cx="290" cy="236" r="5" /><circle cx="190" cy="248" r="4" /><circle cx="256" cy="250" r="4" /></g>
     <!-- нижние зубки -->
     <g fill="#fff" stroke="#94a3b8" stroke-width="2.5" stroke-linejoin="round">
-      <path v-for="k in 7" :key="k" :d="`M${58 + k * 46 - 10} 262 L${58 + k * 46} 244 L${58 + k * 46 + 10} 262Z`" />
+      <path v-for="k in 7" :key="k" :d="`M${58 + k * 46 - 11} 264 Q${58 + k * 46 - 11} 246 ${58 + k * 46} 246 Q${58 + k * 46 + 11} 246 ${58 + k * 46 + 11} 264Z`" />
     </g>
 
     <!-- Верхняя часть морды -->
-    <path d="M18 128 Q18 36 220 36 Q422 36 422 128 L422 150 Q422 162 400 162 H40 Q18 162 18 150Z" fill="#4ade80" stroke="#15803d" stroke-width="5" stroke-linejoin="round" />
-    <path d="M60 52 Q220 14 380 52" fill="none" stroke="#86efac" stroke-width="6" stroke-linecap="round" opacity=".7" />
+    <path d="M18 128 Q18 36 220 36 Q422 36 422 128 L422 150 Q422 162 400 162 H40 Q18 162 18 150Z" fill="#4cae45" stroke="#1f5a2a" stroke-width="5" stroke-linejoin="round" />
+    <path d="M60 52 Q220 14 380 52" fill="none" stroke="#7bc96f" stroke-width="6" stroke-linecap="round" opacity=".7" />
     <!-- ноздри и бугорки -->
-    <ellipse cx="190" cy="132" rx="6" ry="4" fill="#15803d" /><ellipse cx="250" cy="132" rx="6" ry="4" fill="#15803d" />
-    <g fill="#22c55e" stroke="#15803d" stroke-width="2.5"><circle cx="40" cy="112" r="8" /><circle cx="400" cy="112" r="8" /><circle cx="220" cy="48" r="7" /></g>
+    <ellipse cx="190" cy="132" rx="6" ry="4" fill="#1f5a2a" /><ellipse cx="250" cy="132" rx="6" ry="4" fill="#1f5a2a" />
+    <g fill="#3f9f3b" stroke="#1f5a2a" stroke-width="2.5"><circle cx="40" cy="112" r="8" /><circle cx="400" cy="112" r="8" /><circle cx="220" cy="48" r="7" /></g>
 
     <!-- Глаза: в конце жмурится -->
     <g v-if="!happy">
-      <circle cx="108" cy="82" r="24" fill="#fff" stroke="#15803d" stroke-width="4" /><circle cx="114" cy="86" r="11" fill="#1e293b" /><circle cx="118" cy="81" r="4" fill="#fff" />
-      <circle cx="332" cy="82" r="24" fill="#fff" stroke="#15803d" stroke-width="4" /><circle cx="326" cy="86" r="11" fill="#1e293b" /><circle cx="330" cy="81" r="4" fill="#fff" />
+      <circle cx="108" cy="82" r="24" fill="#fff" stroke="#1f5a2a" stroke-width="4" /><circle cx="114" cy="86" r="11" fill="#1e293b" /><circle cx="118" cy="81" r="4" fill="#fff" />
+      <circle cx="332" cy="82" r="24" fill="#fff" stroke="#1f5a2a" stroke-width="4" /><circle cx="326" cy="86" r="11" fill="#1e293b" /><circle cx="330" cy="81" r="4" fill="#fff" />
     </g>
     <g v-else fill="none" stroke="#14532d" stroke-width="6" stroke-linecap="round">
       <path d="M86 88 Q108 64 130 88" /><path d="M310 88 Q332 64 354 88" />
     </g>
-    <path d="M84 56 Q108 42 132 54" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round" />
-    <path d="M308 54 Q332 42 356 56" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round" />
+    <path d="M84 56 Q108 42 132 54" fill="none" stroke="#1f5a2a" stroke-width="5" stroke-linecap="round" />
+    <path d="M308 54 Q332 42 356 56" fill="none" stroke="#1f5a2a" stroke-width="5" stroke-linecap="round" />
     <g fill="#f472b6" opacity=".55"><ellipse cx="70" cy="118" rx="16" ry="9" /><ellipse cx="370" cy="118" rx="16" ry="9" /></g>
 
     <!-- Верхние зубы -->
     <g v-for="(t, i) in TEETH" :key="i" :class="{ dirty: !clean[i] }" @click="wash(i)">
-      <path :d="`M${t.x - 17} 158 L${t.x} 208 L${t.x + 17} 158Z`" :fill="clean[i] ? '#fff' : '#fef3c7'" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round" />
+      <path :d="`M${t.x - 16} 158 V188 Q${t.x - 16} 206 ${t.x} 206 Q${t.x + 16} 206 ${t.x + 16} 188 V158Z`" :fill="clean[i] ? '#fff' : '#fef3c7'" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round" />
       <template v-if="!clean[i]">
         <ellipse :cx="t.x" cy="177" rx="12" ry="11" fill="#78350f" opacity=".9" /><circle :cx="t.x - 5" cy="173" r="4" fill="#a16207" /><circle :cx="t.x + 5" cy="181" r="2.5" fill="#451a03" />
         <path :d="`M${t.x - 9} 160 q-4 -8 0 -14 M${t.x + 9} 160 q4 -8 0 -14`" fill="none" stroke="#65a30d" stroke-width="2.5" stroke-linecap="round" class="stink" />
