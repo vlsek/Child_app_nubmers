@@ -3,14 +3,14 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
-import { pop } from '@/composables/synth'
+import { animalSound, pop } from '@/composables/synth'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 10: «Крокодил греет десять яиц».
  * Тап по яйцу: оно трескается, выглядывает цыплёнок, голос считает.
  */
-defineProps<{ level: NumberLevel }>()
+const props = defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
@@ -37,6 +37,7 @@ async function hatch(i: number): Promise<void> {
   mouth.value = 0.4
   setTimeout(() => (mouth.value = 0), 400)
   pop()
+  animalSound(props.level.animal)
   const said = sayNumber(n)
   if (n < 10) return
   await said

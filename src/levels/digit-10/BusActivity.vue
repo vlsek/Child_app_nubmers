@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
-import { boing } from '@/composables/synth'
+import { animalSound, boing } from '@/composables/synth'
 import { inRect, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -12,7 +12,7 @@ import type { NumberLevel } from '@/types/game'
  * Цыплёнка на остановке перетаскивают в автобус (или тапают: он сам запрыгивает в окошко), голос считает.
  * Когда все десять внутри, автобус уезжает.
  */
-defineProps<{ level: NumberLevel }>()
+const props = defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
@@ -67,6 +67,7 @@ async function board(i: number): Promise<void> {
   boarded.value[i] = n
   flying.value = null
   boing()
+  animalSound(props.level.animal)
   const said = sayNumber(n)
   if (n < 10) return
   await said

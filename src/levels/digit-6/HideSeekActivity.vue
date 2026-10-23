@@ -3,14 +3,14 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
-import { pop } from '@/composables/synth'
+import { animalSound, pop } from '@/composables/synth'
 import type { NumberLevel } from '@/types/game'
 
 /**
  * Цифра 6: «Прятки». Шесть кустиков, за каждым прячется зверёк. Тап по кустику:
  * он трясётся, зверёк выскакивает («ку-ку!»), голос считает, крокодил радуется.
  */
-defineProps<{ level: NumberLevel }>()
+const props = defineProps<{ level: NumberLevel }>()
 const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
@@ -51,6 +51,7 @@ async function look(i: number): Promise<void> {
   mouth.value = 0.5
   setTimeout(() => (mouth.value = 0), 400)
   pop()
+  animalSound(props.level.animal)
   const said = sayNumber(n)
   if (n < N) return
   await said

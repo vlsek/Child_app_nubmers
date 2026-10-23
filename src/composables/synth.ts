@@ -81,8 +81,9 @@ export function ding(n: number): void {
 
 /** Хлопок пузыря / лопнувший шарик. */
 export function pop(): void {
-  tone(900, 0.09, 'sine', 0.3)
-  noise(0.08, 3000, 1200, 0.25, 'highpass')
+  noise(0.09, 6000, 1500, 0.55, 'highpass')
+  noise(0.05, 2500, 900, 0.3, 'bandpass', 0.005)
+  glide([1300, 260], 0.08, 'triangle', 0.3, 4000)
 }
 
 /** Ам! Крокодил смыкает пасть. */
@@ -148,4 +149,70 @@ export function drop(): void {
 export function fanfare(): void {
   ;[0, 2, 4, 7].forEach((k, i) => tone(SCALE[k]! * (k === 7 ? 1 : 1), 0.45, 'triangle', 0.22, i * 0.11))
   tone(SCALE[7]! * 2, 0.7, 'sine', 0.12, 0.45)
+}
+
+/** Нота со скольжением: частота идёт по точкам `freqs` за `seconds`, звук проходит через фильтр. */
+function glide(freqs: number[], seconds: number, type: OscillatorType, volume: number, cutoff = 4000, delay = 0): void {
+  const c = audio()
+  if (!c) return
+  try {
+    const t = c.currentTime + delay
+    const osc = c.createOscillator()
+    osc.type = type
+    osc.frequency.setValueAtTime(freqs[0]!, t)
+    freqs.slice(1).forEach((f, i) => osc.frequency.linearRampToValueAtTime(f, t + (seconds * (i + 1)) / (freqs.length - 1)))
+    const filter = c.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.value = cutoff
+    osc.connect(filter).connect(envelope(c, t, volume, seconds, 0.02)).connect(c.destination)
+    osc.start(t)
+    osc.stop(t + seconds + 0.05)
+  } catch {
+    /* без звука */
+  }
+}
+
+/** Голос зверя (синтез, пока нет записей): кот мяукает, собака гавкает, свинья хрюкает и так далее. */
+export function animalSound(kind: string): void {
+  switch (kind) {
+    case 'cat':
+      glide([480, 900, 760, 520], 0.55, 'sawtooth', 0.16, 2400)
+      break
+    case 'dog':
+      glide([420, 220], 0.14, 'sawtooth', 0.26, 1100)
+      glide([420, 210], 0.16, 'sawtooth', 0.26, 1100, 0.22)
+      break
+    case 'pig':
+      glide([200, 150, 230, 140], 0.4, 'sawtooth', 0.2, 800)
+      noise(0.18, 900, 300, 0.12, 'lowpass', 0.05)
+      break
+    case 'frog':
+      for (let i = 0; i < 3; i++) glide([140, 260, 170], 0.1, 'square', 0.12, 1200, i * 0.13)
+      break
+    case 'chick':
+      for (let i = 0; i < 3; i++) glide([1900, 2700, 2200], 0.09, 'sine', 0.16, 5000, i * 0.12)
+      break
+    case 'bunny':
+      glide([1100, 1500], 0.1, 'sine', 0.14, 4000)
+      glide([1300, 1700], 0.1, 'sine', 0.14, 4000, 0.14)
+      break
+    case 'monkey':
+      glide([480, 760, 520], 0.2, 'triangle', 0.22, 3000)
+      glide([560, 900, 600], 0.2, 'triangle', 0.22, 3000, 0.24)
+      glide([520, 820, 460], 0.28, 'triangle', 0.22, 3000, 0.48)
+      break
+    case 'tiger':
+      glide([170, 110, 85], 0.75, 'sawtooth', 0.24, 700)
+      noise(0.6, 600, 200, 0.14, 'lowpass')
+      break
+    case 'bear':
+      glide([120, 95, 80], 0.65, 'sawtooth', 0.26, 420)
+      noise(0.5, 400, 150, 0.12, 'lowpass')
+      break
+    case 'panda':
+      glide([420, 540, 430, 520], 0.45, 'triangle', 0.22, 2600)
+      break
+    default:
+      tone(520, 0.2, 'triangle', 0.2)
+  }
 }
