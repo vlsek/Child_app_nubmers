@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { splash } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -68,6 +69,7 @@ async function catchFish(i: number): Promise<void> {
   flying.value = null
   mouth.value = 0.4
   setTimeout(() => (mouth.value = 0), 400)
+  splash()
   const said = sayNumber(n)
   if (n < 9) return
   await said

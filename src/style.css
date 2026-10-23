@@ -101,3 +101,29 @@
     animation: none;
   }
 }
+
+/* Искорка под пальцем (SequenceView) */
+.tap-spark {
+  width: 2.2rem;
+  height: 2.2rem;
+  margin: -1.1rem 0 0 -1.1rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #fff 0 18%, #fde047 19% 40%, rgba(253, 224, 71, 0) 70%);
+  animation: tap-spark 0.65s ease-out forwards;
+}
+@keyframes tap-spark {
+  from {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tap-spark {
+    animation: none;
+    opacity: 0;
+  }
+}

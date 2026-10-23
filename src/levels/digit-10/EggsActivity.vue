@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { pop } from '@/composables/synth'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -35,6 +36,7 @@ async function hatch(i: number): Promise<void> {
   hatched.value[i] = n
   mouth.value = 0.4
   setTimeout(() => (mouth.value = 0), 400)
+  pop()
   const said = sayNumber(n)
   if (n < 10) return
   await said

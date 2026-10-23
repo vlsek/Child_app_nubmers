@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { drop } from '@/composables/synth'
 import { inRect, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -55,6 +56,7 @@ function hook(i: number): boolean {
 }
 
 async function go(n: number): Promise<void> {
+  drop()
   const said = sayNumber(n)
   if (n < 5) return
   await said

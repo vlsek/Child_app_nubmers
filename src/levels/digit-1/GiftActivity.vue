@@ -3,6 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { pop } from '@/composables/synth'
 import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -48,6 +49,7 @@ const drag = useDrag<number>(svg, {
 async function open(): Promise<void> {
   if (opened.value) return
   opened.value = true
+  pop()
   const said = sayNumber(1)
   await said
   await sleep(1100)

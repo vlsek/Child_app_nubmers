@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { pop } from '@/composables/synth'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -43,6 +44,7 @@ async function pop(i: number): Promise<void> {
   popped.value[i] = n
   surprise.value = true
   setTimeout(() => (surprise.value = false), 300)
+  pop()
   const said = sayNumber(n)
   if (n < 6) return
   await said

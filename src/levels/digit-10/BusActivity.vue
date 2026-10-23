@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { boing } from '@/composables/synth'
 import { inRect, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -64,6 +65,7 @@ async function board(i: number): Promise<void> {
   const n = count.value + 1
   boarded.value[i] = n
   flying.value = null
+  boing()
   const said = sayNumber(n)
   if (n < 10) return
   await said

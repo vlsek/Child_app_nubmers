@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { chomp } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -83,6 +84,7 @@ async function eat(i: number): Promise<void> {
   const n = eatenCount.value + 1
   eaten.value[i] = n
   flying.value = null
+  chomp()
   const said = sayNumber(n)
   await tweenMouth(0, 220)
   if (n < WANT) return

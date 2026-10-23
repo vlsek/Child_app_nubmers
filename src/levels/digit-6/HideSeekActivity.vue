@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { pop } from '@/composables/synth'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -49,6 +50,7 @@ async function look(i: number): Promise<void> {
   hop.value++
   mouth.value = 0.5
   setTimeout(() => (mouth.value = 0), 400)
+  pop()
   const said = sayNumber(n)
   if (n < N) return
   await said

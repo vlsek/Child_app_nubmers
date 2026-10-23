@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { drop } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -53,6 +54,7 @@ function pick(i: number): boolean {
 async function collect(i: number): Promise<void> {
   const n = count.value + 1
   got.value[i] = n
+  drop()
   const said = sayNumber(n)
   await sleep(500)
   if (!alive) return

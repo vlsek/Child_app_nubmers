@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { chomp } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -50,6 +51,7 @@ async function feed(b: number, c: number): Promise<boolean> {
   if (!alive) return true
   const n = count.value + 1
   fed.value[c] = n
+  chomp()
   const said = sayNumber(n)
   if (n < 2) return true
   await said

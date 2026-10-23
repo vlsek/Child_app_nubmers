@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { boing } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -62,6 +63,7 @@ async function climb(): Promise<void> {
   if (busy || at.value >= 3) return
   busy = true
   at.value++
+  boing()
   const said = sayNumber(at.value)
   await sleep(550)
   busy = false

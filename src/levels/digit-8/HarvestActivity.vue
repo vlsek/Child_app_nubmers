@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { pop } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -60,6 +61,7 @@ async function load(i: number): Promise<void> {
   const n = count.value + 1
   loaded.value[i] = n
   flying.value = null
+  pop()
   const said = sayNumber(n)
   if (n < 8) return
   await said

@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { splash } from '@/composables/synth'
 import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -98,6 +99,7 @@ async function extinguish(i: number): Promise<void> {
   out.value[i] = n
   spraying.value = null
   held.value = null
+  splash()
   const said = sayNumber(n)
   if (n < 7) return
   await said

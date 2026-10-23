@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { drop } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -53,6 +54,7 @@ function place(i: number): boolean {
 }
 
 async function finish(n: number): Promise<void> {
+  drop()
   const said = sayNumber(n)
   if (n < 9) return
   await said

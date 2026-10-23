@@ -43,6 +43,17 @@ const hint = ref(false)
 let runId = 0
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
+/** Искорки под пальцем: любое касание сцены чуть «отзывается». */
+const sparks = ref<{ id: number; x: number; y: number }[]>([])
+let sparkId = 0
+function spark(e: PointerEvent): void {
+  const box = (e.currentTarget as HTMLElement).getBoundingClientRect()
+  const id = ++sparkId
+  sparks.value.push({ id, x: e.clientX - box.left, y: e.clientY - box.top })
+  if (sparks.value.length > 6) sparks.value.shift()
+  setTimeout(() => (sparks.value = sparks.value.filter((s) => s.id !== id)), 650)
+}
+
 function armHint(): void {
   clearTimeout(hintTimer)
   hint.value = false
@@ -155,10 +166,11 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       />
     </div>
 
-    <div v-if="!finished" class="relative min-h-0 flex-1" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint">
+    <div v-if="!finished" class="relative min-h-0 flex-1" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint(); spark($event)">
       <Transition name="page" mode="out-in">
         <component :is="views[step]" :key="`${round}-${step}`" :level="level" @complete="onComplete" />
       </Transition>
+      <span v-for="s in sparks" :key="s.id" class="tap-spark pointer-events-none absolute z-20" :style="{ left: s.x + 'px', top: s.y + 'px' }" />
     </div>
 
     <!-- Конец уровня -->

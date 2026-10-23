@@ -3,6 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { boing } from '@/composables/synth'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -35,6 +36,7 @@ async function jump(): Promise<void> {
   const i = cur.value
   stumps.value[i] = -80
   await sleep(450)
+  boing()
   const said = sayNumber(i + 1)
   await sleep(550)
   jumping.value = false

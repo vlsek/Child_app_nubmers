@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { splash } from '@/composables/synth'
 import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -76,6 +77,7 @@ async function pour(i: number): Promise<void> {
   if (!alive) return
   const n = count.value + 1
   bloom.value[i] = n
+  splash()
   const said = sayNumber(n)
   pouring.value = false
   at.value = -1

@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { pop } from '@/composables/synth'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -53,6 +54,7 @@ async function pop(i: number): Promise<void> {
   const n = count.value + 1
   popped.value[i] = n
   void tweenMouth(0.8, 120)
+  pop()
   const said = sayNumber(n)
   await sleep(350)
   void tweenMouth(0, 200)

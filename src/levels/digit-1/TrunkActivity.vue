@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
+import { whoosh } from '@/composables/synth'
 import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -56,6 +57,7 @@ async function finish(): Promise<void> {
   done.value = true
   pulling.value = false
   happy.value = true
+  whoosh()
   const said = sayNumber(1)
   await said
   await sleep(700)
