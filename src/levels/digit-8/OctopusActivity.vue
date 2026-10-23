@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAudio } from '@/composables/useAudio'
 import { drop } from '@/composables/synth'
-import { near, useDrag } from '@/composables/useDrag'
+import { useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
 /**

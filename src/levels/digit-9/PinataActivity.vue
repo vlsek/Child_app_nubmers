@@ -80,7 +80,7 @@ async function hit(): Promise<void> {
     <path d="M-800 250 H1240 V340 H-800Z" fill="#fb923c" /><path d="M-800 250 H1240" stroke="#c2410c" stroke-width="4" />
     <g class="pointer-events-none">
       <path d="M0 14 Q110 50 220 14 T440 14" fill="none" stroke="#0f172a" stroke-opacity=".35" stroke-width="2.5" />
-      <path v-for="(f, i) in 8" :key="i" :d="`M${i * 55 + 12} ${i % 2 ? 30 : 24} l11 0 l-5.5 17Z`" :fill="COLORS[i]" />
+      <path v-for="(_, i) in 8" :key="i" :d="`M${i * 55 + 12} ${i % 2 ? 30 : 24} l11 0 l-5.5 17Z`" :fill="COLORS[i]" />
     </g>
 
     <!-- верёвка и пиньята -->
