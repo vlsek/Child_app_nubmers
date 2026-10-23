@@ -246,5 +246,5 @@
 ## APK (ветка `agent-1/apk`)
 
 - Обёртка: Capacitor 8 (`capacitor.config.ts`, папка `android/`), горизонтальная ориентация (`sensorLandscape`), appId `app.crocodile.numbers`.
-- Сборка в облаке: `.github/workflows/android-apk.yml` (запуск вручную или пушем в `agent-1/apk`), готовый `app-debug.apk` лежит в Artifacts запуска. Локально нужны JDK 21 и Android SDK: `npm run android:apk`.
+- Сборка в облаке: шаблон `docs/android-apk.workflow.yml`: скопируйте в `.github/workflows/android-apk.yml` через сайт GitHub (у токена агента нет права на workflow-файлы), запуск вручную (Actions → Android APK → Run workflow), готовый `app-debug.apk` лежит в Artifacts запуска. Локально нужны JDK 21 и Android SDK: `npm run android:apk`.
 - Для магазина дальше нужны: иконка и заставка (`@capacitor/assets`), подпись релиза (keystore, не в репозитории!), `assembleRelease`/AAB.

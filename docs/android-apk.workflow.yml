@@ -1,5 +1,6 @@
 name: Android APK
 
+# Скопируйте этот файл в .github/workflows/android-apk.yml (у токена агента нет права на workflow-файлы).
 # Собирает отладочный APK игры и кладёт его в «Artifacts» запуска (Actions → Android APK → app-debug).
 on:
   workflow_dispatch:
