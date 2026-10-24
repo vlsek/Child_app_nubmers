@@ -253,4 +253,5 @@
 
 - Capacitor: `capacitor.config.ts` (appId `com.vlsek.krokodil`), папка `android/` (всегда горизонтально `sensorLandscape`, на весь экран, экран не гаснет, см. `MainActivity.java`). Сборка: `npm run build && npx cap sync android`, затем в Android Studio (или `cd android && ./gradlew assembleDebug`).
 - Готовый APK без Android Studio: `android-ci/android.yml` скопировать в `.github/workflows/android.yml` (через сайт GitHub: токен без права `workflow` не может создать такой файл). Дальше Actions → Android APK → Artifacts → `krokodil-debug-apk`.
-- Не сделано: свой значок и заставка (сейчас стандартные Capacitor), шрифты с Google Fonts не работают без интернета (нужно положить Nunito в проект), подпись release-сборки для магазина.
+- Значок и заставка: исходники `assets/*.svg` (+ png), генерация `npx capacitor-assets generate --android --assetPath assets`. Шрифт Nunito в проекте (`@fontsource/nunito`), работает офлайн.
+- Не сделано: подпись release-сборки для магазина.

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2732 2732" width="2732" height="2732"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#e0f2fe"/></linearGradient></defs><rect width="2732" height="2732" fill="url(#g)"/><g transform="translate(666 520) scale(1.4)">
+<g stroke="#15803d" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+  <!-- нижняя челюсть и пасть -->
+  <path d="M236 540 Q236 760 512 760 Q788 760 788 540Z" fill="#4ade80"/>
+  <path d="M270 540 Q290 720 512 720 Q734 720 754 540Z" fill="#7f1d1d" stroke="none"/>
+  <ellipse cx="512" cy="660" rx="150" ry="52" fill="#f87171" stroke="none"/>
+  <path d="M512 590 V700" stroke="#be123c" stroke-width="10" fill="none"/>
+  <path d="M300 700 L330 660 L360 706 L392 664 M632 664 L664 706 L694 660 L724 700" fill="#fff" stroke="#94a3b8" stroke-width="6"/>
+  <!-- верхняя морда -->
+  <path d="M200 430 Q200 340 300 340 H724 Q824 340 824 430 V540 H200Z" fill="#4ade80"/>
+  <!-- ноздри-бугры -->
+  <circle cx="392" cy="372" r="46" fill="#4ade80"/><circle cx="632" cy="372" r="46" fill="#4ade80"/>
+  <ellipse cx="392" cy="376" rx="14" ry="10" fill="#15803d" stroke="none"/><ellipse cx="632" cy="376" rx="14" ry="10" fill="#15803d" stroke="none"/>
+  <!-- глаза -->
+  <circle cx="300" cy="290" r="78" fill="#4ade80"/><circle cx="724" cy="290" r="78" fill="#4ade80"/>
+  <circle cx="300" cy="290" r="52" fill="#fff"/><circle cx="724" cy="290" r="52" fill="#fff"/>
+  <circle cx="316" cy="300" r="26" fill="#1e293b" stroke="none"/><circle cx="708" cy="300" r="26" fill="#1e293b" stroke="none"/>
+  <circle cx="326" cy="290" r="9" fill="#fff" stroke="none"/><circle cx="718" cy="290" r="9" fill="#fff" stroke="none"/>
+  <!-- верхние зубы -->
+  <path d="M290 540 L322 590 L354 540 M392 540 L424 590 L456 540 M568 540 L600 590 L632 540 M670 540 L702 590 L734 540" fill="#fff" stroke="#94a3b8" stroke-width="6"/>
+  <path d="M200 540 H824" fill="none"/>
+  <ellipse cx="260" cy="470" rx="34" ry="20" fill="#f9a8d4" opacity=".85" stroke="none"/><ellipse cx="764" cy="470" rx="34" ry="20" fill="#f9a8d4" opacity=".85" stroke="none"/>
+</g>
+<g><circle cx="780" cy="790" r="140" fill="#fde047" stroke="#ca8a04" stroke-width="16"/>
+<text x="780" y="838" text-anchor="middle" font-family="Nunito, Arial, sans-serif" font-size="128" font-weight="900" fill="#b45309">123</text></g></g></svg>
