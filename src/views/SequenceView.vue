@@ -140,7 +140,7 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
 </script>
 
 <template>
-  <main class="relative mx-auto flex h-full w-full max-w-4xl flex-col px-4 [@media(orientation:portrait)]:px-0 pb-6 pt-28 [@media(max-height:500px)]:pb-2 [@media(max-height:500px)]:pt-12">
+  <main class="relative mx-auto flex h-full w-full max-w-4xl flex-col px-4 [@media(orientation:portrait)]:px-3 pb-6 pt-28 [@media(max-height:500px)]:pb-2 [@media(max-height:500px)]:pt-12">
     <Confetti :burst="burst" :big="finished" />
     <button type="button" class="btn-round absolute left-4 top-4 z-30 sm:left-8 sm:top-8" aria-label="К машинкам" @click="toCars">
       <Icon name="back" />
