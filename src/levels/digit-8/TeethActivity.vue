@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { pop } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
@@ -16,14 +17,30 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const TEETH = Array.from({ length: 8 }, (_, i) => ({ x: 78 + i * 40 }))
+/** Наш настоящий крокодил крупным планом: пасть открыта на максимум (верхняя челюсть -22°, нижняя +12° вокруг шарнира). */
+const S = 1.95
+const OX = 2
+const OY = -30
+const HINGE = { x: 72, y: 92 }
+const rot = (p: { x: number; y: number }, deg: number): { x: number; y: number } => {
+  const r = (deg * Math.PI) / 180
+  const dx = p.x - HINGE.x
+  const dy = p.y - HINGE.y
+  return { x: HINGE.x + dx * Math.cos(r) - dy * Math.sin(r), y: HINGE.y + dx * Math.sin(r) + dy * Math.cos(r) }
+}
+const TOOTH_X = [108, 132, 156, 180]
+/** 8 зубов: 4 верхних (кончики вниз) и 4 нижних (кончики вверх). `c` — центр в рисунке крокодила, `p` — в сцене. */
+const TEETH = [
+  ...TOOTH_X.map((x) => ({ c: rot({ x: x + 6, y: 99 }, -22), up: true })),
+  ...TOOTH_X.map((x) => ({ c: rot({ x, y: 90 }, 12), up: false })),
+].map((t) => ({ ...t, x: OX + S * t.c.x, y: OY + S * t.c.y }))
 const clean = ref<number[]>(TEETH.map(() => 0))
 const count = computed(() => clean.value.filter(Boolean).length)
 const happy = computed(() => count.value >= 8)
-const birdX = ref(220)
+const birdAt = ref({ x: 270, y: 236 })
 const brushing = ref(-1)
-const foam = ref<{ id: number; x: number; dx: number }[]>([])
-const bird = computed(() => ({ x: birdX.value, y: 224 }))
+const foam = ref<{ id: number; x: number; y: number; dx: number }[]>([])
+const bird = computed(() => ({ x: birdAt.value.x, y: birdAt.value.y }))
 const svg = ref<SVGSVGElement | null>(null)
 let foamId = 0
 let alive = true
@@ -38,16 +55,17 @@ onBeforeUnmount(() => {
 function wash(i: number): boolean {
   if (clean.value[i] || brushing.value >= 0 || count.value >= 8) return false
   brushing.value = i
-  birdX.value = TEETH[i]!.x
+  birdAt.value = { x: TEETH[i]!.x + 6, y: TEETH[i]!.y + (TEETH[i]!.up ? 52 : -34) }
   void scrub(i)
   return true
 }
 
 async function scrub(i: number): Promise<void> {
   const x = TEETH[i]!.x
+  const y = TEETH[i]!.y
   for (let k = 0; k < 4; k++) {
     const id = ++foamId
-    foam.value.push({ id, x: x + (k % 2 ? 8 : -8), dx: (k - 1.5) * 6 })
+    foam.value.push({ id, x: x + (k % 2 ? 8 : -8), y, dx: (k - 1.5) * 6 })
     setTimeout(() => (foam.value = foam.value.filter((f) => f.id !== id)), 900)
     pop()
     await sleep(140)
@@ -68,8 +86,8 @@ function dirtyNear(p: { x: number; y: number }): number {
   let best = -1
   let bd = Infinity
   TEETH.forEach((t, i) => {
-    const d = Math.hypot(p.x - t.x, p.y - 180)
-    if (!clean.value[i] && near(p, { x: t.x, y: 180 }, 62) && d < bd) {
+    const d = Math.hypot(p.x - t.x, p.y - t.y)
+    if (!clean.value[i] && near(p, { x: t.x, y: t.y }, 56) && d < bd) {
       best = i
       bd = d
     }
@@ -92,55 +110,25 @@ const drag = useDrag<number>(svg, {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Почисти восемь зубов крокодилу">
-    <rect x="-800" y="-20" width="2040" height="350" fill="#bae6fd" />
+    <rect x="-800" y="-1200" width="2040" height="1530" fill="#bae6fd" />
 
-    <!-- Нижняя челюсть, горло, язык -->
-    <path d="M30 186 Q30 296 220 296 Q410 296 410 186Z" fill="#4cae45" stroke="#1f5a2a" stroke-width="5" stroke-linejoin="round" />
-    <path d="M52 186 Q60 268 220 268 Q380 268 388 186Z" fill="#7f1d1d" />
-    <ellipse cx="220" cy="214" rx="46" ry="26" fill="#be123c" class="pointer-events-none" />
-    <path d="M60 192 Q72 262 220 262 Q368 262 380 192Z" fill="#f87171" />
-    <path d="M220 190 V258" stroke="#be123c" stroke-width="4" stroke-linecap="round" />
-    <g fill="#fecaca" opacity=".5"><circle cx="150" cy="232" r="5" /><circle cx="290" cy="236" r="5" /><circle cx="190" cy="248" r="4" /><circle cx="256" cy="250" r="4" /></g>
-    <!-- нижние зубки -->
-    <g fill="#fff" stroke="#94a3b8" stroke-width="2.5" stroke-linejoin="round">
-      <path v-for="k in 7" :key="k" :d="`M${58 + k * 46 - 11} 264 Q${58 + k * 46 - 11} 246 ${58 + k * 46} 246 Q${58 + k * 46 + 11} 246 ${58 + k * 46 + 11} 264Z`" />
-    </g>
+    <!-- Наш крокодил с широко открытой пастью -->
+    <Crocodile :x="OX" :y="OY" :width="220 * S" :height="160 * S" :mood="happy ? 'happy' : 'idle'" :mouth="1" :look="1" class="pointer-events-none" />
 
-    <!-- Верхняя часть морды -->
-    <path d="M18 128 Q18 36 220 36 Q422 36 422 128 L422 150 Q422 162 400 162 H40 Q18 162 18 150Z" fill="#4cae45" stroke="#1f5a2a" stroke-width="5" stroke-linejoin="round" />
-    <path d="M60 52 Q220 14 380 52" fill="none" stroke="#7bc96f" stroke-width="6" stroke-linecap="round" opacity=".7" />
-    <!-- ноздри и бугорки -->
-    <ellipse cx="190" cy="132" rx="6" ry="4" fill="#1f5a2a" /><ellipse cx="250" cy="132" rx="6" ry="4" fill="#1f5a2a" />
-    <g fill="#3f9f3b" stroke="#1f5a2a" stroke-width="2.5"><circle cx="40" cy="112" r="8" /><circle cx="400" cy="112" r="8" /><circle cx="220" cy="48" r="7" /></g>
-
-    <!-- Глаза: в конце жмурится -->
-    <g v-if="!happy">
-      <circle cx="108" cy="82" r="24" fill="#fff" stroke="#1f5a2a" stroke-width="4" /><circle cx="114" cy="86" r="11" fill="#1e293b" /><circle cx="118" cy="81" r="4" fill="#fff" />
-      <circle cx="332" cy="82" r="24" fill="#fff" stroke="#1f5a2a" stroke-width="4" /><circle cx="326" cy="86" r="11" fill="#1e293b" /><circle cx="330" cy="81" r="4" fill="#fff" />
-    </g>
-    <g v-else fill="none" stroke="#14532d" stroke-width="6" stroke-linecap="round">
-      <path d="M86 88 Q108 64 130 88" /><path d="M310 88 Q332 64 354 88" />
-    </g>
-    <path d="M84 56 Q108 42 132 54" fill="none" stroke="#1f5a2a" stroke-width="5" stroke-linecap="round" />
-    <path d="M308 54 Q332 42 356 56" fill="none" stroke="#1f5a2a" stroke-width="5" stroke-linecap="round" />
-    <g fill="#f472b6" opacity=".55"><ellipse cx="70" cy="118" rx="16" ry="9" /><ellipse cx="370" cy="118" rx="16" ry="9" /></g>
-
-    <!-- Верхние зубы -->
-    <g v-for="(t, i) in TEETH" :key="i" :class="{ dirty: !clean[i] }" @click="wash(i)">
-      <path :d="`M${t.x - 16} 158 V188 Q${t.x - 16} 206 ${t.x} 206 Q${t.x + 16} 206 ${t.x + 16} 188 V158Z`" :fill="clean[i] ? '#fff' : '#fef3c7'" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round" />
-      <template v-if="!clean[i]">
-        <ellipse :cx="t.x" cy="177" rx="12" ry="11" fill="#78350f" opacity=".9" /><circle :cx="t.x - 5" cy="173" r="4" fill="#a16207" /><circle :cx="t.x + 5" cy="181" r="2.5" fill="#451a03" />
-        <path :d="`M${t.x - 9} 160 q-4 -8 0 -14 M${t.x + 9} 160 q4 -8 0 -14`" fill="none" stroke="#65a30d" stroke-width="2.5" stroke-linecap="round" class="stink" />
-      </template>
-      <template v-else>
-        <path :d="`M${t.x - 8} 166 q4 14 8 20`" fill="none" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" />
-        <g :transform="`translate(${t.x + 6} 174)`" class="spark"><path d="M0 -9 L2.5 -2.5 L9 0 L2.5 2.5 L0 9 L-2.5 2.5 L-9 0 L-2.5 -2.5Z" fill="#fde047" stroke="#ca8a04" stroke-width="1.5" /></g>
-      </template>
-      <rect :x="t.x - 22" y="150" width="44" height="64" fill="transparent" />
+    <!-- Зубы: грязные пятнышки и блеск (рисуем в координатах крокодила) -->
+    <g :transform="`translate(${OX} ${OY}) scale(${S})`" stroke-linejoin="round" stroke-linecap="round">
+      <g v-for="(t, i) in TEETH" :key="i" :class="{ dirty: !clean[i] }" @click="wash(i)">
+        <template v-if="!clean[i]">
+          <ellipse :cx="t.c.x" :cy="t.c.y" rx="6" ry="5.5" fill="#78350f" opacity=".92" />
+          <circle :cx="t.c.x - 2" :cy="t.c.y - 2" r="1.8" fill="#a16207" /><circle :cx="t.c.x + 2.5" :cy="t.c.y + 2" r="1.2" fill="#451a03" />
+        </template>
+        <g v-else :transform="`translate(${t.c.x + 1} ${t.c.y})`" class="spark"><path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6Z" fill="#fde047" stroke="#ca8a04" stroke-width=".8" /></g>
+        <circle :cx="t.c.x" :cy="t.c.y" r="12" fill="transparent" />
+      </g>
     </g>
 
     <!-- Пена -->
-    <circle v-for="f in foam" :key="f.id" :cx="f.x" cy="184" r="6" fill="#fff" stroke="#7dd3fc" stroke-width="2" class="bubble pointer-events-none" :style="{ '--dx': f.dx + 'px' }" />
+    <circle v-for="f in foam" :key="f.id" :cx="f.x" :cy="f.y" r="6" fill="#fff" stroke="#7dd3fc" stroke-width="2" class="bubble pointer-events-none" :style="{ '--dx': f.dx + 'px' }" />
 
     <!-- Птенчик с зубной щёткой -->
     <g :style="drag.style(0, bird)" @pointerdown="drag.start($event, 0, bird)">

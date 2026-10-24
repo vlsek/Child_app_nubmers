@@ -21,11 +21,11 @@ const HOMES = [
   { x: 236, y: 266 },
   { x: 296, y: 268 },
 ]
-const BARROW = { x: 372, y: 252 }
+const BARROW = { x: 372, y: 232 }
 /** Где камень лежит в тачке (по порядку). */
 const IN_BARROW = [
-  { x: 358, y: 240 },
-  { x: 386, y: 238 },
+  { x: 346, y: 216 },
+  { x: 394, y: 213 },
 ]
 
 /** moved[i]: 0 — на дороге, n — в тачке под номером n. */
@@ -89,22 +89,26 @@ const rockStyle = (i: number): Record<string, string> =>
     <!-- Друг стоит на обочине у тачки -->
     <AnimalFigure :kind="level.animal" flip :mood="riding ? 'happy' : 'idle'" x="346" y="146" width="104" height="76" class="pointer-events-none" />
 
-    <!-- Тачка -->
-    <circle v-if="count < 2" :cx="BARROW.x" :cy="BARROW.y" r="52" fill="#fff" fill-opacity=".18" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
-    <g class="pointer-events-none" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M338 234 H408 L396 262 H350Z" fill="#f59e0b" stroke="#b45309" stroke-width="4" />
+    <!-- Тачка: кузов позади камней, передняя стенка поверх, чтобы камни лежали внутри -->
+    <circle v-if="count < 2" :cx="BARROW.x" :cy="BARROW.y" r="62" fill="#fff" fill-opacity=".18" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
+    <g class="pointer-events-none" stroke-linejoin="round" stroke-linecap="round" transform="translate(372 270) scale(1.7) translate(-372 -270)">
       <path d="M408 236 L436 224 M338 240 L318 252" stroke="#92400e" stroke-width="6" fill="none" />
-      <circle cx="372" cy="270" r="11" fill="#1f2937" stroke="#0f172a" stroke-width="3" /><circle cx="372" cy="270" r="4" fill="#cbd5e1" />
+      <path d="M338 234 H408 L396 262 H350Z" fill="#d97706" stroke="#b45309" stroke-width="4" />
     </g>
 
     <!-- Камни -->
     <g v-for="(h, i) in HOMES" :key="i" :style="rockStyle(i)" @pointerdown="drag.start($event, i, h)">
-      <g :class="{ wait: !moved[i] }" :style="{ animationDelay: `${-i * 0.5}s` }">
+      <g :class="{ wait: !moved[i] }" :style="{ animationDelay: `${-i * 0.5}s` }"><g transform="scale(1)">
         <path d="M-24 14 Q-28 -4 -12 -14 Q4 -22 18 -10 Q30 2 24 14 Q0 20 -24 14Z" :fill="i ? '#94a3b8' : '#a8a29e'" stroke="#44403c" stroke-width="4" stroke-linejoin="round" />
         <path d="M-14 -4 Q-6 -12 6 -10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".5" />
         <path d="M6 4 l6 -3 M-8 8 l4 -2" stroke="#57534e" stroke-width="3" stroke-linecap="round" />
-      </g>
+      </g></g>
       <circle v-if="!moved[i]" r="40" fill="transparent" />
+    </g>
+
+    <g class="pointer-events-none" stroke-linejoin="round" stroke-linecap="round" transform="translate(372 270) scale(1.7) translate(-372 -270)">
+      <path d="M341 246 H405 L396 262 H350Z" fill="#f59e0b" stroke="#b45309" stroke-width="4" />
+      <circle cx="372" cy="270" r="11" fill="#1f2937" stroke="#0f172a" stroke-width="3" /><circle cx="372" cy="270" r="4" fill="#cbd5e1" />
     </g>
 
     <!-- Велосипед с крокодилом -->

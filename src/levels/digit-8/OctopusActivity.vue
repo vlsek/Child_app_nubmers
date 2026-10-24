@@ -129,9 +129,18 @@ function sockStyle(s: number): Record<string, string> {
     <g v-for="(c, s) in COLORS" :key="s" :style="sockStyle(s)" @pointerdown="drag.start($event, s, HOMES[s]!)">
       <!-- прищепка -->
       <rect v-if="onLeg[s]! < 0" x="-4" y="-34" width="8" height="14" rx="2" fill="#f59e0b" stroke="#92400e" stroke-width="2" />
-      <path d="M-12 -20 H12 V6 Q12 18 22 18 Q26 30 8 30 H-8 Q-14 30 -14 20Z" :fill="c" stroke="#0f172a" stroke-opacity=".4" stroke-width="3" stroke-linejoin="round" />
-      <rect x="-13" y="-22" width="26" height="9" rx="3" fill="#fff" stroke="#0f172a" stroke-opacity=".3" stroke-width="2.5" />
-      <path d="M-12 -2 H12 M-12 8 H12" stroke="#fff" stroke-width="3" opacity=".6" />
+      <!-- на верёвке: носок с пяткой и носком -->
+      <template v-if="onLeg[s]! < 0">
+        <path d="M-12 -20 H12 V6 Q12 18 22 18 Q26 30 8 30 H-8 Q-14 30 -14 20Z" :fill="c" stroke="#0f172a" stroke-opacity=".4" stroke-width="3" stroke-linejoin="round" />
+        <rect x="-13" y="-22" width="26" height="9" rx="3" fill="#fff" stroke="#0f172a" stroke-opacity=".3" stroke-width="2.5" />
+        <path d="M-12 -2 H12 M-12 8 H12" stroke="#fff" stroke-width="3" opacity=".6" />
+      </template>
+      <!-- на щупальце: трубка натянута на кончик, видна манжета -->
+      <template v-else>
+        <path d="M-13 -38 H13 V0 Q13 10 0 10 Q-13 10 -13 0Z" :fill="c" stroke="#0f172a" stroke-opacity=".4" stroke-width="3" stroke-linejoin="round" />
+        <rect x="-15" y="-40" width="30" height="10" rx="4" fill="#fff" stroke="#0f172a" stroke-opacity=".3" stroke-width="2.5" />
+        <path d="M-13 -18 H13 M-13 -7 H13" stroke="#fff" stroke-width="3" opacity=".6" />
+      </template>
       <circle r="34" fill="transparent" />
     </g>
   </svg>

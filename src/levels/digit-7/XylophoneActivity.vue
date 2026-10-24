@@ -26,6 +26,13 @@ const count = computed(() => played.value.filter(Boolean).length)
 const bounce = ref<number[]>(Array.from({ length: N }, () => 0))
 const notes = ref<{ id: number; x: number; y: number }[]>([])
 const hop = ref(0)
+/** Какую пластинку только что ударила палочка (-1: палочка отдыхает). */
+const striking = ref(-1)
+const PAW = { x: 128, y: 246 }
+const tip = computed(() => {
+  const i = striking.value
+  return i < 0 ? { x: 150, y: 196 } : { x: BARS[i]!.x + 16, y: BASE - BARS[i]!.h - 6 }
+})
 const mouth = ref(0)
 const playing = ref(false)
 let noteId = 0
@@ -42,6 +49,8 @@ function ring(i: number): void {
   tone(SCALE[i]!, 0.6)
   bounce.value[i]!++
   hop.value++
+  striking.value = i
+  setTimeout(() => (striking.value = -1), 260)
   mouth.value = 0.4
   setTimeout(() => (mouth.value = 0), 250)
   const id = ++noteId
@@ -96,6 +105,14 @@ async function hit(i: number): Promise<void> {
         </g>
       </g>
       <rect :x="b.x - 3" :y="BASE - b.h - 10" width="38" :height="b.h + 14" fill="transparent" />
+    </g>
+
+    <!-- Палочка в лапе крокодила бьёт по пластинке -->
+    <g class="pointer-events-none" stroke-linecap="round">
+      <path :d="`M${PAW.x} ${PAW.y} L${tip.x} ${tip.y}`" stroke="#7c4a1e" stroke-width="9" />
+      <path :d="`M${PAW.x} ${PAW.y} L${tip.x} ${tip.y}`" stroke="#d6a56a" stroke-width="4" />
+      <circle :cx="tip.x" :cy="tip.y" r="10" fill="#f43f5e" stroke="#9f1239" stroke-width="3.5" />
+      <circle :cx="PAW.x" :cy="PAW.y" r="12" fill="#4cae45" stroke="#1f5a2a" stroke-width="4" />
     </g>
 
     <!-- Летящие нотки -->

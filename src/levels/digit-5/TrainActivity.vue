@@ -5,6 +5,7 @@ import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
 import { drop } from '@/composables/synth'
 import { inRect, useDrag } from '@/composables/useDrag'
+import type { AnimalKind } from '@/types/art'
 import type { NumberLevel } from '@/types/game'
 
 /**
@@ -18,6 +19,8 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
+/** Зверь в каждом вагончике свой. */
+const KINDS: AnimalKind[] = ['bunny', 'cat', 'pig', 'bear', 'dog']
 const COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#a855f7']
 const SLOT_X = (i: number) => 98 + i * 66
 
@@ -114,9 +117,10 @@ void props
           <g transform="translate(-31 -240)">
             <!-- Сцепка -->
             <rect x="-6" y="244" width="10" height="6" fill="#475569" />
+            <!-- Свой зверь в каждом вагончике: торчит одна голова над бортом -->
+            <AnimalFigure :kind="KINDS[i]!" crop :mood="hooked[i] ? 'happy' : 'idle'" x="6" y="186" width="50" height="37" />
             <rect x="0" y="214" width="62" height="44" rx="6" :fill="c" stroke="#0f172a" stroke-opacity=".4" stroke-width="3.5" />
-            <rect x="6" y="220" width="30" height="24" rx="4" fill="#d4ecfb" />
-            <g v-if="hooked[i]" transform="translate(7 221) scale(.22)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
+            <rect x="8" y="224" width="22" height="16" rx="4" fill="#d4ecfb" />
             <circle v-if="hooked[i]" cx="48" cy="236" r="9" fill="#fff" />
             <text v-if="hooked[i]" x="48" y="241" text-anchor="middle" font-size="14" font-weight="900" fill="#334155">{{ hooked[i] }}</text>
             <g v-for="x in [14, 48]" :key="x" :transform="`translate(${x} 262)`"><circle r="9" fill="#1f2937" /><circle r="3" fill="#cbd5e1" /></g>

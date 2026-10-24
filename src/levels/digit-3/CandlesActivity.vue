@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import { useAudio } from '@/composables/useAudio'
-import { drop, pop } from '@/composables/synth'
+import { SCALE, drop, pop, tone } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
 import type { NumberLevel } from '@/types/game'
 
@@ -26,17 +26,13 @@ const FLAME_Y = 128
 const HOMES = [{ x: 56, y: 96 }, { x: 116, y: 96 }, { x: 176, y: 96 }]
 const placed = ref<boolean[]>([false, false, false])
 const svg = ref<SVGSVGElement | null>(null)
-const MOUTH = { x: 178, y: 236 }
 
-/** out[i] — каким по счёту погасла свечка i (0 — горит). */
-const out = ref<number[]>([0, 0, 0])
-const count = computed(() => out.value.filter(Boolean).length)
-const blowing = ref<number | null>(null)
+const count = computed(() => taken.value.filter(Boolean).length)
 const mouth = ref(0)
 let alive = true
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
-onMounted(() => void sayLine('candles-intro', 'Задуй свечки!'))
+onMounted(() => void sayLine('candles-intro', 'Расставь свечки на торте!'))
 onBeforeUnmount(() => {
   alive = false
   stopVoice()
@@ -61,28 +57,23 @@ function put(j: number, k: number): void {
   taken.value[k] = true
   drop()
   pop()
+  void counted(count.value)
 }
 
-async function blow(i: number): Promise<void> {
-  if (out.value[i] || blowing.value !== null) return
-  blowing.value = i
-  mouth.value = 0.55
-  await sleep(450)
-  if (!alive) return
-  const n = count.value + 1
-  out.value[i] = n
-  blowing.value = null
-  mouth.value = 0
+async function counted(n: number): Promise<void> {
   const said = sayNumber(n)
   if (n < 3) return
   await said
-  await sleep(400)
+  // Свечки горят: крокодил радуется, звучит мелодия «С днём рождения»
+  mouth.value = 0.5
+  ;[0, 0, 1, 0, 3, 2].forEach((note, i) => tone(SCALE[note]!, 0.35, 'triangle', 0.25, i * 0.38))
+  await sleep(2600)
   if (alive) emit('complete')
 }
 </script>
 
 <template>
-  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Задуй три свечки">
+  <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Расставь три свечки на торте">
     <rect x="-800" y="262" width="2040" height="900" fill="#fde68a" />
     <rect x="-800" y="258" width="2040" height="8" fill="#fbbf24" />
 
@@ -101,12 +92,10 @@ async function blow(i: number): Promise<void> {
           <path :d="`M${c.x} 140 v-8`" stroke="#334155" stroke-width="3" stroke-linecap="round" />
         </g>
         <!-- Огонёк / дымок -->
-        <g v-if="taken[i] && !out[i]" class="flame" :style="{ animationDelay: `${-i * 0.2}s` }" @click="blow(i)">
+        <g v-if="taken[i]" class="flame" :style="{ animationDelay: `${-i * 0.2}s` }">
           <path :d="`M${c.x} ${FLAME_Y - 14} q14 18 0 30 q-14 -12 0 -30Z`" fill="#fb923c" stroke="#ea580c" stroke-width="2.5" />
           <path :d="`M${c.x} ${FLAME_Y + 2} q6 8 0 14 q-6 -6 0 -14Z`" fill="#fef08a" />
-          <circle :cx="c.x" :cy="FLAME_Y + 4" r="34" fill="transparent" />
         </g>
-        <path v-else-if="out[i]" class="smoke" :d="`M${c.x} ${FLAME_Y + 10} q-8 -14 0 -26 t0 -26`" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
       </g>
     </g>
 
@@ -119,11 +108,6 @@ async function blow(i: number): Promise<void> {
         </g>
         <circle r="38" fill="transparent" />
       </g>
-    </g>
-
-    <!-- Ветер: от крокодила к свече -->
-    <g v-if="blowing !== null" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round">
-      <path v-for="k in 3" :key="k" class="wind" :d="`M${MOUTH.x} ${MOUTH.y + (k - 2) * 8} Q${(MOUTH.x + CANDLES[blowing]!.x) / 2} ${FLAME_Y + 60 + k * 10} ${CANDLES[blowing]!.x - 12} ${FLAME_Y + 6 + (k - 2) * 6}`" />
     </g>
 
     <!-- Крокодил -->

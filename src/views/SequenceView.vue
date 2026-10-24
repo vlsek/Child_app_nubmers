@@ -168,7 +168,7 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
     </div>
 
     <!-- Вертикальный экран: сцена остаётся 4:3, свободное место занимают крупная цифра и столько зверей, сколько цифра -->
-    <div v-if="!finished" class="hidden flex-1 items-center justify-center [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
+    <div v-if="!finished" class="relative z-10 hidden flex-1 items-center justify-center [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
       <div
         class="flex h-28 w-28 items-center justify-center rounded-full text-7xl font-black leading-none text-white"
         :style="{ background: level.color, boxShadow: `0 8px 0 0 ${level.shade}` }"

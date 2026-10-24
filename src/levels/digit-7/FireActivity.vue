@@ -154,8 +154,8 @@ const nozzleStyle = computed(() => drag.style(0, held.value ?? HOME))
     <g transform="translate(305 180) scale(.3)"><AnimalFigure :kind="level.animal" :x="-10" :y="0" :width="120" :height="89.5" crop /></g>
 
     <Crocodile x="-14" y="170" width="170" height="124" :mood="count >= 7 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
-    <!-- Каска -->
-    <g class="pointer-events-none" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Каска: сидит на макушке, не закрывая глаза -->
+    <g class="pointer-events-none" stroke-linejoin="round" stroke-linecap="round" transform="translate(6 -16)">
       <path d="M26 206 Q26 178 60 174 Q92 178 94 206Z" fill="#ef4444" stroke="#991b1b" stroke-width="4" />
       <path d="M60 176 V204" stroke="#fca5a5" stroke-width="5" opacity=".7" />
       <path d="M22 206 Q60 214 100 206 Q96 202 60 202 Q26 202 22 206Z" fill="#b91c1c" stroke="#7f1d1d" stroke-width="3.5" />

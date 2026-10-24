@@ -94,6 +94,12 @@ const drag = useDrag<number>(svg, {
 
     <!-- Слонёнок -->
     <g stroke="#475569" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Тело: круглый бок, ножки с ноготками, хвостик -->
+      <path d="M12 226 q-14 6 -10 22" fill="none" stroke-width="5" />
+      <ellipse cx="68" cy="232" rx="66" ry="44" fill="#b3bccb" />
+      <rect x="22" y="246" width="34" height="30" rx="12" fill="#b3bccb" />
+      <rect x="82" y="246" width="34" height="30" rx="12" fill="#b3bccb" />
+      <path d="M30 272 h18 M90 272 h18" stroke="#e2e8f0" stroke-width="4" />
       <circle cx="26" cy="168" r="30" fill="#9aa6b8" />
       <circle cx="26" cy="168" r="18" fill="#f9a8d4" stroke="none" />
       <circle cx="118" cy="168" r="30" fill="#9aa6b8" />

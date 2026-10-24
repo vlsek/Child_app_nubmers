@@ -4,6 +4,7 @@ import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import { useAudio } from '@/composables/useAudio'
 import { drop, pop } from '@/composables/synth'
 import { near, useDrag } from '@/composables/useDrag'
+import type { AnimalKind } from '@/types/art'
 import type { NumberLevel } from '@/types/game'
 
 /** Цифра 4: «Ночной дом». В тёмном доме четыре окна: лампочки тащат в окна, в каждом загорается свет и жилец машет. */
@@ -17,6 +18,8 @@ const WIN = [
   { x: 150, y: 216 },
   { x: 290, y: 216 },
 ]
+/** В каждом окне живёт свой зверь. */
+const WINDOW_KINDS: AnimalKind[] = ['cat', 'bunny', 'pig', 'bear']
 const HOMES = [0, 1, 2, 3].map((i) => ({ x: 70 + i * 100, y: 296 }))
 /** lit[i] — окно i горит; bulb[j] — лампочка j уже вкручена. */
 const lit = ref<boolean[]>([false, false, false, false])
@@ -60,7 +63,7 @@ async function place(j: number, w: number): Promise<void> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Зажги четыре окна">
-    <rect x="-800" y="-20" width="2040" height="300" fill="#172554" />
+    <rect x="-800" y="-1200" width="2040" height="1480" fill="#172554" />
     <circle cx="380" cy="40" r="20" fill="#fef9c3" class="pointer-events-none" /><circle cx="388" cy="34" r="18" fill="#172554" class="pointer-events-none" />
     <g fill="#fef9c3" class="pointer-events-none"><circle cx="40" cy="30" r="2.5" /><circle cx="110" cy="62" r="2" /><circle cx="330" cy="28" r="2.5" /><circle cx="70" cy="110" r="2" /></g>
     <path d="M-800 262 H1240 V1200 H-800Z" fill="#14532d" />
@@ -74,7 +77,7 @@ async function place(j: number, w: number): Promise<void> {
         <rect x="-40" y="-34" width="80" height="68" rx="6" :fill="lit[i] ? '#fde047' : '#0f172a'" stroke="#451a03" stroke-width="5" />
         <g v-if="lit[i]">
           <rect x="-40" y="-34" width="80" height="68" rx="6" fill="#fef08a" class="glow" />
-          <AnimalFigure :kind="props.level.animal" :x="-34" y="-28" width="68" height="50" mood="happy" />
+          <AnimalFigure :kind="WINDOW_KINDS[i]!" :x="-34" y="-28" width="68" height="50" mood="happy" />
         </g>
         <path d="M0 -34 V34 M-40 0 H40" stroke="#451a03" stroke-width="4" />
       </g>

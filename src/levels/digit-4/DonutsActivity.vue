@@ -57,6 +57,14 @@ onBeforeUnmount(() => {
 
 const svg = ref<SVGSVGElement | null>(null)
 
+/** Пончик несут ко рту: чем ближе, тем шире открывается пасть. */
+const liveMouth = computed(() => {
+  const a = drag.active.value
+  if (!a || full.value) return mouth.value
+  const d = Math.hypot(a.x - MOUTH.x, a.y - MOUTH.y)
+  return Math.max(mouth.value, Math.min(0.9, Math.max(0, 1.1 - d / 170)))
+})
+
 const drag = useDrag<number>(svg, {
   canGrab: (i) => !eaten.value[i] && flying.value === null,
   onDrop: (i, p) => near(p, MOUTH, 85) && feed(i),
@@ -117,7 +125,7 @@ function flightStyle(i: number): Record<string, string> {
 
     <!-- Крокодил: толстеет с каждым пончиком -->
     <g :style="{ transform: `scale(${1 + eatenCount * 0.025})`, transformOrigin: '110px 300px', transition: 'transform .3s' }" :class="{ shake }">
-      <Crocodile x="0" y="140" width="240" height="175" :mood="full ? 'happy' : 'idle'" :mouth="mouth" :look="1" />
+      <Crocodile x="0" y="140" width="240" height="175" :mood="full ? 'happy' : 'idle'" :mouth="liveMouth" :look="1" />
     </g>
 
     <!-- Друг приносит пончики -->
