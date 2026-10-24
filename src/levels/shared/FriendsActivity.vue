@@ -55,7 +55,7 @@ const animalFont = computed(() => `min(9rem, 13vh, ${(88 / (columns.value * 1.3)
   <div class="flex h-full w-full flex-col items-center justify-center gap-4 sm:gap-6">
     <!-- Крокодил говорит цифру -->
     <div class="relative flex items-end gap-2">
-      <Crocodile :key="hop" class="w-[min(15rem,34vh,60vw)] animate-pop" mood="happy" :mouth="mouth" :look="0" />
+      <Crocodile class="w-[min(15rem,34vh,60vw)]" mood="happy" :mouth="mouth" :look="0" />
       <div
         class="mb-[18%] flex h-[min(7rem,14vh)] w-[min(7rem,14vh)] items-center justify-center rounded-full text-[min(5rem,10vh)] font-black leading-none text-white shadow-lg"
         :style="{ background: level.color, boxShadow: `0 6px 0 0 ${level.shade}` }"

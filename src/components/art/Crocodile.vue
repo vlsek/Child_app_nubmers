@@ -54,9 +54,10 @@ function rot(p: { x: number; y: number }, deg: number) {
 }
 /** Тёмная пасть между челюстями: треугольник шарнир — кончик верхней — кончик нижней. */
 const inside = computed(() => {
-  const u = rot({ x: 202, y: 90 }, -upA.value)
-  const l = rot({ x: 202, y: 96 }, lowA.value)
-  const t = rot({ x: 150, y: 96 }, lowA.value * 0.9)
+  // Только глубина пасти: у кончиков морды красного нет, там виден фон
+  const u = rot({ x: 166, y: 90 }, -upA.value)
+  const l = rot({ x: 166, y: 96 }, lowA.value)
+  const t = rot({ x: 140, y: 96 }, lowA.value * 0.9)
   return `${H.x},${H.y - 2} ${u.x},${u.y} ${l.x},${l.y}  ${t.x},${t.y}`
 })
 const tongue = computed(() => {

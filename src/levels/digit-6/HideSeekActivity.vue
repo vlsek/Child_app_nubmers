@@ -67,7 +67,7 @@ async function look(i: number): Promise<void> {
 
     <defs><clipPath id="hs-clip"><rect x="-70" y="-110" width="140" height="132" /></clipPath></defs>
 
-    <Crocodile :key="hop" x="-20" y="170" width="190" height="139" :mood="count >= N ? 'happy' : 'idle'" :mouth="mouth" :look="1" class="pointer-events-none animate-pop" />
+    <Crocodile x="-20" y="170" width="190" height="139" :mood="count >= N ? 'happy' : 'idle'" :mouth="mouth" :look="1" class="pointer-events-none" />
 
     <g v-for="(b, i) in BUSHES" :key="i" :transform="`translate(${b.x} ${b.y})`" class="cursor-pointer" @pointerdown.prevent="look(i)">
       <!-- Зверёк: за кустом, выскакивает вверх -->

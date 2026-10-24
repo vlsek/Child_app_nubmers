@@ -83,7 +83,7 @@ async function hit(i: number): Promise<void> {
     <rect x="-800" y="262" width="2040" height="900" fill="#fcd34d" />
     <rect x="-800" y="258" width="2040" height="8" fill="#f59e0b" />
 
-    <Crocodile :key="hop" x="-14" y="174" width="170" height="124" :mood="count >= N ? 'happy' : 'idle'" :mouth="mouth" :look="1" class="pointer-events-none animate-pop" />
+    <Crocodile x="-14" y="174" width="170" height="124" :mood="count >= N ? 'happy' : 'idle'" :mouth="mouth" :look="1" class="pointer-events-none" />
 
     <!-- Ножки и рейки ксилофона -->
     <g stroke="#7c4a1e" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
