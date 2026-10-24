@@ -166,7 +166,7 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       />
     </div>
 
-    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint(); spark($event)">
+    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible [@media(max-height:500px)]:pt-9" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint(); spark($event)">
       <Transition name="page" mode="out-in">
         <component :is="views[step]" :key="`${round}-${step}`" :level="level" @complete="onComplete" />
       </Transition>

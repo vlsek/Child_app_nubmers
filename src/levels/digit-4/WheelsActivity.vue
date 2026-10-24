@@ -87,8 +87,8 @@ const nextSlot = computed(() => SLOTS[placed.value])
     </defs>
 
     <!-- Земля -->
-    <rect x="-40" y="250" width="520" height="90" fill="#6b7280" />
-    <rect x="-40" y="246" width="520" height="8" fill="#4b5563" />
+    <rect x="-800" y="250" width="2040" height="90" fill="#6b7280" />
+    <rect x="-800" y="246" width="2040" height="8" fill="#4b5563" />
 
     <g class="scene" :style="{ transform: driving ? 'translateX(620px)' : 'translateX(0)', transition: driving ? 'transform 1.7s cubic-bezier(.5,0,.9,.6)' : 'none' }">
       <!-- Кузов (оседает, пока колёс мало) -->
