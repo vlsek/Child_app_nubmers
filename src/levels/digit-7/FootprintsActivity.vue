@@ -45,7 +45,7 @@ async function stamp(i: number): Promise<void> {
 
 <template>
   <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Поставь семь следов">
-    <rect x="-800" y="262" width="2040" height="70" fill="#4ade80" />
+    <rect x="-800" y="262" width="2040" height="900" fill="#4ade80" />
     <!-- Песчаная тропинка -->
     <path d="M-20 252 Q60 214 140 246 T300 240 T460 236 V292 Q380 300 300 288 T140 292 T-20 290Z" fill="#fde68a" stroke="#f59e0b" stroke-width="3" />
 

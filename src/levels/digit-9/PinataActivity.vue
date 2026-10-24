@@ -77,7 +77,7 @@ async function hit(): Promise<void> {
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Разбей пиньяту: девять конфет">
     <!-- праздничная комната -->
     <rect x="-800" y="-20" width="2040" height="270" fill="#fef3c7" />
-    <path d="M-800 250 H1240 V340 H-800Z" fill="#fb923c" /><path d="M-800 250 H1240" stroke="#c2410c" stroke-width="4" />
+    <path d="M-800 250 H1240 V1200 H-800Z" fill="#fb923c" /><path d="M-800 250 H1240" stroke="#c2410c" stroke-width="4" />
     <g class="pointer-events-none">
       <path d="M0 14 Q110 50 220 14 T440 14" fill="none" stroke="#0f172a" stroke-opacity=".35" stroke-width="2.5" />
       <path v-for="(_, i) in 8" :key="i" :d="`M${i * 55 + 12} ${i % 2 ? 30 : 24} l11 0 l-5.5 17Z`" :fill="COLORS[i]" />

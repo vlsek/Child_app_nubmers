@@ -77,7 +77,7 @@ const drag = useDrag<number>(svg, {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Накорми двух птенцов">
-    <rect x="-800" y="276" width="2040" height="60" fill="#4ade80" />
+    <rect x="-800" y="276" width="2040" height="900" fill="#4ade80" />
     <rect x="-800" y="272" width="2040" height="8" fill="#22c55e" />
 
     <Crocodile x="-12" y="172" width="170" height="124" :mood="count >= 2 ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />

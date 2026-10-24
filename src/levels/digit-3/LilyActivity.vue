@@ -83,7 +83,7 @@ const crocStyle = computed(() => drag.style(0, { x: crocAt.value.x, y: crocAt.va
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Перепрыгни три кувшинки">
     <!-- пруд и берега -->
-    <path d="M-800 214 H1240 V340 H-800Z" fill="#38bdf8" />
+    <path d="M-800 214 H1240 V1200 H-800Z" fill="#38bdf8" />
     <path d="M-800 214 H-20 Q60 206 120 216 T260 214 T400 216 T460 214 H1240 V226 H-800Z" fill="#7dd3fc" />
     <g fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"><path d="M60 290 q14 -8 28 0 M300 296 q14 -8 28 0 M170 300 q12 -7 24 0" /></g>
     <path d="M-800 204 H88 Q100 232 70 262 H-800Z" fill="#4ade80" stroke="#15803d" stroke-width="4" stroke-linejoin="round" />

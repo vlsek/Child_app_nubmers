@@ -81,7 +81,7 @@ async function catchFish(i: number): Promise<void> {
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Поймай девять рыбок">
     <!-- Берега и пруд -->
-    <rect x="-800" y="206" width="2040" height="130" fill="#4ade80" />
+    <rect x="-800" y="206" width="2040" height="900" fill="#4ade80" />
     <path d="M92 212 H368 V300 Q368 318 350 318 H110 Q92 318 92 300Z" fill="#38bdf8" stroke="#0284c7" stroke-width="4" />
     <path d="M110 226 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" opacity=".8" />
 

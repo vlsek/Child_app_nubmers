@@ -55,7 +55,7 @@ async function pop(i: number): Promise<void> {
 
 <template>
   <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Полопай шесть пузырей">
-    <rect x="-800" y="290" width="2040" height="40" fill="#bae6fd" />
+    <rect x="-800" y="290" width="2040" height="900" fill="#bae6fd" />
 
     <!-- Крокодил в ванне -->
     <Crocodile x="96" y="122" width="210" height="154" :mood="count >= 6 ? 'happy' : 'idle'" :mouth="surprise ? 0.5 : 0" :look="0" class="pointer-events-none" />

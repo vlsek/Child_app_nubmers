@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import AnimalFigure from '@/components/art/AnimalFigure.vue'
 import Crocodile from '@/components/art/Crocodile.vue'
 import Confetti from '@/components/common/Confetti.vue'
 import Icon from '@/components/common/Icon.vue'
@@ -166,11 +167,25 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       />
     </div>
 
-    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible [@media(max-height:500px)]:pt-9" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint(); spark($event)">
+    <!-- Вертикальный экран: сцена остаётся 4:3, свободное место занимают крупная цифра и столько зверей, сколько цифра -->
+    <div v-if="!finished" class="hidden flex-1 items-center justify-center [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
+      <div
+        class="flex h-28 w-28 items-center justify-center rounded-full text-7xl font-black leading-none text-white"
+        :style="{ background: level.color, boxShadow: `0 8px 0 0 ${level.shade}` }"
+      >
+        {{ level.value }}
+      </div>
+    </div>
+
+    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible [@media(max-height:500px)]:pt-9 [@media(orientation:portrait)_and_(max-width:700px)]:flex-none" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint(); spark($event)">
       <Transition name="page" mode="out-in">
         <component :is="views[step]" :key="`${round}-${step}`" :level="level" @complete="onComplete" />
       </Transition>
       <span v-for="s in sparks" :key="s.id" class="tap-spark pointer-events-none absolute z-20" :style="{ left: s.x + 'px', top: s.y + 'px' }" />
+    </div>
+
+    <div v-if="!finished" class="relative z-10 hidden flex-1 flex-wrap content-center items-end justify-center gap-x-1 px-6 pb-24 [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
+      <AnimalFigure v-for="n in level.value" :key="n" :kind="level.animal" :variant="n" mood="idle" class="h-auto w-16" />
     </div>
 
     <!-- Конец уровня -->

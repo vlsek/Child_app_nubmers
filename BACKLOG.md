@@ -255,3 +255,8 @@
 - Готовый APK без Android Studio: `android-ci/android.yml` скопировать в `.github/workflows/android.yml` (через сайт GitHub: токен без права `workflow` не может создать такой файл). Дальше Actions → Android APK → Artifacts → `krokodil-debug-apk`.
 - Значок и заставка: исходники `assets/*.svg` (+ png), генерация `npx capacitor-assets generate --android --assetPath assets`. Шрифт Nunito в проекте (`@fontsource/nunito`), работает офлайн.
 - Не сделано: подпись release-сборки для магазина.
+
+## Вертикальный экран (агент 1)
+
+- Сцены остаются 4:3. В портрете (`orientation:portrait` и ширина ≤700px) `SequenceView` показывает над сценой крупную цифру, а под ней столько зверей, сколько цифра (стоят на траве: земля в сценах продлена вниз, `height="900"`/`V1200`). Новые сцены: ground-прямоугольник `x=-800 width=2040`, высота большая, чтобы он тянулся вниз.
+- Значок «поверни телефон» остаётся.

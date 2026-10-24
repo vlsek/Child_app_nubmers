@@ -80,7 +80,7 @@ async function board(i: number): Promise<void> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Посади десять цыплят в автобус">
-    <rect x="-800" y="290" width="2040" height="40" fill="#64748b" />
+    <rect x="-800" y="290" width="2040" height="900" fill="#64748b" />
     <rect x="-20" y="224" width="200" height="12" fill="#94a3b8" />
 
     <g :class="{ drive: leaving }">

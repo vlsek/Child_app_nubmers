@@ -48,7 +48,7 @@ async function hatch(i: number): Promise<void> {
 
 <template>
   <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Выведи десять цыплят">
-    <rect x="-800" y="150" width="2040" height="190" fill="#fcd34d" opacity=".55" />
+    <rect x="-800" y="150" width="2040" height="900" fill="#fcd34d" opacity=".55" />
     <Crocodile x="120" y="34" width="170" height="124" :mood="count >= 10 ? 'happy' : 'idle'" :mouth="mouth" :look="0" class="pointer-events-none" />
 
     <g v-for="(e, i) in EGGS" :key="i" :transform="`translate(${e.x} ${e.y})`" @click="hatch(i)">

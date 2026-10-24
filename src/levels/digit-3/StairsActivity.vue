@@ -76,7 +76,7 @@ async function climb(): Promise<void> {
 
 <template>
   <svg ref="svg" viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full touch-none" role="img" aria-label="Помоги крокодилу подняться на три ступеньки">
-    <rect x="-800" y="262" width="2040" height="70" fill="#4ade80" />
+    <rect x="-800" y="262" width="2040" height="900" fill="#4ade80" />
     <rect x="-800" y="258" width="2040" height="8" fill="#22c55e" />
 
     <!-- Площадка и друг наверху -->

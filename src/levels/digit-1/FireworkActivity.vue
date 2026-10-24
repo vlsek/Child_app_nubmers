@@ -55,7 +55,7 @@ async function launch(): Promise<void> {
     <rect x="-800" y="-20" width="2040" height="300" fill="#1e1b4b" />
     <g fill="#fef9c3" class="pointer-events-none"><circle v-for="(s, i) in stars" :key="i" :cx="s[0]" :cy="s[1]" r="2.5" class="twinkle" :style="{ animationDelay: i * 0.3 + 's' }" /></g>
     <circle cx="60" cy="60" r="22" fill="#fef9c3" class="pointer-events-none" /><circle cx="68" cy="54" r="20" fill="#1e1b4b" class="pointer-events-none" />
-    <path d="M-800 270 H1240 V340 H-800Z" fill="#14532d" /><path d="M-800 270 H-20 Q110 252 220 270 T460 266 H1240 V340 H-800Z" fill="#166534" />
+    <path d="M-800 270 H1240 V1200 H-800Z" fill="#14532d" /><path d="M-800 270 H-20 Q110 252 220 270 T460 266 H1240 V1200 H-800Z" fill="#166534" />
 
     <!-- ракета -->
     <g :transform="`translate(220 ${phase === 'wait' ? 0 : 0})`" class="pointer-events-none">
