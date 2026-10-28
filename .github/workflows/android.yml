@@ -1,4 +1,4 @@
-# Скопируйте этот файл в .github/workflows/android.yml (подробности в android-ci/README.md).
+# Сборка Android: debug-APK при каждом пуше, подписанный релиз при наличии секретов (см. android-ci/README.md).
 name: Android
 
 # Каждый пуш в main (или ручной запуск) собирает debug-APK для проверки на телефоне.
