@@ -1,15 +1,21 @@
-# Скопируйте этот файл в .github/workflows/android.yml (токен без права workflow не может создать его сам).
-name: Android APK
+# Скопируйте этот файл в .github/workflows/android.yml (подробности в android-ci/README.md).
+name: Android
 
-# Собирает debug-APK при каждом пуше в main (или вручную): скачайте файл из Actions → Artifacts.
+# Каждый пуш в main (или ручной запуск) собирает debug-APK для проверки на телефоне.
+# Если в секретах репозитория заданы данные ключа подписи, дополнительно собираются
+# подписанный релизный AAB (для Google Play) и подписанный APK.
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 jobs:
-  apk:
+  build:
     runs-on: ubuntu-latest
+    env:
+      VERSION_CODE: ${{ github.run_number }}
+      VERSION_NAME: 1.0.${{ github.run_number }}
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,10 +29,30 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx cap sync android
-      - name: Build debug APK
+
+      - name: Debug APK
         working-directory: android
         run: ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: krokodil-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Release (подписанный AAB и APK)
+        if: env.HAS_KEYSTORE == 'true'
+        working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          ./gradlew bundleRelease assembleRelease
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEYSTORE == 'true'
+        with:
+          name: krokodil-release
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/app-release.apk

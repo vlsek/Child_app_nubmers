@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import Clouds from '@/components/common/Clouds.vue'
+import RotateOverlay from '@/components/common/RotateOverlay.vue'
 import { useAudio } from '@/composables/useAudio'
 
 // Фоновая музыка стартует с первого касания: раньше браузер звук не разрешит.
@@ -9,6 +10,7 @@ useAudio().startMusicOnFirstTouch()
 
 <template>
   <Clouds />
+  <RotateOverlay />
   <RouterView v-slot="{ Component }">
     <Transition name="page" mode="out-in">
       <component :is="Component" />
