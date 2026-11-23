@@ -1,5 +1,5 @@
-import { ding, setSynthMuted } from './synth'
-import { ref, watch } from 'vue'
+import { ding, playSfxByName, resumeSynth, setSynthMuted, setSynthVolume, suspendSynth } from './synth'
+import { getCurrentInstance, onBeforeUnmount, ref, watch } from 'vue'
 import musicUrl from '@/assets/audio/music/bouncy-piano-groove.mp3'
 import {
   PRAISE_KEYS,
@@ -21,11 +21,26 @@ import type { AudioChannel } from '@/types/game'
  * вызвали composable, они управляют одним и тем же звуком.
  */
 const muted = ref(false)
-const volumes = ref<Record<AudioChannel, number>>({
-  music: 0.6,
-  sfx: 0.8,
-  voice: 1,
-})
+const VOLUMES_KEY = 'krokodil.audio.volumes'
+/** Музыка заметно тише голоса, эффекты чуть тише голоса. */
+const DEFAULT_VOLUMES: Record<AudioChannel, number> = { music: 0.35, sfx: 0.8, voice: 1 }
+
+function loadVolumes(): Record<AudioChannel, number> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(VOLUMES_KEY) ?? 'null') as Partial<Record<AudioChannel, number>> | null
+    const out = { ...DEFAULT_VOLUMES }
+    for (const ch of Object.keys(out) as AudioChannel[]) {
+      const v = raw?.[ch]
+      if (typeof v === 'number' && Number.isFinite(v)) out[ch] = Math.min(1, Math.max(0, v))
+    }
+    return out
+  } catch {
+    return { ...DEFAULT_VOLUMES }
+  }
+}
+
+const volumes = ref<Record<AudioChannel, number>>(loadVolumes())
+setSynthVolume(volumes.value.sfx)
 
 /** Пока говорит голос, музыка тише в столько раз: слова должны быть слышны. */
 const DUCK = 0.4
@@ -34,6 +49,12 @@ let music: HTMLAudioElement | null = null
 let voice: HTMLAudioElement | null = null
 /** Завершает ожидание текущей реплики (и записанной, и синтезированной). */
 let finishVoice: (() => void) | null = null
+
+/** Какая реплика (`sayLine`) звучит сейчас, кто её запустил и когда: нужен, чтобы не было дублей. */
+let currentLine: { name: string; owner: unknown; at: number } | null = null
+let lastLineCall: { name: string; text: string } | null = null
+/** Одну и ту же реплику, запрошенную дважды за это время, второй раз не проигрываем. */
+const LINE_DEDUPE_MS = 1500
 
 let ducked = false
 let musicGain = 1
@@ -81,9 +102,29 @@ function stopSpeech(): void {
 
 /** Обрывает всё, что сейчас говорит: запись и синтез. Ожидающие реплики завершаются. */
 function stopVoice(): void {
-  voice?.pause()
+  if (voice) fadeOutAndPause(voice)
   stopSpeech()
   finishVoice?.()
+  currentLine = null
+}
+
+/** Короткое затухание вместо резкого обрыва: щелчка нет, а фраза не «рубится». */
+function fadeOutAndPause(audio: HTMLAudioElement, ms = 90): void {
+  const start = audio.volume
+  if (audio.paused || start === 0 || muted.value) {
+    audio.pause()
+    return
+  }
+  const steps = 6
+  let i = 0
+  const t = setInterval(() => {
+    i++
+    audio.volume = Math.max(0, start * (1 - i / steps))
+    if (i >= steps) {
+      clearInterval(t)
+      audio.pause()
+    }
+  }, ms / steps)
 }
 
 // Mute и громкость применяются сразу к тому, что играет сейчас.
@@ -94,6 +135,21 @@ watch(muted, (value) => {
   if (value) stopSpeech()
 })
 watch(() => volumes.value.music, applyMusicVolume)
+watch(
+  () => volumes.value.sfx,
+  (value) => setSynthVolume(value),
+)
+watch(
+  volumes,
+  (value) => {
+    try {
+      localStorage.setItem(VOLUMES_KEY, JSON.stringify(value))
+    } catch {
+      /* приватный режим: просто не запоминаем */
+    }
+  },
+  { deep: true },
+)
 watch(
   () => volumes.value.voice,
   (value) => {
@@ -109,17 +165,34 @@ if (typeof document !== 'undefined') {
       musicWasPlaying = !!music && !music.paused
       music?.pause()
       stopVoice()
-    } else if (musicWasPlaying) {
-      void safePlay(music)
+      suspendSynth()
+    } else {
+      resumeSynth()
+      if (musicWasPlaying) void safePlay(music)
     }
   })
 }
 
 export function useAudio() {
-  /** Короткий звуковой эффект: клик, «правильно», «ошибка». Можно играть внахлёст. */
-  function playSfx(src: string): void {
+  // Задание ушло с экрана: его реплика обрывается и не звучит поверх следующего.
+  const owner = getCurrentInstance()
+  if (owner) {
+    onBeforeUnmount(() => {
+      if (currentLine?.owner === owner) stopVoice()
+    })
+  }
+
+  /**
+   * Короткий звуковой эффект. Принимает адрес файла (как раньше) или имя эффекта:
+   * `playSfx('pop')` играет запись `sfx/pop.mp3`, а если её нет, синтез. Можно играть внахлёст.
+   */
+  function playSfx(srcOrName: string): void {
     if (muted.value) return
-    void safePlay(createAudio(src, 'sfx'))
+    if (!/[./]/.test(srcOrName)) {
+      playSfxByName(srcOrName)
+      return
+    }
+    void safePlay(createAudio(srcOrName, 'sfx'))
   }
 
   /**
@@ -196,8 +269,27 @@ export function useAudio() {
    * Так любой агент может добавить фразу сразу, а голос записать позже.
    */
   function sayLine(name: string, text: string): Promise<void> {
+    const now = Date.now()
+    lastLineCall = { name, text }
+    // Та же реплика уже звучит (двойной onMounted, повторный тап): не начинаем сначала.
+    if (currentLine && currentLine.name === name && now - currentLine.at < LINE_DEDUPE_MS) {
+      return Promise.resolve()
+    }
     const url = lineUrl(name)
-    return url ? playVoice(url) : speak(text)
+    const p = url ? playVoice(url) : speak(text)
+    // playVoice/speak сбрасывают currentLine через stopVoice, поэтому ставим после запуска
+    currentLine = { name, owner, at: now }
+    void p.then(() => {
+      if (currentLine?.name === name && currentLine.at === now) currentLine = null
+    })
+    return p
+  }
+
+  /** Повторить последнюю реплику уровня (тап на крокодила: «что надо делать?»). Дубль-защита не мешает. */
+  function replayLine(): Promise<void> {
+    if (!lastLineCall) return Promise.resolve()
+    currentLine = null
+    return sayLine(lastLineCall.name, lastLineCall.text)
   }
 
   function sayNumber(value: number): Promise<void> {
@@ -274,7 +366,7 @@ export function useAudio() {
   }
 
   function setVolume(channel: AudioChannel, value: number): void {
-    volumes.value[channel] = Math.max(0, value)
+    volumes.value[channel] = Math.min(1, Math.max(0, value))
   }
 
   return {
@@ -285,6 +377,7 @@ export function useAudio() {
     speak,
     say,
     sayLine,
+    replayLine,
     sayNumber,
     sayPraise,
     sayRetry,
