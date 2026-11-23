@@ -148,3 +148,27 @@
 @media (prefers-reduced-motion: reduce) {
   .hint-hand { animation: none; }
 }
+
+/* Финал уровня: крокодил пританцовывает, а звезда улетает к индикатору прогресса. */
+.crocodile-dance {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: crocodile-dance 720ms ease-in-out infinite;
+}
+@keyframes crocodile-dance {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  25% { transform: translateY(-9px) rotate(5deg); }
+  50% { transform: translateY(1px) rotate(-5deg); }
+  75% { transform: translateY(-6px) rotate(3deg); }
+}
+.level-star-flight {
+  animation: level-star-flight 1.25s cubic-bezier(.2,.75,.25,1) 250ms both;
+}
+@keyframes level-star-flight {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  68% { transform: translateY(-30vh) scale(.72); opacity: 1; }
+  100% { transform: translateY(-39vh) scale(.2); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crocodile-dance, .level-star-flight { animation: none; }
+}
