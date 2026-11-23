@@ -56,7 +56,7 @@
 | Агент 5 | Арт: крокодил и звери | Свободно | `src/components/art/**`, `src/views/ArtView.vue` |
 | Агент 6 | Задания цифр 1–5 | Свободно | `src/levels/digit-1…5/**` |
 | Агент 7 | Задания цифр 6–10 | Свободно | `src/levels/digit-6…10/**` |
-| Агент 8 | Оболочка уровня и «вау»-эффекты | Свободно | `src/views/SequenceView.vue`, `src/levels/shared/FriendsActivity.vue`, `src/style.css`, `src/components/common/**`, `src/composables/useDrag.ts` |
+| Агент 8 | Оболочка уровня и «вау»-эффекты | В работе | `src/views/SequenceView.vue`, `src/levels/shared/FriendsActivity.vue`, `src/style.css`, `src/components/common/**`, `src/composables/useDrag.ts` |
 | Агент 9 | Релиз: Android, магазин, тесты, родительский раздел | Свободно | `android/**`, `android-ci/**`, `.github/**`, `scripts/**`, `tests/**`, `src/views/Parent*` |
 
 Чужие файлы не правь: нужна правка в чужой зоне, напиши владельцу в свой раздел BACKLOG («Просьбы») или сделай минимальный коммит и пометь его `[чужая зона]`.
