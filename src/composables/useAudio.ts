@@ -27,6 +27,9 @@ const volumes = ref<Record<AudioChannel, number>>({
   voice: 1,
 })
 
+/** Приветствие должно прозвучать один раз за запуск приложения, даже если composable вызван в нескольких компонентах. */
+let greeted = false
+
 /** Пока говорит голос, музыка тише в столько раз: слова должны быть слышны. */
 const DUCK = 0.4
 
@@ -221,8 +224,7 @@ export function useAudio() {
     return say(lastRetry)
   }
 
-  let greeted = false
-  /** Приветствие «Привет! Давай учить цифры!» один раз за запуск; null, если уже звучало. */
+  /** Приветствие «Привет! Давай учить цифры!» один раз за запуск всего приложения. */
   function greetOnce(): Promise<void> | null {
     if (greeted) return null
     greeted = true
