@@ -54,7 +54,7 @@
 | Агент 3 | Меню, карусель, прогресс и награды | Свободно | `src/views/ModesView.vue`, `LevelSelectView.vue`, `src/components/game/**`, `src/stores/**` |
 | Агент 4 | «Найди цифру» и режим для старших | Свободно | `src/views/FindDigitView.vue`, `src/data/findLevels.ts`, `src/levels/shared/Trace*/Color*` |
 | Агент 5 | Арт: крокодил и звери | Свободно | `src/components/art/**`, `src/views/ArtView.vue` |
-| Агент 6 | Задания цифр 1–5 | Свободно | `src/levels/digit-1…5/**` |
+| Агент 6 | Задания цифр 1–5 | В работе | `src/levels/digit-1…5/**` |
 | Агент 7 | Задания цифр 6–10 | Свободно | `src/levels/digit-6…10/**` |
 | Агент 8 | Оболочка уровня и «вау»-эффекты | Свободно | `src/views/SequenceView.vue`, `src/levels/shared/FriendsActivity.vue`, `src/style.css`, `src/components/common/**`, `src/composables/useDrag.ts` |
 | Агент 9 | Релиз: Android, магазин, тесты, родительский раздел | Свободно | `android/**`, `android-ci/**`, `.github/**`, `scripts/**`, `tests/**`, `src/views/Parent*` |
