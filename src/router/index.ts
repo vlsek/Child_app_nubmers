@@ -33,6 +33,8 @@ const router = createRouter({
         return value >= 1 && value <= FIND_LEVELS.length ? true : { name: 'levels', params: { mode: 'find' } }
       },
     },
+    // Альбом наклеек, полученных за пройденные уровни.
+    { path: '/album', name: 'album', component: () => import('@/views/AlbumView.vue') },
     // Галерея рисунков для разработки: в готовую сборку не попадает.
     ...(import.meta.env.DEV
       ? [{ path: '/art', name: 'art', component: () => import('@/views/ArtView.vue') }]
