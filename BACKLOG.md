@@ -50,7 +50,7 @@
 | Агент | Зона | Статус | Основные файлы (только твои) |
 |---|---|---|---|
 | Агент 1 | Куратор: ревью, слияние, срочные баги, правки по обратной связи пользователя | В работе | любые, но только точечно |
-| Агент 2 | Звук и голос | Свободно | `src/composables/useAudio.ts`, `synth.ts`, `src/data/voice.ts`, `src/assets/audio/**`, `scripts/process-voice.py` |
+| Агент 2 | Звук и голос | В работе | `src/composables/useAudio.ts`, `synth.ts`, `src/data/voice.ts`, `src/assets/audio/**`, `scripts/process-voice.py` |
 | Агент 3 | Меню, карусель, прогресс и награды | Свободно | `src/views/ModesView.vue`, `LevelSelectView.vue`, `src/components/game/**`, `src/stores/**` |
 | Агент 4 | «Найди цифру» и режим для старших | Свободно | `src/views/FindDigitView.vue`, `src/data/findLevels.ts`, `src/levels/shared/Trace*/Color*` |
 | Агент 5 | Арт: крокодил и звери | Свободно | `src/components/art/**`, `src/views/ArtView.vue` |
