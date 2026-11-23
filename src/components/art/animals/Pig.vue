@@ -19,12 +19,14 @@
       <path d="M110 152 v4 M122 152 v4" stroke-width="3" fill="none" />
       <path d="M50 152 v4 M62 152 v4" stroke-width="3" fill="none" />
       <!-- Дальнее ухо -->
-      <path d="M78 52 L84 20 L108 40Z" fill="#f59ab4" />
+      <g class="ear-far" style="transform-origin: 90px 50px"><path d="M78 52 L84 20 L108 40Z" fill="#f59ab4" /></g>
       <!-- Голова -->
       <ellipse cx="128" cy="78" rx="56" ry="46" fill="#ffb4c8" />
       <!-- Ближнее ухо -->
-      <path d="M96 44 L98 12 L128 34Z" fill="#ffb4c8" />
-      <path d="M100 36 L101 22 L116 33Z" fill="#ff8fb0" stroke="none" />
+      <g class="ear-near" style="transform-origin: 108px 44px">
+        <path d="M96 44 L98 12 L128 34Z" fill="#ffb4c8" />
+        <path d="M100 36 L101 22 L116 33Z" fill="#ff8fb0" stroke="none" />
+      </g>
       <path d="M92 58 Q116 40 150 42" fill="none" stroke="#fff" stroke-width="4" opacity=".4" />
       <!-- Глаза -->
       <g class="fig-blink">
@@ -47,3 +49,19 @@
     </g>
   </g>
 </template>
+
+<style scoped>
+.ear-near, .ear-far {
+  transform-box: view-box;
+  animation: ear-twitch 5.2s ease-in-out var(--phase, 0s) infinite;
+}
+.ear-far { animation-delay: calc(var(--phase, 0s) - 0.7s); }
+@keyframes ear-twitch {
+  0%, 88%, 100% { transform: rotate(0); }
+  92% { transform: rotate(-6deg); }
+  96% { transform: rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ear-near, .ear-far { animation: none; }
+}
+</style>

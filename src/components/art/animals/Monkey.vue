@@ -18,14 +18,18 @@
       <ellipse cx="124" cy="148" rx="18" ry="9" fill="#a56a38" />
       <ellipse cx="124" cy="148" rx="11" ry="5" fill="#f7dcb4" stroke="none" />
       <!-- Дальнее ухо -->
-      <circle cx="176" cy="48" r="18" fill="#a56a38" />
-      <circle cx="176" cy="48" r="9" fill="#f7dcb4" stroke="none" />
+      <g class="ear-far" style="transform-origin: 172px 62px">
+        <circle cx="176" cy="48" r="18" fill="#a56a38" />
+        <circle cx="176" cy="48" r="9" fill="#f7dcb4" stroke="none" />
+      </g>
       <!-- Голова -->
       <ellipse cx="128" cy="76" rx="54" ry="46" fill="#b97a45" />
       <path d="M96 52 Q120 38 152 42" fill="none" stroke="#fff" stroke-width="4" opacity=".35" />
       <!-- Ближнее ухо -->
-      <circle cx="80" cy="72" r="19" fill="#b97a45" />
-      <circle cx="82" cy="72" r="10" fill="#f7dcb4" stroke="none" />
+      <g class="ear-near" style="transform-origin: 90px 72px">
+        <circle cx="80" cy="72" r="19" fill="#b97a45" />
+        <circle cx="82" cy="72" r="10" fill="#f7dcb4" stroke="none" />
+      </g>
       <!-- Светлая мордочка -->
       <path d="M108 64 Q122 52 138 66 Q152 52 170 62 Q196 70 190 96 Q182 118 152 118 Q114 118 106 94 Q102 78 108 64Z" fill="#f7dcb4" />
       <!-- Глаза -->
@@ -46,3 +50,19 @@
     </g>
   </g>
 </template>
+
+<style scoped>
+.ear-near, .ear-far {
+  transform-box: view-box;
+  animation: ear-twitch 5.2s ease-in-out var(--phase, 0s) infinite;
+}
+.ear-far { animation-delay: calc(var(--phase, 0s) - 0.7s); }
+@keyframes ear-twitch {
+  0%, 88%, 100% { transform: rotate(0); }
+  92% { transform: rotate(-6deg); }
+  96% { transform: rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ear-near, .ear-far { animation: none; }
+}
+</style>

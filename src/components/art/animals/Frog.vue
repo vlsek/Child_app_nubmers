@@ -33,6 +33,7 @@
       <ellipse cx="178" cy="94" rx="9" ry="5.5" fill="#ff8aa5" opacity=".6" stroke="none" />
       <circle cx="150" cy="72" r="2.4" fill="#1f6a34" stroke="none" />
       <circle cx="166" cy="72" r="2.4" fill="#1f6a34" stroke="none" />
+      <ellipse class="throat" cx="142" cy="116" rx="26" ry="10" fill="#c6f27a" stroke-width="3" />
       <path d="M100 90 Q136 112 184 86" fill="none" stroke-width="4" />
       <path d="M126 102 Q140 112 156 100 Q142 98 126 102Z" fill="#f472b6" stroke-width="2.5" />
     </g>
@@ -45,3 +46,18 @@
     </g>
   </g>
 </template>
+
+<style scoped>
+.throat {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: throat 1.6s ease-in-out var(--phase, 0s) infinite;
+}
+@keyframes throat {
+  0%, 100% { transform: scale(0.9, 0.7); }
+  45% { transform: scale(1.12, 1.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .throat { animation: none; }
+}
+</style>
