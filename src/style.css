@@ -127,3 +127,24 @@
     opacity: 0;
   }
 }
+
+/* Подсказка жеста: рука показывает короткое движение перетаскивания. */
+.hint-hand {
+  margin-left: -1.45rem;
+  color: #334155;
+  font-size: 2.9rem;
+  filter: drop-shadow(0 3px 2px rgb(255 255 255 / 85%));
+  animation: hint-hand-drag 1.35s ease-in-out infinite;
+}
+.hint-hand svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+@keyframes hint-hand-drag {
+  0%, 100% { transform: translate(0, -3px) rotate(-14deg); }
+  55% { transform: translate(34px, -17px) rotate(5deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hint-hand { animation: none; }
+}
