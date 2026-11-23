@@ -30,6 +30,15 @@ const vehicles: { kind: VehicleKind; color: string; shade: string }[] = [
       <Crocodile class="w-full rounded-2xl bg-white/70" mood="happy" :mouth="0.35" />
       <Crocodile class="w-full rounded-2xl bg-white/70" mood="sleep" />
     </div>
+    <h2 class="mb-2 text-xl font-bold">Крокодил: эмоции, походка, наряды</h2>
+    <div class="mb-6 grid grid-cols-4 gap-3 sm:grid-cols-6">
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="surprised" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="sad" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="laugh" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" walk />
+      <Crocodile class="w-full rounded-2xl bg-white/70" :outfit="['party', 'bow']" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="happy" :outfit="['glasses', 'backpack']" :mouth="0.3" />
+    </div>
     <div class="mb-6 grid grid-cols-5 gap-3 sm:grid-cols-10">
       <svg v-for="a in animals" :key="a" viewBox="0 0 100 100" class="h-auto w-full rounded-2xl bg-white/70">
         <AnimalHead :kind="a" />
