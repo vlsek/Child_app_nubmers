@@ -17,7 +17,7 @@ const { say, sayNumber, sayPraise, sayRetry, stopVoice } = useAudio()
 const index = computed(() => Number(route.params.level))
 const level = computed(() => getFindLevel(index.value))
 
-const rounds = ref(buildRounds(level.value?.max ?? 3))
+const rounds = ref(buildRounds(level.value?.max ?? 3, level.value?.options))
 const round = ref(0)
 const done = ref(false)
 /** Цифры, на которые малыш уже ошибся в этом раунде: они бледнеют. */
@@ -42,7 +42,7 @@ async function ask(id = runId): Promise<void> {
 
 async function start(): Promise<void> {
   runId++
-  rounds.value = buildRounds(level.value?.max ?? 3)
+  rounds.value = buildRounds(level.value?.max ?? 3, level.value?.options)
   round.value = 0
   done.value = false
   wrong.value = []

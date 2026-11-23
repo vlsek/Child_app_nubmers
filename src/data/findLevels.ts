@@ -2,30 +2,33 @@ import { NUMBER_LEVELS } from '@/data/numbersLevels'
 import type { NumberLevel } from '@/types/game'
 
 /**
- * Уровни режима «Найди цифру»: чем дальше, тем больше цифр в игре.
- * Каждый уровень называется по самой большой цифре (3, 5, 7, 10) и едет на её машине.
+ * Уровни режима «Найди цифру»: три ступени сложности. Чем дальше, тем больше вариантов
+ * на экране: 3 → 5 → 10. Ступень называется по самой большой цифре (3, 5, 10) и едет на её машине.
  */
 export interface FindLevel {
   /** Номер уровня в карусели, с 1. */
   index: number
   /** Самая большая цифра: в раундах участвуют цифры от 1 до неё. */
   max: number
+  /** Сколько вариантов ответа на экране (совпадает с max: все цифры ступени перед глазами). */
+  options: number
   /** Оформление (машина, звери, цвета) берём у одноимённой цифры. */
   look: NumberLevel
 }
 
-const MAXES = [3, 5, 7, 10] as const
+const MAXES = [3, 5, 10] as const
 
 export const FIND_LEVELS: readonly FindLevel[] = MAXES.map((max, i) => ({
   index: i + 1,
   max,
+  options: max,
   look: NUMBER_LEVELS[max - 1]!,
 }))
 
 /** Сколько правильных ответов нужно, чтобы пройти уровень. */
 export const FIND_ROUNDS = 5
 
-/** Сколько вариантов ответа на экране. */
+/** Сколько вариантов на первой ступени (оставлено для совместимости). */
 export const FIND_OPTIONS = 3
 
 export function getFindLevel(index: number): FindLevel | undefined {
@@ -52,7 +55,7 @@ export function shuffle<T>(items: readonly T[]): T[] {
  * (дальше — по кругу заново), без повторов подряд. К каждой цифре — варианты ответа:
  * правильная и неправильные цифры, перемешанные.
  */
-export function buildRounds(max: number): { target: number; options: number[] }[] {
+export function buildRounds(max: number, optionCount = Math.min(max, FIND_OPTIONS)): { target: number; options: number[] }[] {
   const pool = Array.from({ length: max }, (_, i) => i + 1)
   const targets: number[] = []
   while (targets.length < FIND_ROUNDS) {
@@ -62,7 +65,7 @@ export function buildRounds(max: number): { target: number; options: number[] }[
     targets.push(...batch)
   }
   return targets.slice(0, FIND_ROUNDS).map((target) => {
-    const wrong = shuffle(pool.filter((n) => n !== target)).slice(0, FIND_OPTIONS - 1)
+    const wrong = shuffle(pool.filter((n) => n !== target)).slice(0, optionCount - 1)
     return { target, options: shuffle([target, ...wrong]) }
   })
 }
