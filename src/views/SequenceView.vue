@@ -198,8 +198,8 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
 
     <!-- Конец уровня -->
     <div v-else class="flex flex-1 flex-col items-center justify-center gap-6">
-      <Crocodile class="w-[min(20rem,70vw)] animate-pop" mood="happy" :mouth="0.4" />
-      <div class="animate-pop text-8xl"><Icon name="star" /></div>
+      <Crocodile class="w-[min(20rem,70vw)] crocodile-dance" mood="happy" :mouth="0.4" />
+      <div class="level-star-flight text-8xl"><Icon name="star" /></div>
       <div class="flex items-center gap-5">
         <button type="button" class="btn-round" aria-label="Ещё раз" @click="restart()"><Icon name="again" /></button>
         <button type="button" class="btn-kid bg-grass shadow-kid-green !px-8 !py-5" aria-label="К машинкам" @click="toCars">
