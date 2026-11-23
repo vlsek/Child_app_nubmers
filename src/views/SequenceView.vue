@@ -16,9 +16,11 @@ import { useGameStore } from '@/stores/useGameStore'
  * Если малышу долго не удаётся, появляется кнопка «пропустить».
  * Сами задания — компоненты из реестра (`src/levels/registry.ts`), им нужно лишь `emit('complete')`.
  */
-const SKIP_AFTER_MS = 20_000
+const SKIP_AFTER_MS = 45_000
 /** Через столько без касаний предметы начинают подсвечиваться: «возьми меня». */
 const HINT_AFTER_MS = 6_000
+/** Ещё через столько появляется наглядная подсказка жеста перетаскивания. */
+const HINT_HAND_DELAY_MS = 6_000
 
 const route = useRoute()
 const router = useRouter()
@@ -40,7 +42,7 @@ const round = ref(0)
 
 let timer: ReturnType<typeof setTimeout> | undefined
 let hintTimer: ReturnType<typeof setTimeout> | undefined
-const hint = ref(false)
+const hintStage = ref(0)
 let runId = 0
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -57,8 +59,11 @@ function spark(e: PointerEvent): void {
 
 function armHint(): void {
   clearTimeout(hintTimer)
-  hint.value = false
-  hintTimer = setTimeout(() => (hint.value = true), HINT_AFTER_MS)
+  hintStage.value = 0
+  hintTimer = setTimeout(() => {
+    hintStage.value = 1
+    hintTimer = setTimeout(() => (hintStage.value = 2), HINT_HAND_DELAY_MS)
+  }, HINT_AFTER_MS)
 }
 
 function armSkip(): void {
@@ -177,11 +182,14 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       </div>
     </div>
 
-    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible [@media(max-height:500px)]:pt-9 [@media(orientation:portrait)_and_(max-width:700px)]:flex-none" :class="{ 'hint-idle': hint }" @pointerdown.capture="armHint(); spark($event)">
+    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible [@media(max-height:500px)]:pt-9 [@media(orientation:portrait)_and_(max-width:700px)]:flex-none" :class="{ 'hint-idle': hintStage >= 1 }" @pointerdown.capture="armHint(); spark($event)">
       <Transition name="page" mode="out-in">
         <component :is="views[step]" :key="`${round}-${step}`" :level="level" @complete="onComplete" />
       </Transition>
       <span v-for="s in sparks" :key="s.id" class="tap-spark pointer-events-none absolute z-20" :style="{ left: s.x + 'px', top: s.y + 'px' }" />
+      <div v-if="hintStage >= 2" class="hint-hand pointer-events-none absolute bottom-2 left-1/2 z-30" aria-hidden="true">
+        <Icon name="hand" />
+      </div>
     </div>
 
     <div v-if="!finished" class="relative z-10 hidden flex-1 flex-wrap content-center items-end justify-center gap-x-1 px-6 pb-24 [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
