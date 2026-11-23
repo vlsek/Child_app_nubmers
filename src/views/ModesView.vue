@@ -21,7 +21,7 @@ const hello = ref(false)
 function wave(): void {
   if (hello.value) return
   hello.value = true
-  void sayLine('hello', 'Привет! Давай играть!')
+  void sayLine('croc-hello', 'Привет! Давай играть!')
   setTimeout(() => (hello.value = false), 1800)
 }
 

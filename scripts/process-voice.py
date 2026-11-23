@@ -104,6 +104,15 @@ def main() -> None:
         process_voice(src, VOICE_DIR / f"{key}.mp3")
         print(f"voice  {key:16s} <- {src.name}")
 
+    # Реплики заданий: файлы с латинским именем (`bike-intro.wav`) идут как есть, ключ = имя файла.
+    # `hello.wav` (тап по крокодилу на главном экране) сохраняется как `croc-hello`, чтобы не затереть приветствие.
+    for stem, src in list(files.items()):
+        if re.fullmatch(r"[a-z0-9-]+", stem):
+            key = "croc-hello" if stem == "hello" else stem
+            process_voice(src, VOICE_DIR / f"{key}.mp3")
+            print(f"line   {key:16s} <- {src.name}")
+            files.pop(stem)
+
     for stem, src in list(files.items()):
         if "piano" in stem or src.suffix.lower() == ".mp3" and src.stat().st_size > 1_000_000:
             flt = loudnorm_filter(src, "anull", MUSIC_LUFS)
