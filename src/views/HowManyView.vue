@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
       </button>
     </header>
 
-    <svg v-if="!done" viewBox="0 0 440 330" preserveAspectRatio="xMidYMax meet" class="min-h-0 w-full flex-1 touch-none overflow-visible" role="group" aria-label="Сколько?">
+    <svg v-if="!done" viewBox="0 0 440 344" preserveAspectRatio="xMidYMax meet" class="min-h-0 w-full flex-1 touch-none overflow-visible" role="group" aria-label="Сколько?">
       <rect x="-800" y="86" width="2040" height="1400" fill="#4ade80" />
       <rect x="-800" y="82" width="2040" height="8" fill="#22c55e" />
       <Crocodile x="24" y="2" width="124" height="90" :mood="solved ? 'happy' : 'idle'" :mouth="solved ? 0.5 : 0" :look="0.4" class="pointer-events-none" />
