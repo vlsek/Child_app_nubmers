@@ -85,7 +85,7 @@ async function paint(i: number): Promise<void> {
     </g>
 
     <!-- Места под дуги -->
-    <path v-for="(_, k) in COLORS" :key="`g${k}`" :d="arc(k)" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="13" class="pointer-events-none" />
+    <path v-for="(_, k) in COLORS" :key="`g${k}`" :d="arc(k)" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="13" class="pointer-events-none" />
     <!-- Сами дуги -->
     <path
       v-for="(c, k) in COLORS"
