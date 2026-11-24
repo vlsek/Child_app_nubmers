@@ -127,3 +127,66 @@
     opacity: 0;
   }
 }
+
+/* Подсказка жеста: рука показывает короткое движение перетаскивания. */
+.hint-hand {
+  margin-left: -1.45rem;
+  color: #334155;
+  font-size: 2.9rem;
+  filter: drop-shadow(0 3px 2px rgb(255 255 255 / 85%));
+  animation: hint-hand-drag 1.35s ease-in-out infinite;
+}
+.hint-hand svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+@keyframes hint-hand-drag {
+  0%, 100% { transform: translate(0, -3px) rotate(-14deg); }
+  55% { transform: translate(34px, -17px) rotate(5deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hint-hand { animation: none; }
+}
+
+/* Финал уровня: крокодил пританцовывает, а звезда улетает к индикатору прогресса. */
+.crocodile-dance {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: crocodile-dance 720ms ease-in-out infinite;
+}
+@keyframes crocodile-dance {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  25% { transform: translateY(-9px) rotate(5deg); }
+  50% { transform: translateY(1px) rotate(-5deg); }
+  75% { transform: translateY(-6px) rotate(3deg); }
+}
+.level-star-flight {
+  animation: level-star-flight 1.25s cubic-bezier(.2,.75,.25,1) 250ms both;
+}
+@keyframes level-star-flight {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  68% { transform: translateY(-30vh) scale(.72); opacity: 1; }
+  100% { transform: translateY(-39vh) scale(.2); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crocodile-dance, .level-star-flight { animation: none; }
+}
+
+/* Смена заданий: короткий сдвиг и растворение вместо резкого скачка сцены. */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(22px) scale(.985);
+}
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-22px) scale(.985);
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active, .page-leave-active { transition-duration: 1ms; }
+  .page-enter-from, .page-leave-to { transform: none; }
+}

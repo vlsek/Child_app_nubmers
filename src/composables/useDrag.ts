@@ -23,6 +23,10 @@ export interface DragOptions<T extends string | number> {
   threshold?: number
   /** Можно ли сейчас брать предмет (например, он уже принят). */
   canGrab?: (id: T) => boolean
+  /** Центр магнитной цели. Если предмет отпущен рядом, onDrop получит координаты этой цели. */
+  snapTo?: (id: T, p: Pt) => Pt | null | undefined
+  /** Радиус магнитного притяжения в координатах viewBox (по умолчанию 44). */
+  snapRadius?: number
 }
 
 /**
@@ -47,7 +51,13 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
   let offset: Pt = { x: 0, y: 0 }
   let startPt: Pt = { x: 0, y: 0 }
   let moved = false
+  let pointerId: number | null = null
   let cleanup: (() => void) | null = null
+
+  /** Короткий тактильный отклик: на устройствах без Vibration API просто ничего не происходит. */
+  function vibrate(): void {
+    if (typeof navigator !== 'undefined') navigator.vibrate?.(12)
+  }
 
   function toSvg(e: PointerEvent): Pt {
     const el = svg.value
@@ -58,21 +68,25 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
   }
 
   function start(e: PointerEvent, id: T, home: Pt): void {
-    if (active.value || (opts.canGrab && !opts.canGrab(id))) return
+    // Второй палец не должен перехватывать drag и случайно завершать жест первого.
+    if (e.isPrimary === false || active.value || (opts.canGrab && !opts.canGrab(id))) return
     e.preventDefault()
     const p = toSvg(e)
     startPt = p
     offset = { x: home.x - p.x, y: home.y - p.y }
     moved = false
+    pointerId = e.pointerId
     returning.value = null
     active.value = { id, x: home.x, y: home.y }
 
     const onMove = (ev: PointerEvent): void => {
+      if (ev.pointerId !== pointerId) return
       const q = toSvg(ev)
       if (!moved && Math.hypot(q.x - startPt.x, q.y - startPt.y) > (opts.threshold ?? 8)) moved = true
       if (moved && active.value) active.value = { id, x: q.x + offset.x, y: q.y + offset.y }
     }
-    const onUp = (): void => {
+    const onUp = (ev: PointerEvent): void => {
+      if (ev.pointerId !== pointerId) return
       const a = active.value
       stop()
       if (!a) return
@@ -83,6 +97,7 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
           if (taps >= (opts.tapAssist ?? 3)) {
             taps = 0
             opts.onTap(id)
+            vibrate()
           } else {
             nudge.value = id
             setTimeout(() => (nudge.value = null), 380)
@@ -90,23 +105,36 @@ export function useDrag<T extends string | number>(svg: Ref<SVGSVGElement | null
         } else if (opts.onDrop(id, home) === false) returning.value = id
         return
       }
-      const ok = opts.onDrop(id, { x: a.x, y: a.y })
+      const p = { x: a.x, y: a.y }
+      const target = opts.snapTo?.(id, p)
+      const dropPoint = target && Math.hypot(p.x - target.x, p.y - target.y) <= (opts.snapRadius ?? 44) ? target : p
+      const ok = opts.onDrop(id, dropPoint)
       if (ok === false) returning.value = id
-      else taps = 0
+      else {
+        taps = 0
+        vibrate()
+      }
+    }
+    const onCancel = (ev: PointerEvent): void => {
+      if (ev.pointerId !== pointerId) return
+      const a = active.value
+      stop()
+      if (a) returning.value = id
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
-    window.addEventListener('pointercancel', onUp)
+    window.addEventListener('pointercancel', onCancel)
     cleanup = () => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
-      window.removeEventListener('pointercancel', onUp)
+      window.removeEventListener('pointercancel', onCancel)
     }
   }
 
   function stop(): void {
     cleanup?.()
     cleanup = null
+    pointerId = null
     active.value = null
   }
 
