@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Icon from '@/components/common/Icon.vue'
 import VehicleArt from '@/components/art/VehicleArt.vue'
+import Magnifier from '@/components/game/Magnifier.vue'
 import type { NumberLevel } from '@/types/game'
 
 defineProps<{
@@ -11,6 +12,8 @@ defineProps<{
   count: number
   learned?: boolean
   label: string
+  /** Режим «Найди цифру»: над машиной лупа. */
+  search?: boolean
 }>()
 
 defineEmits<{ select: [] }>()
@@ -27,6 +30,7 @@ defineEmits<{ select: [] }>()
       :digit="digit"
       class="block w-full"
     />
+    <Magnifier v-if="search" class="lupa" />
     <span v-if="learned" class="star" aria-hidden="true"><Icon name="star" /></span>
   </button>
 </template>
@@ -48,6 +52,13 @@ defineEmits<{ select: [] }>()
   outline: 6px solid #fff;
   outline-offset: 6px;
   border-radius: 2rem;
+}
+.lupa {
+  position: absolute;
+  left: 2%;
+  top: -8%;
+  width: 34%;
+  pointer-events: none;
 }
 .star {
   position: absolute;

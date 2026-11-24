@@ -87,7 +87,7 @@ const ordered = computed(() => {
         <g v-for="(v, i) in locked" :key="`l${v}`" :transform="`translate(${W / 2 - ((locked.length - 1) * shelfStep) / 2 + i * shelfStep} 297) scale(${shelfStep / 80})`">
           <StickerBadge :value="v" locked />
         </g>
-        <Crocodile :x="W - 150" y="196" width="120" height="87" mood="happy" :mouth="0.2" />
+        <Crocodile :x="W - 150" y="196" width="120" height="87" mood="happy" :mouth="0.2" :outfit="game.outfit" />
         <g v-for="v in ordered" :key="v" :style="drag.style(v, homeOf(v))" @pointerdown="drag.start($event, v, homeOf(v))">
           <StickerBadge :value="v" />
         </g>

@@ -12,6 +12,8 @@ export interface CarouselItem {
   count: number
   learned: boolean
   label: string
+  /** Режим «Найди цифру»: на карточке лупа. */
+  search?: boolean
 }
 
 const props = defineProps<{
@@ -188,6 +190,7 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
             :count="item.count"
             :learned="item.learned"
             :label="item.label"
+            :search="item.search"
             @select="onSelect(i)"
           />
           <span v-if="i === nextIndex && !item.learned && !showHint" class="nudge" aria-hidden="true">

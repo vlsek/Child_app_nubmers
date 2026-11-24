@@ -35,6 +35,7 @@ const items = computed<CarouselItem[]>(() =>
         count: l.max,
         learned: game.hasLearned('find', findCardId(l.index)),
         label: `Уровень ${l.index}: цифры от 1 до ${l.max}`,
+        search: true,
       })),
 )
 

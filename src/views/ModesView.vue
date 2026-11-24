@@ -2,8 +2,12 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Crocodile from '@/components/art/Crocodile.vue'
+import Confetti from '@/components/common/Confetti.vue'
 import Icon from '@/components/common/Icon.vue'
+import Magnifier from '@/components/game/Magnifier.vue'
+import StarGift from '@/components/game/StarGift.vue'
 import VehicleArt from '@/components/art/VehicleArt.vue'
+import { fanfare } from '@/composables/synth'
 import { useAudio } from '@/composables/useAudio'
 import { getNumberLevel } from '@/data/numbersLevels'
 import { useGameStore } from '@/stores/useGameStore'
@@ -37,6 +41,18 @@ function wave(): void {
   setTimeout(() => (hello.value = false), 1800)
 }
 
+/** Подарок за звёзды: крокодил надевает новый наряд и радуется. */
+const burst = ref(0)
+function takeGift(): void {
+  if (!game.openGift()) return
+  sleeping.value = false
+  hello.value = true
+  burst.value++
+  fanfare()
+  void sayLine('croc-new-gift', 'Ура! Подарок!')
+  setTimeout(() => (hello.value = false), 2200)
+}
+
 function open(mode: GameMode): void {
   void greetOnce()
   router.push({ name: 'levels', params: { mode } })
@@ -49,13 +65,7 @@ onMounted(() => game.setMode(null))
   <main class="flex h-full flex-col overflow-y-auto" :style="skyStyle">
     <header class="flex shrink-0 items-center justify-between gap-4 p-4 sm:p-8 sm:pb-2 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:pb-0">
       <div class="flex items-center gap-3">
-        <div
-          class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg [@media(max-height:500px)]:h-14"
-          :aria-label="`Звёзд: ${game.totalStars}`"
-        >
-          <span class="text-4xl"><Icon name="star" /></span>
-          <span>{{ game.totalStars }}</span>
-        </div>
+        <StarGift @open="takeGift" />
         <button type="button" class="btn-round relative" aria-label="Альбом наклеек" @click="router.push({ name: 'album' })">
           <svg viewBox="0 0 40 40" class="h-9 w-9" aria-hidden="true" stroke-linejoin="round">
             <rect x="6" y="5" width="28" height="30" rx="5" fill="#fb923c" stroke="#c2410c" stroke-width="2.5" />
@@ -80,7 +90,7 @@ onMounted(() => game.setMode(null))
       <!-- Травяной холмик: крокодил стоит на земле, а не висит в воздухе -->
       <span class="relative block">
         <span class="absolute -bottom-1 left-1/2 h-[18%] w-[130%] -translate-x-1/2 rounded-[50%] bg-grass shadow-[0_5px_0_0_#16a34a]" aria-hidden="true" />
-        <Crocodile :mood="hello ? 'happy' : sleeping ? 'sleep' : 'idle'" :mouth="hello ? 0.6 : 0" :look="0.6" class="relative w-full" />
+        <Crocodile :mood="hello ? 'happy' : sleeping ? 'sleep' : 'idle'" :outfit="game.outfit" :mouth="hello ? 0.6 : 0" :look="0.6" class="relative w-full" />
       </span>
     </button>
 
@@ -89,11 +99,13 @@ onMounted(() => game.setMode(null))
         <VehicleArt :kind="car.vehicle" :color="car.color" :shade="car.shade" :animal="car.animal" :count="3" :digit="3" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[11rem]" />
         <span class="sr-only">Учим цифры</span>
       </button>
-      <button type="button" class="mode bg-sky-kid" aria-label="Найди цифру" @click="open('find')">
+      <button type="button" class="mode relative bg-sky-kid" aria-label="Найди цифру" @click="open('find')">
+        <Magnifier class="absolute left-[6%] top-[4%] w-[26%] max-w-24" />
         <VehicleArt :kind="bus.vehicle" :color="bus.color" :shade="bus.shade" :animal="bus.animal" :count="5" :digit="5" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[11rem]" />
         <span class="sr-only">Найди цифру</span>
       </button>
     </div>
+  <Confetti :burst="burst" big />
   </main>
 </template>
 

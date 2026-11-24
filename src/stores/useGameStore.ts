@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useAudio } from '@/composables/useAudio'
+import { GIFT_OUTFITS, STARS_PER_GIFT } from '@/data/gifts'
 import { activityCardId, MAX_LEVEL, MIN_LEVEL, numberCardId } from '@/data/numbersLevels'
 import { activitiesFor } from '@/levels/registry'
 import type { GameMode, ModeProgress, Progress, SoundSettings } from '@/types/game'
@@ -27,6 +28,8 @@ interface SavedState {
   sound: SoundSettings
   /** Полученные наклейки: цифра уровня → положение в альбоме. */
   stickers?: Record<string, StickerPos>
+  /** Сколько подарков (нарядов крокодила) уже открыто. */
+  giftsOpened?: number
 }
 
 /** Начальное место наклейки в альбоме: две строки по пять, чтобы новые не лежали стопкой. */
@@ -77,6 +80,9 @@ export const useGameStore = defineStore('game', () => {
   /** Цифра наклейки, которую только что заработали: оболочка уровня может показать её (null — нет новой). */
   const newSticker = ref<number | null>(null)
 
+  /** Открытые подарки: каждый надевает на крокодила следующий наряд. */
+  const giftsOpened = ref(Math.min(GIFT_OUTFITS.length, Math.max(0, Math.floor(saved.giftsOpened ?? 0))))
+
   // Синхронизируем сохранённый mute с аудио-менеджером при старте.
   audio.setMuted(soundMuted.value)
 
@@ -92,6 +98,19 @@ export const useGameStore = defineStore('game', () => {
   }))
 
   const totalStars = computed(() => progress.value.learn.stars + progress.value.find.stars)
+
+  /** Все наряды собраны: звёзды больше не копятся к подарку. */
+  const allGifts = computed(() => giftsOpened.value >= GIFT_OUTFITS.length)
+  /** Сколько подарков уже можно открыть (звёзд хватает, а подарок ещё не открыт). */
+  const giftsReady = computed(() =>
+    Math.max(0, Math.min(GIFT_OUTFITS.length, Math.floor(totalStars.value / STARS_PER_GIFT)) - giftsOpened.value),
+  )
+  /** Сколько звёзд уже собрано на следующий подарок (0…STARS_PER_GIFT). */
+  const starsIntoGift = computed(() =>
+    Math.min(STARS_PER_GIFT, Math.max(0, totalStars.value - giftsOpened.value * STARS_PER_GIFT)),
+  )
+  /** Наряд крокодила на главном экране и в альбоме. */
+  const outfit = computed(() => GIFT_OUTFITS.slice(0, giftsOpened.value))
 
   const currentProgress = computed<ModeProgress | null>(() =>
     currentMode.value ? progress.value[currentMode.value] : null,
@@ -143,6 +162,13 @@ export const useGameStore = defineStore('game', () => {
     stickers.value[value] = { x: Math.min(1, Math.max(0, pos.x)), y: Math.min(1, Math.max(0, pos.y)) }
   }
 
+  /** Открыть подарок: крокодил получает следующий наряд. Возвращает false, если открывать нечего. */
+  function openGift(): boolean {
+    if (giftsReady.value <= 0) return false
+    giftsOpened.value += 1
+    return true
+  }
+
   function clearNewSticker(): void {
     newSticker.value = null
   }
@@ -175,6 +201,7 @@ export const useGameStore = defineStore('game', () => {
     if (mode) progress.value[mode] = emptyModeProgress()
     else progress.value = emptyProgress()
     // Наклейки принадлежат «Учим цифры»: сбросили всё или этот режим, альбом начинается заново.
+    if (!mode) giftsOpened.value = 0
     if (!mode || mode === 'learn') {
       stickers.value = {}
       newSticker.value = null
@@ -193,10 +220,10 @@ export const useGameStore = defineStore('game', () => {
 
   // --- persistence ---
   watch(
-    [progress, soundMuted, stickers],
+    [progress, soundMuted, stickers, giftsOpened],
     () => {
       try {
-        const data: SavedState = { progress: progress.value, sound: sound.value, stickers: stickers.value }
+        const data: SavedState = { progress: progress.value, sound: sound.value, stickers: stickers.value, giftsOpened: giftsOpened.value }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
       } catch {
         /* приватный режим или переполненное хранилище — играем без сохранения */
@@ -213,6 +240,10 @@ export const useGameStore = defineStore('game', () => {
     stickers,
     newSticker,
     totalStars,
+    allGifts,
+    giftsReady,
+    starsIntoGift,
+    outfit,
     currentProgress,
     setMode,
     setMenuLevel,
@@ -221,6 +252,7 @@ export const useGameStore = defineStore('game', () => {
     levelDone,
     finishLevel,
     moveSticker,
+    openGift,
     clearNewSticker,
     toggleSound,
     registerCorrect,
