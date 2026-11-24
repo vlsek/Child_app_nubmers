@@ -77,9 +77,6 @@ async function counted(n: number): Promise<void> {
     <rect x="-800" y="262" width="2040" height="900" fill="#fde68a" />
     <rect x="-800" y="258" width="2040" height="8" fill="#fbbf24" />
 
-    <!-- Друг в колпаке -->
-    <AnimalFigure :kind="level.animal" flip hat="party" :mood="count >= 3 ? 'happy' : 'idle'" x="296" y="2" width="136" height="99" class="pointer-events-none" />
-
     <!-- Торт -->
     <g stroke-linejoin="round">
       <rect x="214" y="212" width="190" height="52" rx="10" fill="#f9a8d4" stroke="#be185d" stroke-width="4" />
@@ -109,6 +106,9 @@ async function counted(n: number): Promise<void> {
         <circle r="38" fill="transparent" />
       </g>
     </g>
+
+    <!-- Друг в колпаке стоит на земле справа от торта (раньше парил в небе) -->
+    <AnimalFigure :kind="level.animal" flip hat="party" :mood="count >= 3 ? 'happy' : 'idle'" x="368" y="202" width="84" height="61" class="pointer-events-none" />
 
     <!-- Крокодил -->
     <Crocodile x="-8" y="168" width="200" height="146" :mood="count >= 3 ? 'happy' : 'idle'" :mouth="mouth" :look="1" class="pointer-events-none" />
