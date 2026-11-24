@@ -77,7 +77,11 @@ onMounted(() => game.setMode(null))
     </header>
 
     <button type="button" class="mx-auto -mb-2 mt-1 block w-44 shrink-0 sm:w-56 [@media(max-height:700px)]:sm:w-40 [@media(max-height:500px)]:mt-0 [@media(max-height:500px)]:w-24 [@media(max-height:500px)]:sm:w-24" aria-label="Крокодил" @click="wave">
-      <Crocodile :mood="hello ? 'happy' : sleeping ? 'sleep' : 'idle'" :mouth="hello ? 0.6 : 0" :look="0.6" class="w-full" />
+      <!-- Травяной холмик: крокодил стоит на земле, а не висит в воздухе -->
+      <span class="relative block">
+        <span class="absolute -bottom-1 left-1/2 h-[18%] w-[130%] -translate-x-1/2 rounded-[50%] bg-grass shadow-[0_5px_0_0_#16a34a]" aria-hidden="true" />
+        <Crocodile :mood="hello ? 'happy' : sleeping ? 'sleep' : 'idle'" :mouth="hello ? 0.6 : 0" :look="0.6" class="relative w-full" />
+      </span>
     </button>
 
     <div class="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 content-center gap-6 p-4 sm:grid-cols-2 sm:gap-8 sm:p-8 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:sm:p-2 [@media(max-height:500px)]:sm:gap-4">
