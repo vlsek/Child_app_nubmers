@@ -5,6 +5,7 @@ const activities: ActivityDef[] = [
   { id: 'gift', title: 'Один подарок', component: () => import('./GiftActivity.vue') },
   { id: 'trunk', title: 'Крокодил тянет слонёнка за хобот', component: () => import('./TrunkActivity.vue') },
   { id: 'firework', title: 'Зажги один салют', component: () => import('./FireworkActivity.vue') },
+  { id: 'star', title: 'Отнеси одну звёздочку к фонарику', component: () => import('./StarActivity.vue') },
 ]
 
 export default activities

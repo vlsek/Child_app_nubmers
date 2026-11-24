@@ -76,10 +76,9 @@ onBeforeUnmount(() => {
 })
 
 const drag = useDrag<number>(svg, {
-  canGrab: () => {
-    pulling.value = false
-    return !done.value
-  },
+  // Не сбрасываем pulling при касании: малыш продолжает тыкать, и помощь не должна от этого прерываться.
+  // Перетаскивание и так главнее (в tick ветка drag.active стоит раньше pulling).
+  canGrab: () => !done.value,
   onDrop: () => false, // отпустил раньше: хобот возвращается сам (см. tick)
   onTap: () => {
     pulling.value = true

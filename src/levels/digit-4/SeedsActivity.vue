@@ -17,7 +17,7 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const BIN = { x: 372, y: 236 }
+const BIN = { x: 292, y: 236 }
 const HOMES = [
   { x: 150, y: 150 },
   { x: 232, y: 166 },
@@ -89,6 +89,11 @@ async function finish(n: number): Promise<void> {
     role="img"
     aria-label="Убери из арбуза четыре косточки в ведро"
   >
+    <!-- Земля на всю ширину: друг и ведро стоят на ней, ломтик лежит на тарелке -->
+    <rect x="-800" y="262" width="2040" height="900" fill="#4ade80" />
+    <rect x="-800" y="258" width="2040" height="8" fill="#22c55e" />
+    <ellipse cx="190" cy="252" rx="132" ry="9" fill="#f8fafc" stroke="#94a3b8" stroke-width="3" />
+
     <!-- Ломтик арбуза (в конце летит в пасть крокодила) -->
     <g :class="{ eat: eating }" class="slice">
     <path d="M52 110 A138 138 0 0 0 328 110Z" fill="#16a34a" stroke="#14532d" stroke-width="5" stroke-linejoin="round" />
@@ -98,7 +103,7 @@ async function finish(n: number): Promise<void> {
     </g>
 
     <!-- Друг держит ведро -->
-    <AnimalFigure :kind="level.animal" flip :mood="removed >= 4 ? 'happy' : 'idle'" x="306" y="116" width="134" height="98" class="pointer-events-none" />
+    <AnimalFigure :kind="level.animal" flip :mood="removed >= 4 ? 'happy' : 'idle'" x="334" y="198" width="106" height="77" class="pointer-events-none" />
 
     <!-- Ведро: большая мигающая зона, куда нести косточки -->
     <circle v-if="removed < 4" :cx="BIN.x" :cy="BIN.y + 22" r="52" fill="#fff" fill-opacity=".25" stroke="#fff" stroke-width="4" stroke-dasharray="8 8" class="target pointer-events-none" />
