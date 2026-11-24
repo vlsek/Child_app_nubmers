@@ -37,6 +37,12 @@ const items = computed<CarouselItem[]>(() =>
       })),
 )
 
+/** Первая ещё не пройденная машина: на ней «ручка». Все пройдены — подсказка не нужна. */
+const nextIndex = computed(() => {
+  const i = items.value.findIndex((it) => !it.learned)
+  return i === -1 ? undefined : i
+})
+
 const learnedFlags = computed(() => NUMBER_LEVELS.map((l) => game.hasLearned('learn', numberCardId(l.value))))
 
 function open(index: number): void {
@@ -81,6 +87,7 @@ onBeforeUnmount(stopVoice)
       :items="items"
       :start="game.menuLevel[mode] - 1"
       :hint="game.totalStars === 0"
+      :next-index="nextIndex"
       @select="open"
       @active="onActive"
       @settle="onSettle"

@@ -20,6 +20,8 @@ const props = defineProps<{
   start: number
   /** Показывать подсказку «листай», пока малыш не коснулся экрана. */
   hint: boolean
+  /** Какую машину играть дальше: на ней «ручка» показывает, куда нажать (нет — не показываем). */
+  nextIndex?: number
 }>()
 
 const emit = defineEmits<{
@@ -188,6 +190,9 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
             :label="item.label"
             @select="onSelect(i)"
           />
+          <span v-if="i === nextIndex && !item.learned && !showHint" class="nudge" aria-hidden="true">
+            <Icon name="hand" />
+          </span>
         </div>
       </li>
     </ul>
@@ -240,8 +245,31 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
   scroll-snap-stop: always;
 }
 .slide-inner {
+  position: relative;
   will-change: transform, opacity;
   transform-origin: center bottom;
+}
+/* «Ручка» на следующей машине: качается вверх-вниз и не мешает касанию */
+.nudge {
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  z-index: 5;
+  margin-left: -2.25rem;
+  font-size: 4.5rem;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.25));
+  animation: nudge 1.1s ease-in-out infinite;
+}
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
 }
 .road {
   top: 50%;
@@ -265,6 +293,9 @@ const roadShift = computed(() => `${-Math.round(pos.value * stepPx())}px`)
 @media (prefers-reduced-motion: reduce) {
   .slide-inner {
     will-change: auto;
+  }
+  .nudge {
+    animation: none;
   }
 }
 </style>
