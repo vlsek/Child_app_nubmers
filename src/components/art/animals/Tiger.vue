@@ -21,14 +21,18 @@
       <ellipse cx="122" cy="148" rx="18" ry="9" fill="#fff3dc" />
       <path d="M114 152 v4 M122 153 v4 M130 152 v4" stroke-width="2.5" fill="none" />
       <!-- Дальнее ухо -->
-      <circle cx="170" cy="40" r="17" fill="#ffa63a" />
-      <circle cx="170" cy="42" r="8" fill="#2b1708" stroke="none" opacity=".35" />
+      <g class="ear-far" style="transform-origin: 170px 56px">
+        <circle cx="170" cy="40" r="17" fill="#ffa63a" />
+        <circle cx="170" cy="42" r="8" fill="#2b1708" stroke="none" opacity=".35" />
+      </g>
       <!-- Голова с пушистыми щёчками -->
       <path d="M72 84 Q74 46 124 42 Q178 40 192 74 L204 84 L192 92 L200 108 L180 110 L170 122 Q150 112 140 120 Q124 112 110 120 L100 108 L82 106 L90 96 Z" fill="#ffa63a" />
       <path d="M96 56 Q124 40 158 46" fill="none" stroke="#fff" stroke-width="4" opacity=".4" />
       <!-- Ближнее ухо -->
-      <circle cx="94" cy="50" r="18" fill="#ffa63a" />
-      <circle cx="95" cy="52" r="9" fill="#ffd3a0" stroke="none" />
+      <g class="ear-near" style="transform-origin: 96px 66px">
+        <circle cx="94" cy="50" r="18" fill="#ffa63a" />
+        <circle cx="95" cy="52" r="9" fill="#ffd3a0" stroke="none" />
+      </g>
       <!-- Лобные полоски -->
       <g stroke="#2b1708" stroke-width="4.5" fill="none"><path d="M130 44 v12" /><path d="M118 46 q2 8 6 10" /><path d="M142 46 q-2 8 -6 10" /></g>
       <!-- Полоски на щеках -->
@@ -53,3 +57,19 @@
     </g>
   </g>
 </template>
+
+<style scoped>
+.ear-near, .ear-far {
+  transform-box: view-box;
+  animation: ear-twitch 5.2s ease-in-out var(--phase, 0s) infinite;
+}
+.ear-far { animation-delay: calc(var(--phase, 0s) - 0.7s); }
+@keyframes ear-twitch {
+  0%, 88%, 100% { transform: rotate(0); }
+  92% { transform: rotate(-6deg); }
+  96% { transform: rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ear-near, .ear-far { animation: none; }
+}
+</style>

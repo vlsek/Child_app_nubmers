@@ -6,7 +6,10 @@ import Bunny from './animals/Bunny.vue'
 import Cat from './animals/Cat.vue'
 import Chick from './animals/Chick.vue'
 import Dog from './animals/Dog.vue'
+import Elephant from './animals/Elephant.vue'
 import Frog from './animals/Frog.vue'
+import Lion from './animals/Lion.vue'
+import Mouse from './animals/Mouse.vue'
 import Monkey from './animals/Monkey.vue'
 import Panda from './animals/Panda.vue'
 import Pig from './animals/Pig.vue'
@@ -30,6 +33,7 @@ const props = withDefaults(defineProps<{ kind: AnimalKind; flip?: boolean; mood?
 const HEAD: Record<AnimalKind, { cx: number; top: number }> = {
   bear: { cx: 127, top: 30 }, bunny: { cx: 128, top: 50 }, cat: { cx: 128, top: 38 }, chick: { cx: 132, top: 28 }, dog: { cx: 128, top: 36 },
   frog: { cx: 120, top: 52 }, monkey: { cx: 128, top: 32 }, panda: { cx: 127, top: 30 }, pig: { cx: 128, top: 34 }, tiger: { cx: 124, top: 42 },
+  lion: { cx: 128, top: 28 }, mouse: { cx: 130, top: 30 }, elephant: { cx: 132, top: 40 },
 }
 const head = computed(() => HEAD[props.kind])
 /** `variant` — номер особи: каждый зверь в толпе чуть другого оттенка (сдвиг тона ±14°, насыщенность). */
@@ -41,7 +45,7 @@ const tint = computed(() => {
   return `hue-rotate(${hue}deg) saturate(${sat.toFixed(2)})`
 })
 
-const parts = { bear: Bear, bunny: Bunny, cat: Cat, chick: Chick, dog: Dog, frog: Frog, monkey: Monkey, panda: Panda, pig: Pig, tiger: Tiger }
+const parts = { lion: Lion, mouse: Mouse, elephant: Elephant, bear: Bear, bunny: Bunny, cat: Cat, chick: Chick, dog: Dog, frog: Frog, monkey: Monkey, panda: Panda, pig: Pig, tiger: Tiger }
 /** Для окон: голова и плечи. У цыплёнка тело круглое, его не обрезаем. */
 const box = computed(() => (props.seated ? '0 0 220 160' : props.crop && props.kind !== 'chick' ? (props.flip ? '0 0 158 118' : '62 0 158 118') : '0 0 220 160'))
 const roundCrop = computed(() => props.crop && props.kind === 'bear')

@@ -175,6 +175,58 @@ const phase = `${-(Math.random() * 4).toFixed(2)}s`
       <path d="M50 67 V72 Q44 78 38 74 M50 72 Q56 78 62 74" fill="none" stroke-width="2.6" />
     </template>
 
+    <!-- Львёнок -->
+    <template v-else-if="kind === 'lion'">
+      <circle cx="50" cy="54" r="43" fill="#c46a1c" />
+      <circle cx="28" cy="24" r="10" fill="#f3c05a" />
+      <circle cx="72" cy="24" r="10" fill="#f3c05a" />
+      <circle cx="50" cy="56" r="31" fill="#f6c667" />
+      <ellipse cx="50" cy="68" rx="15" ry="11" fill="#fff1c9" stroke="none" />
+      <path d="M43 59 h14 l-7 7Z" fill="#7a3a1a" stroke-width="2.5" />
+      <path d="M50 66 V71 M42 73 Q50 79 58 73" fill="none" stroke-width="2.6" />
+      <ellipse cx="29" cy="66" rx="5.5" ry="3.8" fill="#ff8aa5" stroke="none" opacity=".55" />
+      <ellipse cx="71" cy="66" rx="5.5" ry="3.8" fill="#ff8aa5" stroke="none" opacity=".55" />
+      <circle class="eye" cx="38" cy="50" r="4.8" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="62" cy="50" r="4.8" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="39.5" cy="48.3" r="1.7" fill="#fff" stroke="none" />
+      <circle class="eye" cx="63.5" cy="48.3" r="1.7" fill="#fff" stroke="none" />
+    </template>
+
+    <!-- Мышонок -->
+    <template v-else-if="kind === 'mouse'">
+      <circle cx="22" cy="30" r="18" fill="#b9b9c8" />
+      <circle cx="22" cy="31" r="10" fill="#ffb3c7" stroke="none" />
+      <circle cx="78" cy="30" r="18" fill="#b9b9c8" />
+      <circle cx="78" cy="31" r="10" fill="#ffb3c7" stroke="none" />
+      <ellipse cx="50" cy="58" rx="35" ry="33" fill="#d6d6e2" />
+      <ellipse cx="50" cy="70" rx="15" ry="11" fill="#f1eff7" stroke="none" />
+      <ellipse cx="50" cy="62" rx="5.5" ry="4.2" fill="#ff7aa2" stroke-width="2.5" />
+      <path d="M50 66 V71 M43 74 Q50 79 57 74" fill="none" stroke-width="2.6" />
+      <path d="M46 74 h8 v7 q-4 2 -8 0Z" fill="#fff" stroke-width="2" />
+      <path d="M36 66 l-16 -3 M36 70 l-16 4 M64 66 l16 -3 M64 70 l16 4" stroke-width="1.8" fill="none" opacity=".7" />
+      <circle class="eye" cx="37" cy="50" r="5" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="63" cy="50" r="5" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="38.6" cy="48.2" r="1.8" fill="#fff" stroke="none" />
+      <circle class="eye" cx="64.6" cy="48.2" r="1.8" fill="#fff" stroke="none" />
+    </template>
+
+    <!-- Слонёнок -->
+    <template v-else-if="kind === 'elephant'">
+      <ellipse cx="16" cy="48" rx="15" ry="22" fill="#8fa9cc" />
+      <ellipse cx="84" cy="48" rx="15" ry="22" fill="#8fa9cc" />
+      <ellipse cx="16" cy="50" rx="8" ry="14" fill="#ffc2d4" stroke="none" opacity=".8" />
+      <ellipse cx="84" cy="50" rx="8" ry="14" fill="#ffc2d4" stroke="none" opacity=".8" />
+      <circle cx="50" cy="46" r="33" fill="#a9c1de" />
+      <path d="M40 62 Q40 88 48 92 Q56 96 58 88 Q52 88 54 74 Q56 62 60 62Z" fill="#a9c1de" />
+      <path d="M44 76 h8 M44 82 h8" stroke-width="2" fill="none" opacity=".6" />
+      <ellipse cx="29" cy="62" rx="5.5" ry="3.8" fill="#ff8aa5" stroke="none" opacity=".55" />
+      <ellipse cx="71" cy="62" rx="5.5" ry="3.8" fill="#ff8aa5" stroke="none" opacity=".55" />
+      <circle class="eye" cx="37" cy="44" r="4.8" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="63" cy="44" r="4.8" fill="#2b1a12" stroke="none" />
+      <circle class="eye" cx="38.6" cy="42.3" r="1.7" fill="#fff" stroke="none" />
+      <circle class="eye" cx="64.6" cy="42.3" r="1.7" fill="#fff" stroke="none" />
+    </template>
+
     <!-- Цыплёнок -->
     <template v-else>
       <path d="M41 21 Q35 5 45 10 Q50 -1 55 10 Q65 5 59 21 Z" fill="#ffd83d" />

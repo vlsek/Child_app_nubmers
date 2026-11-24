@@ -6,7 +6,7 @@ import AnimalHead from '@/components/art/AnimalHead.vue'
 import VehicleArt from '@/components/art/VehicleArt.vue'
 import type { AnimalKind, VehicleKind } from '@/types/art'
 
-const animals: AnimalKind[] = ['bear', 'bunny', 'cat', 'dog', 'panda', 'frog', 'monkey', 'pig', 'tiger', 'chick']
+const animals: AnimalKind[] = ['bear', 'bunny', 'cat', 'dog', 'panda', 'frog', 'monkey', 'pig', 'tiger', 'chick', 'lion', 'mouse', 'elephant']
 
 const vehicles: { kind: VehicleKind; color: string; shade: string }[] = [
   { kind: 'hatch', color: '#f43f5e', shade: '#9f1239' },
@@ -30,6 +30,15 @@ const vehicles: { kind: VehicleKind; color: string; shade: string }[] = [
       <Crocodile class="w-full rounded-2xl bg-white/70" mood="happy" :mouth="0.35" />
       <Crocodile class="w-full rounded-2xl bg-white/70" mood="sleep" />
     </div>
+    <h2 class="mb-2 text-xl font-bold">Крокодил: эмоции, походка, наряды</h2>
+    <div class="mb-6 grid grid-cols-4 gap-3 sm:grid-cols-6">
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="surprised" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="sad" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="laugh" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" walk />
+      <Crocodile class="w-full rounded-2xl bg-white/70" :outfit="['party', 'bow']" />
+      <Crocodile class="w-full rounded-2xl bg-white/70" mood="happy" :outfit="['glasses', 'backpack']" :mouth="0.3" />
+    </div>
     <div class="mb-6 grid grid-cols-5 gap-3 sm:grid-cols-10">
       <svg v-for="a in animals" :key="a" viewBox="0 0 100 100" class="h-auto w-full rounded-2xl bg-white/70">
         <AnimalHead :kind="a" />
@@ -39,6 +48,17 @@ const vehicles: { kind: VehicleKind; color: string; shade: string }[] = [
     <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
       <AnimalFigure v-for="k in animals" :key="k" :kind="k" class="w-full rounded-2xl bg-white/70" />
       <AnimalFigure v-for="k in animals" :key="'f' + k" :kind="k" flip mood="happy" class="w-full rounded-2xl bg-white/70" />
+    </div>
+    <h2 class="mb-2 text-xl font-bold">Новые звери: колпаки и машины</h2>
+    <div class="mb-6 grid grid-cols-3 gap-3">
+      <AnimalFigure kind="lion" hat="party" class="w-full rounded-2xl bg-white/70" />
+      <AnimalFigure kind="mouse" hat="chef" class="w-full rounded-2xl bg-white/70" />
+      <AnimalFigure kind="elephant" hat="party" flip class="w-full rounded-2xl bg-white/70" />
+    </div>
+    <div class="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
+      <VehicleArt kind="ambulance" color="#0ea5e9" shade="#075985" animal="elephant" :count="6" digit="6" class="w-full" />
+      <VehicleArt kind="firetruck" color="#dc2626" shade="#7f1d1d" animal="lion" :count="7" digit="7" class="w-full" />
+      <VehicleArt kind="bus" color="#14b8a6" shade="#115e59" animal="mouse" :count="10" digit="10" class="w-full" />
     </div>
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
       <VehicleArt
