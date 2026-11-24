@@ -23,6 +23,8 @@ const props = defineProps<{
 }>()
 
 const uid = useId()
+/** Своя фаза покачивания у каждой машины, чтобы не дрожали хором. */
+const phase = `${-(Math.random() * 2).toFixed(2)}s`
 const glassColor = '#d4ecfb'
 
 interface Config {
@@ -166,7 +168,14 @@ const tint = computed(() => {
 
     <ellipse :cx="cfg.shadow.cx" cy="266" :rx="cfg.shadow.rx" ry="9" fill="#000" opacity=".2" />
 
-    <g :stroke="shade" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Дымок из выхлопной трубы: три колечка поднимаются и тают -->
+    <g class="veh-smoke" fill="#fff" stroke="#cbd5e1" stroke-width="2" aria-hidden="true">
+      <circle class="puff" cx="30" cy="250" r="7" />
+      <circle class="puff p2" cx="30" cy="250" r="6" />
+      <circle class="puff p3" cx="30" cy="250" r="8" />
+    </g>
+
+    <g class="veh-bob" :style="{ '--vphase': phase }" :stroke="shade" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
       <!-- ===== Задний план: то, что за спинами зверей ===== -->
       <template v-if="kind === 'police'">
         <rect x="54" y="116" width="190" height="48" rx="14" :fill="shade" stroke="none" opacity=".9" />
@@ -407,3 +416,33 @@ const tint = computed(() => {
     </g>
   </svg>
 </template>
+
+<style scoped>
+/* Мотор работает: кузов чуть подрагивает, колёса остаются на земле (тень не двигается) */
+.veh-bob {
+  transform-box: view-box;
+  transform-origin: 200px 262px;
+  animation: veh-bob 0.55s ease-in-out var(--vphase, 0s) infinite alternate;
+}
+@keyframes veh-bob {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-1.6px) rotate(-0.25deg); }
+}
+.puff {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: puff 2.4s ease-out infinite;
+}
+.p2 { animation-delay: 0.8s; }
+.p3 { animation-delay: 1.6s; }
+@keyframes puff {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: translate(-14px, -32px) scale(1.6); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .veh-bob, .puff { animation: none; }
+  .puff { opacity: 0; }
+}
+</style>
