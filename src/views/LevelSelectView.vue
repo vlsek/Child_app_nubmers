@@ -70,9 +70,7 @@ onBeforeUnmount(stopVoice)
       <button type="button" class="btn-round" aria-label="Назад" @click="router.push({ name: 'modes' })">
         <Icon name="back" />
       </button>
-      <h1 class="text-center text-3xl font-black leading-tight text-white drop-shadow-[0_4px_0_rgba(2,132,199,0.55)] sm:text-5xl">
-        Выбери машинку
-      </h1>
+      <h1 class="sr-only">Выбери машинку</h1>
       <button
         type="button"
         class="btn-round"
