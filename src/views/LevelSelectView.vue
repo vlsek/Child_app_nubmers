@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from '@/components/common/Icon.vue'
 import TrophyShelf from '@/components/game/TrophyShelf.vue'
+import StickerAward from '@/components/game/StickerAward.vue'
 import LevelCarousel, { type CarouselItem } from '@/components/game/LevelCarousel.vue'
 import { useAudio } from '@/composables/useAudio'
 import { FIND_LEVELS, findCardId } from '@/data/findLevels'
@@ -93,5 +94,6 @@ onBeforeUnmount(stopVoice)
       @settle="onSettle"
     />
     <TrophyShelf v-if="mode === 'learn'" :learned="learnedFlags" />
+    <StickerAward v-if="mode === 'learn'" />
   </main>
 </template>
