@@ -5,6 +5,7 @@ const activities: ActivityDef[] = [
   { id: 'chicks', title: 'Крокодил кормит двух птенцов', component: () => import('./FeedChicksActivity.vue') },
   { id: 'bike', title: 'Убери с дороги два камня', component: () => import('./BikeActivity.vue') },
   { id: 'drums', title: 'Два барабана', component: () => import('./DrumsActivity.vue') },
+  { id: 'seesaw', title: 'Двое на качелях', component: () => import('./SeesawActivity.vue') },
 ]
 
 export default activities
