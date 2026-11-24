@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
     </header>
 
     <!-- Выбор цифры -->
-    <ul v-if="!level" class="mx-auto my-auto grid w-full max-w-3xl grid-cols-5 gap-3 pb-6 sm:gap-6">
+    <ul v-if="!level" class="mx-auto my-auto grid w-full max-w-3xl grid-cols-5 [@media(orientation:portrait)]:max-w-sm [@media(orientation:portrait)]:grid-cols-3 gap-3 pb-6 sm:gap-6">
       <li v-for="l in NUMBER_LEVELS" :key="l.value" class="animate-pop flex justify-center" :style="{ animationDelay: `${l.value * 50}ms` }">
         <button
           type="button"
