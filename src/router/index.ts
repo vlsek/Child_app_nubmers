@@ -33,6 +33,8 @@ const router = createRouter({
         return value >= 1 && value <= FIND_LEVELS.length ? true : { name: 'levels', params: { mode: 'find' } }
       },
     },
+    // Режим «Для старших» (агент 4): выбор цифры и задания «напиши / раскрась».
+    { path: '/older/:level(\\d+)?', name: 'older', component: () => import('@/views/OlderView.vue') },
     // Галерея рисунков для разработки: в готовую сборку не попадает.
     ...(import.meta.env.DEV
       ? [{ path: '/art', name: 'art', component: () => import('@/views/ArtView.vue') }]

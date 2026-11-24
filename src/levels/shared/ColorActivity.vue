@@ -22,7 +22,7 @@ const THICK = 24 // толщина цифры, которую красим
 const svg = ref<SVGSVGElement | null>(null)
 const paths = ref<SVGPathElement[]>([])
 const blobs = ref<{ x: number; y: number; c: string }[]>([])
-/** Клетки внутри цифры: когда закрашено 90 % — победа. */
+/** Клетки внутри цифры: когда закрашено 82 % — победа (мягко). */
 const cells = ref<{ x: number; y: number; hit: boolean }[]>([])
 const hitCount = ref(0)
 const finished = ref(false)
@@ -72,7 +72,7 @@ function paint(e: PointerEvent): void {
       hitCount.value++
     }
   }
-  if (cells.value.length && hitCount.value / cells.value.length >= 0.9) {
+  if (cells.value.length && hitCount.value / cells.value.length >= 0.82) {
     finished.value = true
     emit('complete')
   }
@@ -122,7 +122,7 @@ const onMove = (e: PointerEvent) => pressed && paint(e)
         :key="c"
         type="button"
         role="radio"
-        class="h-14 w-14 rounded-full border-4 border-white shadow-md transition-transform"
+        class="h-16 w-16 rounded-full border-4 border-white shadow-md transition-transform"
         :class="c === color ? 'scale-125 ring-4 ring-slate-700' : ''"
         :style="{ background: c }"
         :aria-checked="c === color"
