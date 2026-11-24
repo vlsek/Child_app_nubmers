@@ -35,6 +35,10 @@ const router = createRouter({
     },
     // Альбом наклеек, полученных за пройденные уровни.
     { path: '/album', name: 'album', component: () => import('@/views/AlbumView.vue') },
+    // Режим «Для старших» (агент 4): выбор цифры и задания «напиши / раскрась».
+    { path: '/older/:level(\\d+)?', name: 'older', component: () => import('@/views/OlderView.vue') },
+    // Режим «Сколько?» (агент 4): N зверей и три цифры на выбор.
+    { path: '/howmany', name: 'howmany', component: () => import('@/views/HowManyView.vue') },
     // Галерея рисунков для разработки: в готовую сборку не попадает.
     ...(import.meta.env.DEV
       ? [{ path: '/art', name: 'art', component: () => import('@/views/ArtView.vue') }]

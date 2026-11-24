@@ -13,8 +13,8 @@ const { sayLine, stopVoice } = useAudio()
 const glyph = computed(() => glyphFor(props.level.value))
 
 const STEP = 2 // расстояние между точками-образцами вдоль линии
-const REACH = 26 // на сколько образцов вперёд можно «перепрыгнуть» за одно движение
-const TOLERANCE = 20 // как далеко от линии может быть палец
+const REACH = 34 // на сколько образцов вперёд можно «перепрыгнуть» за одно движение
+const TOLERANCE = 30 // как далеко от линии может быть палец (мягко: 5–6 лет водят неточно)
 
 const svg = ref<SVGSVGElement | null>(null)
 const paths = ref<SVGPathElement[]>([])
@@ -23,6 +23,9 @@ const stroke = ref(0) // какую линию сейчас пишем
 const cur = ref(0) // сколько образцов уже пройдено на ней
 const done = ref(false)
 const pressed = ref(false)
+/** Линия, по которой едет подсказка-точка. */
+const guide = computed(() => glyph.value.strokes[stroke.value] ?? '')
+const showGuide = computed(() => !done.value && !pressed.value && cur.value < 6)
 /** Длина уже закрашенной части каждой линии. */
 const filled = ref<number[]>([])
 
@@ -107,15 +110,20 @@ const start = computed(() => samples.value[stroke.value]?.[cur.value] ?? null)
       <path v-for="(d, i) in glyph.strokes" :key="'g' + i" :d="d" stroke="#fff" stroke-width="26" opacity=".7" />
       <path v-for="(d, i) in glyph.strokes" :key="'p' + i" :ref="(el) => { if (el) paths[i] = el as SVGPathElement }" :d="d" stroke="#64748b" stroke-width="3" stroke-dasharray="1 9" />
       <!-- Пройденная часть -->
+      <template v-for="(d, i) in glyph.strokes" :key="'f' + i">
       <path
-        v-for="(d, i) in glyph.strokes"
-        :key="'f' + i"
+        v-if="(filled[i] ?? 0) > 0"
         :d="d"
         :stroke="level.color"
         stroke-width="18"
         :stroke-dasharray="`${filled[i] ?? 0} 99999`"
       />
+      </template>
       <!-- Старт -->
+      <!-- Подсказка: точка сама проезжает путь цифры, пока палец не на экране -->
+      <circle v-if="showGuide && guide" :key="'guide' + stroke" r="11" fill="#facc15" stroke="#fff" stroke-width="3" opacity=".95">
+        <animateMotion :path="guide" dur="2.4s" repeatCount="indefinite" />
+      </circle>
       <circle v-if="start && !done" :cx="start.x" :cy="start.y" r="9" fill="#22c55e" stroke="#fff" stroke-width="3" class="pulse" />
     </svg>
     <Crocodile class="pointer-events-none absolute -bottom-2 right-0 w-28 sm:w-40" :mood="done ? 'happy' : 'idle'" :mouth="done ? 0.3 : 0" :look="1" />
