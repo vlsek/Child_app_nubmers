@@ -88,6 +88,8 @@ function restart(first = false): void {
 function advance(): void {
   if (step.value + 1 >= list.value.length) {
     finished.value = true
+    // Наклейка и звезда даются за дошедший до конца уровень, даже если задание пропустили.
+    game.finishLevel(value.value)
     burst.value++
     showSkip.value = false
     clearTimeout(timer)
@@ -172,8 +174,8 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       />
     </div>
 
-    <!-- Вертикальный экран: сцена остаётся 4:3, свободное место занимают крупная цифра и столько зверей, сколько цифра -->
-    <div v-if="!finished" class="relative z-10 hidden flex-1 items-center justify-center [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
+    <!-- Вертикальный экран (кроме разминки с друзьями: там цифра и звери уже в самой сцене): сцена остаётся 4:3, свободное место занимают крупная цифра и столько зверей, сколько цифра -->
+    <div v-if="!finished && step > 0" class="relative z-10 hidden flex-1 items-center justify-center [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
       <div
         class="flex h-28 w-28 items-center justify-center rounded-full text-7xl font-black leading-none text-white"
         :style="{ background: level.color, boxShadow: `0 8px 0 0 ${level.shade}` }"
@@ -182,7 +184,7 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       </div>
     </div>
 
-    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible [@media(max-height:500px)]:pt-9 [@media(orientation:portrait)_and_(max-width:700px)]:flex-none" :class="{ 'hint-idle': hintStage >= 1 }" @pointerdown.capture="armHint(); spark($event)">
+    <div v-if="!finished" class="relative min-h-0 flex-1 [&_svg]:overflow-visible [@media(max-height:500px)]:pt-9" :class="{ 'hint-idle': hintStage >= 1, '[@media(orientation:portrait)_and_(max-width:700px)]:flex-none': step > 0 }" @pointerdown.capture="armHint(); spark($event)">
       <Transition name="page" mode="out-in">
         <component :is="views[step]" :key="`${round}-${step}`" :level="level" @complete="onComplete" />
       </Transition>
@@ -192,12 +194,12 @@ const toCars = () => router.push({ name: 'levels', params: { mode: 'learn' } })
       </div>
     </div>
 
-    <div v-if="!finished" class="relative z-10 hidden flex-1 flex-wrap content-center items-end justify-center gap-x-1 px-6 pb-24 [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
+    <div v-if="!finished && step > 0" class="relative z-10 hidden flex-1 flex-wrap content-center items-end justify-center gap-x-1 px-6 pb-24 [@media(orientation:portrait)_and_(max-width:700px)]:flex" aria-hidden="true">
       <AnimalFigure v-for="n in level.value" :key="n" :kind="level.animal" :variant="n" mood="idle" class="h-auto w-16" />
     </div>
 
     <!-- Конец уровня -->
-    <div v-else class="flex flex-1 flex-col items-center justify-center gap-6">
+    <div v-if="finished" class="flex flex-1 flex-col items-center justify-center gap-6">
       <Crocodile class="w-[min(20rem,70vw)] crocodile-dance" mood="happy" :mouth="0.4" />
       <div class="level-star-flight text-8xl"><Icon name="star" /></div>
       <div class="flex items-center gap-5">
