@@ -22,7 +22,7 @@ let ro: ResizeObserver | undefined
 
 function measure(): void {
   const r = box.value?.getBoundingClientRect()
-  if (r && r.width > 0 && r.height > 0) W.value = Math.round(H * Math.min(2.6, Math.max(0.6, r.width / r.height)))
+  if (r && r.width > 0 && r.height > 0) W.value = Math.round(H * Math.min(2.6, Math.max(0.4, r.width / r.height)))
 }
 
 onMounted(() => {
@@ -42,14 +42,19 @@ const locked = computed(() => levels.filter((v) => !game.stickers[v]))
 
 function homeOf(v: number): { x: number; y: number } {
   const p = game.stickers[v]!
-  return { x: p.x * W.value, y: p.y * H }
+  return { x: clampX(p.x * W.value), y: clampY(p.y * H) }
 }
+
+/** Наклейка всегда целиком на странице, даже если экран потом стал уже. */
+const clampX = (x: number): number => Math.min(W.value - MARGIN, Math.max(MARGIN, x))
+const clampY = (y: number): number => Math.min(H - MARGIN, Math.max(MARGIN + 20, y))
+
+/** Полка пустых мест: шаг сужается, если не помещается в ширину. */
+const shelfStep = computed(() => Math.min(44, (W.value - 60) / Math.max(1, locked.value.length)))
 
 const drag = useDrag<number>(svg, {
   onDrop(id, p) {
-    const x = Math.min(W.value - MARGIN, Math.max(MARGIN, p.x))
-    const y = Math.min(H - MARGIN, Math.max(MARGIN + 20, p.y))
-    game.moveSticker(id, { x: x / W.value, y: y / H })
+    game.moveSticker(id, { x: clampX(p.x) / W.value, y: clampY(p.y) / H })
     void sayNumber(id)
     return true
   },
@@ -79,7 +84,7 @@ const ordered = computed(() => {
         <rect x="-800" y="262" :width="W + 1600" height="1200" fill="#4ade80" />
         <rect x="-800" y="262" :width="W + 1600" height="8" fill="#16a34a" />
         <!-- Полка: наклейки, которые ещё не получены -->
-        <g v-for="(v, i) in locked" :key="`l${v}`" :transform="`translate(${W / 2 - (locked.length - 1) * 22 + i * 44} 297) scale(.55)`">
+        <g v-for="(v, i) in locked" :key="`l${v}`" :transform="`translate(${W / 2 - ((locked.length - 1) * shelfStep) / 2 + i * shelfStep} 297) scale(${shelfStep / 80})`">
           <StickerBadge :value="v" locked />
         </g>
         <Crocodile :x="W - 150" y="196" width="120" height="87" mood="happy" :mouth="0.2" />
