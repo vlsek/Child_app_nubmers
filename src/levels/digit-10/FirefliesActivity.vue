@@ -86,19 +86,17 @@ const glow = computed(() => 0.15 + count.value * 0.085)
         <stop offset="0" stop-color="#1e1b4b" /><stop offset="1" stop-color="#312e81" />
       </linearGradient>
       <radialGradient id="ff-glow"><stop offset="0" stop-color="#fef08a" stop-opacity=".95" /><stop offset="1" stop-color="#fef08a" stop-opacity="0" /></radialGradient>
-      <clipPath id="ff-frame"><rect x="8" y="8" width="424" height="304" rx="30" /></clipPath>
     </defs>
-    <g clip-path="url(#ff-frame)">
-      <rect x="0" y="0" width="440" height="320" fill="url(#ff-night)" />
+    <g>
+      <rect x="-800" y="-1200" width="2040" height="1462" fill="#1e1b4b" /><rect x="-800" y="0" width="2040" height="270" fill="url(#ff-night)" />
       <!-- звёзды и луна -->
       <g fill="#fff"><circle cx="40" cy="40" r="2" class="tw" /><circle cx="120" cy="30" r="1.6" class="tw d2" /><circle cx="200" cy="50" r="2" class="tw d3" /><circle cx="330" cy="34" r="1.8" class="tw" /><circle cx="400" cy="90" r="2" class="tw d2" /><circle cx="260" cy="26" r="1.5" class="tw d3" /></g>
       <circle cx="372" cy="52" r="24" fill="#fef9c3" /><circle cx="382" cy="46" r="21" fill="#312e81" />
       <!-- луг -->
-      <path d="M0 262 Q80 240 160 258 T330 252 T440 258 V330 H0Z" fill="#14532d" />
-      <path d="M0 280 Q100 262 200 278 T440 274 V330 H0Z" fill="#166534" />
+      <path d="M-800 262 H0 Q80 240 160 258 T330 252 T440 258 H1240 V1000 H-800Z" fill="#14532d" />
+      <path d="M-800 280 H0 Q100 262 200 278 T440 274 H1240 V1000 H-800Z" fill="#166534" />
       <g stroke="#14532d" stroke-width="4" stroke-linecap="round" fill="none"><path d="M30 290 v-18 M36 290 v-12 M240 292 v-16 M246 292 v-10 M410 288 v-14" /></g>
     </g>
-    <rect x="8" y="8" width="424" height="304" rx="30" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3" />
 
     <Crocodile x="12" y="194" width="140" height="102" :mood="count >= N ? 'happy' : 'idle'" :mouth="0" :look="1" class="pointer-events-none" />
 
