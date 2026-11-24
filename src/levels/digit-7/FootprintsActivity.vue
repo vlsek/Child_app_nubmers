@@ -16,7 +16,7 @@ const emit = defineEmits<{ complete: [] }>()
 
 const { sayNumber, sayLine, stopVoice } = useAudio()
 
-const SPOTS = Array.from({ length: 7 }, (_, i) => ({ x: 40 + i * 50, y: 236 + (i % 2 ? -16 : 12) }))
+const SPOTS = Array.from({ length: 7 }, (_, i) => ({ x: 122 + i * 34, y: 236 + (i % 2 ? -16 : 12) }))
 
 /** step[i] — каким по счёту поставлен след i (0 — пятнышко). */
 const step = ref<number[]>(SPOTS.map(() => 0))
@@ -47,9 +47,9 @@ async function stamp(i: number): Promise<void> {
   <svg viewBox="0 0 440 320" class="mx-auto h-full max-h-[34rem] w-full" role="img" aria-label="Поставь семь следов">
     <rect x="-800" y="262" width="2040" height="900" fill="#4ade80" />
     <!-- Песчаная тропинка -->
-    <path d="M-20 252 Q60 214 140 246 T300 240 T460 236 V292 Q380 300 300 288 T140 292 T-20 290Z" fill="#fde68a" stroke="#f59e0b" stroke-width="3" />
+    <path d="M-800 252 H-20 Q60 214 140 246 T300 240 T460 236 H1240 V292 H460 Q380 300 300 288 T140 292 T-20 290 H-800Z" fill="#fde68a" stroke="#f59e0b" stroke-width="3" />
 
-    <Crocodile x="-14" y="52" width="150" height="110" :mood="count >= 7 ? 'happy' : 'idle'" :mouth="count >= 7 ? 0.4 : 0" :look="1" class="pointer-events-none" />
+    <Crocodile x="-24" y="182" width="130" height="95" :mood="count >= 7 ? 'happy' : 'idle'" :mouth="count >= 7 ? 0.4 : 0" :look="1" class="pointer-events-none" />
 
     <!-- Куст с обезьянкой -->
     <g transform="translate(360 170)">
