@@ -10,6 +10,9 @@ export type AnimalKind =
   | 'pig'
   | 'tiger'
   | 'chick'
+  | 'lion'
+  | 'mouse'
+  | 'elephant'
 
 /** Виды транспорта, нарисованные в src/components/art/VehicleArt.vue. */
 export type VehicleKind =

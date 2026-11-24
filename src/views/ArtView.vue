@@ -6,7 +6,7 @@ import AnimalHead from '@/components/art/AnimalHead.vue'
 import VehicleArt from '@/components/art/VehicleArt.vue'
 import type { AnimalKind, VehicleKind } from '@/types/art'
 
-const animals: AnimalKind[] = ['bear', 'bunny', 'cat', 'dog', 'panda', 'frog', 'monkey', 'pig', 'tiger', 'chick']
+const animals: AnimalKind[] = ['bear', 'bunny', 'cat', 'dog', 'panda', 'frog', 'monkey', 'pig', 'tiger', 'chick', 'lion', 'mouse', 'elephant']
 
 const vehicles: { kind: VehicleKind; color: string; shade: string }[] = [
   { kind: 'hatch', color: '#f43f5e', shade: '#9f1239' },
