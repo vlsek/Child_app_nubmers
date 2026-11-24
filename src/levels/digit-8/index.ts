@@ -4,6 +4,7 @@ import type { ActivityDef } from '@/types/activity'
 const activities: ActivityDef[] = [
   { id: 'teeth', title: 'Птичка чистит восемь зубов', component: () => import('./TeethActivity.vue') },
   { id: 'harvest', title: 'Трактор возит восемь морковок', component: () => import('./HarvestActivity.vue') },
+  { id: 'drummer', title: 'Осьминог играет на восьми барабанах', component: () => import('./DrummerActivity.vue') },
   { id: 'octopus', title: 'Одень осьминогу восемь носков', component: () => import('./OctopusActivity.vue') },
 ]
 
