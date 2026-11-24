@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Crocodile from '@/components/art/Crocodile.vue'
 import Icon from '@/components/common/Icon.vue'
@@ -13,6 +13,7 @@ const router = useRouter()
 const game = useGameStore()
 const { greetOnce, sayLine } = useAudio()
 
+const stickerCount = computed(() => Object.keys(game.stickers).length)
 const car = getNumberLevel(3)!
 const bus = getNumberLevel(10)!
 
@@ -36,12 +37,22 @@ onMounted(() => game.setMode(null))
 <template>
   <main class="flex h-full flex-col overflow-y-auto">
     <header class="flex shrink-0 items-center justify-between gap-4 p-4 sm:p-8 sm:pb-2 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:pb-0">
-      <div
-        class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg [@media(max-height:500px)]:h-14"
-        :aria-label="`Звёзд: ${game.totalStars}`"
-      >
-        <span class="text-4xl"><Icon name="star" /></span>
-        <span>{{ game.totalStars }}</span>
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg [@media(max-height:500px)]:h-14"
+          :aria-label="`Звёзд: ${game.totalStars}`"
+        >
+          <span class="text-4xl"><Icon name="star" /></span>
+          <span>{{ game.totalStars }}</span>
+        </div>
+        <button type="button" class="btn-round relative" aria-label="Альбом наклеек" @click="router.push({ name: 'album' })">
+          <svg viewBox="0 0 40 40" class="h-9 w-9" aria-hidden="true" stroke-linejoin="round">
+            <rect x="6" y="5" width="28" height="30" rx="5" fill="#fb923c" stroke="#c2410c" stroke-width="2.5" />
+            <rect x="10" y="9" width="20" height="22" rx="3" fill="#fff" />
+            <circle cx="20" cy="20" r="6" fill="#4ade80" stroke="#16a34a" stroke-width="2" />
+          </svg>
+          <span v-if="stickerCount" class="absolute -right-1 -top-1 flex h-7 min-w-7 items-center justify-center rounded-full bg-candy px-1 text-base font-black text-white shadow">{{ stickerCount }}</span>
+        </button>
       </div>
       <h1 class="text-center text-3xl font-black text-white drop-shadow-[0_4px_0_rgba(2,132,199,0.55)] sm:text-5xl">
         Во что играем?
