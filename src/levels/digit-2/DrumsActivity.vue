@@ -107,7 +107,12 @@ void props
     </g>
 
     <!-- Нотки -->
-    <text v-for="n in notes" :key="n.id" :x="n.x" y="190" font-size="30" font-weight="900" :fill="n.c" stroke="#fff" stroke-width="1.5" class="note pointer-events-none">♪</text>
+    <g v-for="n in notes" :key="n.id" :transform="`translate(${n.x} 190)`" class="pointer-events-none">
+      <g class="note">
+        <path d="M0 0 V-26 L14 -22 V-17 L5 -20 V3" fill="none" :stroke="n.c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+        <ellipse cx="-3" cy="4" rx="7" ry="5.5" :fill="n.c" stroke="#fff" stroke-width="1.5" transform="rotate(-18 -3 4)" />
+      </g>
+    </g>
 
     <!-- Палочки: на полу или на барабане (играют сами) -->
     <g v-for="(h, j) in HOMES" :key="j" :style="onDrum[j]! >= 0 ? { transform: `translate(${DRUMS[onDrum[j]!]!.x}px, ${DRUM_Y - 22}px)`, transition: 'transform .4s cubic-bezier(.3,1.4,.5,1)' } : drag.style(j, h)" @pointerdown="drag.start($event, j, h)">
