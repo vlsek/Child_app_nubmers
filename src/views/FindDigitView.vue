@@ -4,8 +4,10 @@ import { useRoute, useRouter } from 'vue-router'
 import Crocodile from '@/components/art/Crocodile.vue'
 import Confetti from '@/components/common/Confetti.vue'
 import Icon from '@/components/common/Icon.vue'
+import DigitTile from '@/views/find/DigitTile.vue'
+import { animalSound, boing, fanfare } from '@/composables/synth'
 import { useAudio } from '@/composables/useAudio'
-import { FIND_ROUNDS, buildRounds, findCardId, getFindLevel } from '@/data/findLevels'
+import { FIND_GRASS_Y, FIND_ROUNDS, buildRounds, findCardId, findLayout, getFindLevel } from '@/data/findLevels'
 import { getNumberLevel } from '@/data/numbersLevels'
 import { useGameStore } from '@/stores/useGameStore'
 
@@ -13,6 +15,12 @@ const route = useRoute()
 const router = useRouter()
 const game = useGameStore()
 const { say, sayNumber, sayPraise, sayRetry, stopVoice } = useAudio()
+
+/** Портрет: сцена выше, плиток в ряду меньше. */
+const portrait = ref(false)
+let mq: MediaQueryList | null = null
+const onMq = () => (portrait.value = !!mq?.matches)
+
 
 const index = computed(() => Number(route.params.level))
 const level = computed(() => getFindLevel(index.value))
@@ -27,6 +35,25 @@ const solved = ref(false)
 const burst = ref(0)
 
 const current = computed(() => rounds.value[round.value])
+const layout = computed(() => findLayout(level.value?.options ?? 3, portrait.value))
+/** Мягкая подсказка: нужная плитка светится, крокодил смотрит на неё. */
+const hint = ref(false)
+let hintTimer: ReturnType<typeof setTimeout> | undefined
+function armHint(): void {
+  clearTimeout(hintTimer)
+  hint.value = false
+  hintTimer = setTimeout(() => (hint.value = true), 8000)
+}
+const targetIndex = computed(() => current.value?.options.indexOf(current.value.target) ?? -1)
+const look = computed(() => {
+  const spot = layout.value.spots[targetIndex.value]
+  return hint.value && spot ? Math.max(-1, Math.min(1, (spot.cx - 95) / 160)) : 0.4
+})
+function stateOf(n: number): 'idle' | 'wrong' | 'right' | 'hint' {
+  if (wrong.value.includes(n)) return 'wrong'
+  if (n === current.value?.target) return solved.value ? 'right' : hint.value ? 'hint' : 'idle'
+  return 'idle'
+}
 
 let runId = 0
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
@@ -35,7 +62,8 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 async function ask(id = runId): Promise<void> {
   const c = current.value
   if (!c) return
-  await say('find-digit')
+  armHint()
+  await say(round.value % 2 ? 'show-digit' : 'find-digit')
   if (id !== runId) return
   await sayNumber(c.target)
 }
@@ -58,6 +86,7 @@ async function choose(n: number): Promise<void> {
   if (n !== c.target) {
     // Мягкая ошибка: цифра бледнеет, повторяем вопрос; ничего не отнимаем.
     wrong.value.push(n)
+    if (wrong.value.length >= 2) hint.value = true
     game.registerMistake('find')
     await sayRetry()
     if (id !== runId) return
@@ -65,13 +94,18 @@ async function choose(n: number): Promise<void> {
     return
   }
   solved.value = true
+  clearTimeout(hintTimer)
+  hint.value = false
   burst.value++
+  boing()
+  animalSound(getNumberLevel(n)!.animal)
   game.registerCorrect('find', `find-${index.value}-${c.target}`)
   await sayPraise()
   await sleep(400)
   if (id !== runId) return
   if (round.value + 1 >= FIND_ROUNDS) {
     done.value = true
+    fanfare()
     // Звезда за уровень отмечается в registerCorrect по id уровня.
     game.registerCorrect('find', findCardId(index.value))
     return
@@ -93,131 +127,70 @@ function back(): void {
 const hasNext = computed(() => !!getFindLevel(index.value + 1))
 
 onMounted(() => {
+  mq = window.matchMedia('(orientation: portrait)')
+  onMq()
+  mq.addEventListener('change', onMq)
   game.setMode('find')
   game.setMenuLevel('find', index.value)
   void start()
 })
 onBeforeUnmount(() => {
+  clearTimeout(hintTimer)
+  mq?.removeEventListener('change', onMq)
   runId++
   stopVoice()
 })
 </script>
 
 <template>
-  <main v-if="level && current" class="relative mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-center gap-6 px-4 pt-32 pb-12 [@media(max-height:500px)]:gap-2 [@media(max-height:500px)]:pt-20 [@media(max-height:500px)]:pb-3">
+  <main v-if="level && current" class="relative mx-auto flex h-full w-full max-w-5xl flex-col px-2">
     <Confetti :burst="burst" :big="done" />
-    <button type="button" class="btn-round absolute left-4 top-4 sm:left-8 sm:top-8" aria-label="К машинкам" @click="back">
-      <Icon name="back" />
-    </button>
-    <button
-      type="button"
-      class="btn-round absolute right-4 top-4 sm:right-8 sm:top-8"
-      :aria-label="game.sound.muted ? 'Включить звук' : 'Выключить звук'"
-      @click="game.toggleSound()"
-    >
-      <Icon :name="game.sound.muted ? 'mute' : 'sound'" />
-    </button>
-
-    <!-- Прогресс: звёздочки по числу раундов -->
-    <div class="absolute left-1/2 top-28 flex -translate-x-1/2 gap-2 text-4xl sm:top-10 [@media(max-height:500px)]:top-4 [@media(max-height:500px)]:sm:top-4 [@media(max-height:500px)]:text-3xl" aria-hidden="true">
-      <span
-        v-for="r in FIND_ROUNDS"
-        :key="r"
-        class="transition-all duration-300"
-        :class="r - 1 < round || done ? 'scale-110' : 'opacity-35 grayscale'"
-      >
-        <Icon name="star" />
-      </span>
-    </div>
-
-    <Crocodile
-      :mood="solved || done ? 'happy' : 'idle'"
-      :mouth="solved ? 0.5 : 0"
-      :look="0"
-      class="pointer-events-none -mb-2 w-36 shrink-0 sm:w-52 [@media(max-height:500px)]:w-20 [@media(max-height:500px)]:sm:w-20 [@media(max-height:500px)]:mb-0"
-    />
-
-    <template v-if="!done">
-      <!-- Повтор вопроса: большая кнопка с динамиком -->
-      <button type="button" class="btn-kid bg-tangerine shadow-kid-yellow !px-8 !py-5 !text-3xl [@media(max-height:500px)]:!py-2 [@media(max-height:500px)]:!px-6" aria-label="Повторить вопрос" @click="ask(++runId)">
-        <span class="text-5xl [@media(max-height:500px)]:text-4xl"><Icon name="sound" /></span>
+    <!-- Шапка: назад, прогресс-звёздочки, звук -->
+    <header class="relative z-10 flex h-24 shrink-0 items-center justify-between px-2 pt-2 [@media(max-height:500px)]:h-16">
+      <button type="button" class="btn-round" aria-label="К машинкам" @click="back"><Icon name="back" /></button>
+      <div class="flex gap-1 text-2xl sm:gap-2 sm:text-4xl [@media(max-height:500px)]:text-3xl" aria-hidden="true">
+        <span v-for="r in FIND_ROUNDS" :key="r" class="transition-all duration-300" :class="r - 1 < round || done ? 'scale-110' : 'opacity-35 grayscale'">
+          <Icon name="star" />
+        </span>
+      </div>
+      <button type="button" class="btn-round" :aria-label="game.sound.muted ? 'Включить звук' : 'Выключить звук'" @click="game.toggleSound()">
+        <Icon :name="game.sound.muted ? 'mute' : 'sound'" />
       </button>
+    </header>
 
-      <ul class="flex w-full flex-wrap items-center justify-center gap-4 sm:gap-8">
-        <li v-for="n in current.options" :key="`${round}-${n}`" class="animate-pop">
-          <button
-            type="button"
-            class="digit"
-            :class="{ 'digit--wrong': wrong.includes(n), 'digit--right': solved && n === current.target }"
-            :style="{
-              background: getNumberLevel(n)!.color,
-              boxShadow: `0 10px 0 0 ${getNumberLevel(n)!.shade}`,
-            }"
-            :aria-label="`Цифра ${n}`"
-            @click="choose(n)"
-          >
-            {{ n }}
-          </button>
-        </li>
-      </ul>
-    </template>
+    <!-- Сцена: трава на всю ширину, крокодил спрашивает, звери держат таблички -->
+    <svg
+      v-if="!done"
+      :viewBox="`0 0 440 ${layout.height}`"
+      preserveAspectRatio="xMidYMax meet"
+      class="min-h-0 w-full flex-1 touch-none overflow-visible"
+      role="group"
+      aria-label="Найди цифру"
+    >
+      <rect x="-800" :y="FIND_GRASS_Y" width="2040" height="1400" fill="#4ade80" />
+      <rect x="-800" :y="FIND_GRASS_Y - 4" width="2040" height="8" fill="#22c55e" />
+      <Crocodile x="24" :y="FIND_GRASS_Y - 90" width="124" height="90" :mood="solved ? 'happy' : 'idle'" :mouth="solved ? 0.5 : 0" :look="look" class="pointer-events-none" />
+      <!-- Повтор вопроса: крупная кнопка с динамиком -->
+      <g role="button" tabindex="0" aria-label="Повторить вопрос" class="cursor-pointer" @click="ask(++runId)" @keydown.enter.prevent="ask(++runId)">
+        <circle cx="206" cy="58" r="34" fill="#d97706" transform="translate(0 4)" />
+        <circle cx="206" cy="58" r="34" fill="#fb923c" stroke="#fff" stroke-width="4" />
+        <path d="M192 52h8l11-9v30l-11-9h-8z" fill="#fff" />
+        <path d="M219 50q7 8 0 16M225 44q13 14 0 28" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+      </g>
+      <template v-for="(n, i) in current.options" :key="`${round}-${n}`">
+        <DigitTile :n="n" :cx="layout.spots[i]!.cx" :ground="layout.spots[i]!.ground" :w="layout.w" :order="i" :state="stateOf(n)" @pick="choose" />
+      </template>
+    </svg>
 
     <!-- Уровень пройден -->
-    <template v-else>
-      <div class="animate-pop text-[8rem] leading-none [@media(max-height:500px)]:text-[5rem]"><Icon name="star" /></div>
+    <div v-else class="flex flex-1 flex-col items-center justify-center gap-4">
+      <Crocodile class="w-[min(16rem,40vh,70vw)] animate-pop" mood="happy" :mouth="0.4" />
+      <div class="animate-pop text-[6rem] leading-none [@media(max-height:500px)]:text-[4rem]"><Icon name="star" /></div>
       <div class="flex items-center gap-6">
         <button type="button" class="btn-round" aria-label="Ещё раз" @click="start"><Icon name="again" /></button>
-        <button type="button" class="btn-kid bg-grass shadow-kid-green !px-8 !py-5" aria-label="К машинкам" @click="back">
-          <Icon name="home" />
-        </button>
-        <button
-          type="button"
-          class="btn-round animate-wiggle disabled:opacity-40"
-          :disabled="!hasNext"
-          aria-label="Дальше"
-          @click="goTo(index + 1)"
-        >
-          <Icon name="right" />
-        </button>
+        <button type="button" class="btn-kid bg-grass shadow-kid-green !px-8 !py-5" aria-label="К машинкам" @click="back"><Icon name="home" /></button>
+        <button type="button" class="btn-round animate-wiggle disabled:opacity-40" :disabled="!hasNext" aria-label="Дальше" @click="goTo(index + 1)"><Icon name="right" /></button>
       </div>
-    </template>
+    </div>
   </main>
 </template>
-
-<style scoped>
-.digit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(11rem, 26vw);
-  height: min(11rem, 26vw);
-  min-width: 6.5rem;
-  min-height: 6.5rem;
-  border-radius: 9999px;
-  color: #fff;
-  font-size: min(6.5rem, 15vw);
-  font-weight: 900;
-  line-height: 1;
-  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s, opacity 0.2s;
-}
-@media (max-height: 500px) {
-  .digit {
-    width: min(8rem, 26vw, 30vh);
-    height: min(8rem, 26vw, 30vh);
-    min-width: 5rem;
-    min-height: 5rem;
-    font-size: min(4.5rem, 15vw);
-  }
-}
-.digit:active {
-  transform: translateY(8px);
-}
-.digit--wrong {
-  opacity: 0.3;
-  pointer-events: none;
-}
-.digit--right {
-  animation: hop 0.6s ease-in-out 2;
-}
-</style>
