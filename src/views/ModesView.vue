@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Crocodile from '@/components/art/Crocodile.vue'
 import Icon from '@/components/common/Icon.vue'
@@ -13,6 +13,17 @@ const router = useRouter()
 const game = useGameStore()
 const { greetOnce, sayLine } = useAudio()
 
+/** Время суток по часам устройства: день, вечер или ночь (ночью крокодил спит, пока его не потрогают). */
+const hour = new Date().getHours()
+const period = hour >= 20 || hour < 6 ? 'night' : hour >= 17 ? 'evening' : 'day'
+const SKY: Record<string, string | undefined> = {
+  night: 'linear-gradient(180deg, #312e81 0%, #4f46e5 55%, #7c83f5 100%)',
+  evening: 'linear-gradient(180deg, #fb923c 0%, #f9a8d4 55%, #7dd3fc 100%)',
+}
+const skyStyle = SKY[period] ? { background: SKY[period] } : undefined
+const sleeping = ref(period === 'night')
+
+const stickerCount = computed(() => Object.keys(game.stickers).length)
 const car = getNumberLevel(3)!
 const bus = getNumberLevel(10)!
 
@@ -20,6 +31,7 @@ const bus = getNumberLevel(10)!
 const hello = ref(false)
 function wave(): void {
   if (hello.value) return
+  sleeping.value = false
   hello.value = true
   void sayLine('croc-hello', 'Привет! Давай играть!')
   setTimeout(() => (hello.value = false), 1800)
@@ -34,18 +46,26 @@ onMounted(() => game.setMode(null))
 </script>
 
 <template>
-  <main class="flex h-full flex-col overflow-y-auto">
+  <main class="flex h-full flex-col overflow-y-auto" :style="skyStyle">
     <header class="flex shrink-0 items-center justify-between gap-4 p-4 sm:p-8 sm:pb-2 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:pb-0">
-      <div
-        class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg [@media(max-height:500px)]:h-14"
-        :aria-label="`Звёзд: ${game.totalStars}`"
-      >
-        <span class="text-4xl"><Icon name="star" /></span>
-        <span>{{ game.totalStars }}</span>
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-20 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-3xl shadow-lg [@media(max-height:500px)]:h-14"
+          :aria-label="`Звёзд: ${game.totalStars}`"
+        >
+          <span class="text-4xl"><Icon name="star" /></span>
+          <span>{{ game.totalStars }}</span>
+        </div>
+        <button type="button" class="btn-round relative" aria-label="Альбом наклеек" @click="router.push({ name: 'album' })">
+          <svg viewBox="0 0 40 40" class="h-9 w-9" aria-hidden="true" stroke-linejoin="round">
+            <rect x="6" y="5" width="28" height="30" rx="5" fill="#fb923c" stroke="#c2410c" stroke-width="2.5" />
+            <rect x="10" y="9" width="20" height="22" rx="3" fill="#fff" />
+            <circle cx="20" cy="20" r="6" fill="#4ade80" stroke="#16a34a" stroke-width="2" />
+          </svg>
+          <span v-if="stickerCount" class="absolute -right-1 -top-1 flex h-7 min-w-7 items-center justify-center rounded-full bg-candy px-1 text-base font-black text-white shadow">{{ stickerCount }}</span>
+        </button>
       </div>
-      <h1 class="text-center text-3xl font-black text-white drop-shadow-[0_4px_0_rgba(2,132,199,0.55)] sm:text-5xl">
-        Во что играем?
-      </h1>
+      <h1 class="sr-only">Во что играем?</h1>
       <button
         type="button"
         class="btn-round"
@@ -56,18 +76,22 @@ onMounted(() => game.setMode(null))
       </button>
     </header>
 
-    <button type="button" class="mx-auto -mb-2 mt-1 block w-44 shrink-0 sm:w-56 [@media(max-height:500px)]:mt-0 [@media(max-height:500px)]:w-24 [@media(max-height:500px)]:sm:w-24" aria-label="Крокодил" @click="wave">
-      <Crocodile :mood="hello ? 'happy' : 'idle'" :mouth="hello ? 0.6 : 0" :look="0.6" class="w-full" />
+    <button type="button" class="mx-auto -mb-2 mt-1 block w-44 shrink-0 sm:w-56 [@media(max-height:700px)]:sm:w-40 [@media(max-height:500px)]:mt-0 [@media(max-height:500px)]:w-24 [@media(max-height:500px)]:sm:w-24" aria-label="Крокодил" @click="wave">
+      <!-- Травяной холмик: крокодил стоит на земле, а не висит в воздухе -->
+      <span class="relative block">
+        <span class="absolute -bottom-1 left-1/2 h-[18%] w-[130%] -translate-x-1/2 rounded-[50%] bg-grass shadow-[0_5px_0_0_#16a34a]" aria-hidden="true" />
+        <Crocodile :mood="hello ? 'happy' : sleeping ? 'sleep' : 'idle'" :mouth="hello ? 0.6 : 0" :look="0.6" class="relative w-full" />
+      </span>
     </button>
 
     <div class="mx-auto grid w-full max-w-4xl flex-1 grid-cols-1 content-center gap-6 p-4 sm:grid-cols-2 sm:gap-8 sm:p-8 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:p-2 [@media(max-height:500px)]:sm:p-2 [@media(max-height:500px)]:sm:gap-4">
       <button type="button" class="mode bg-grass" aria-label="Учим цифры" @click="open('learn')">
         <VehicleArt :kind="car.vehicle" :color="car.color" :shade="car.shade" :animal="car.animal" :count="3" :digit="3" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[11rem]" />
-        <span class="mode-title">Учим цифры</span>
+        <span class="sr-only">Учим цифры</span>
       </button>
       <button type="button" class="mode bg-sky-kid" aria-label="Найди цифру" @click="open('find')">
         <VehicleArt :kind="bus.vehicle" :color="bus.color" :shade="bus.shade" :animal="bus.animal" :count="5" :digit="5" class="w-full max-w-[16rem] [@media(max-height:500px)]:max-w-[11rem]" />
-        <span class="mode-title">Найди цифру</span>
+        <span class="sr-only">Найди цифру</span>
       </button>
     </div>
   </main>

@@ -33,3 +33,6 @@
 - `fanfare` — задание пройдено
 - `ding-1` … `ding-10` — нота на счёте
 - `animal-cat`, `animal-dog`, `animal-pig`, `animal-frog`, `animal-chick`, `animal-bunny`, `animal-monkey`, `animal-tiger`, `animal-bear`, `animal-panda` — голоса зверей (можно по несколько вариантов: `animal-cat-2` …)
+## Новые запросы (ждут записи)
+
+- `croc-new-sticker` — «Ура! Новая наклейка!» — награда за пройденный уровень (StickerAward, агент 3)

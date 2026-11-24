@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from '@/components/common/Icon.vue'
 import TrophyShelf from '@/components/game/TrophyShelf.vue'
+import StickerAward from '@/components/game/StickerAward.vue'
 import LevelCarousel, { type CarouselItem } from '@/components/game/LevelCarousel.vue'
 import { useAudio } from '@/composables/useAudio'
 import { FIND_LEVELS, findCardId } from '@/data/findLevels'
@@ -37,6 +38,12 @@ const items = computed<CarouselItem[]>(() =>
       })),
 )
 
+/** Первая ещё не пройденная машина: на ней «ручка». Все пройдены — подсказка не нужна. */
+const nextIndex = computed(() => {
+  const i = items.value.findIndex((it) => !it.learned)
+  return i === -1 ? undefined : i
+})
+
 const learnedFlags = computed(() => NUMBER_LEVELS.map((l) => game.hasLearned('learn', numberCardId(l.value))))
 
 function open(index: number): void {
@@ -63,9 +70,7 @@ onBeforeUnmount(stopVoice)
       <button type="button" class="btn-round" aria-label="Назад" @click="router.push({ name: 'modes' })">
         <Icon name="back" />
       </button>
-      <h1 class="text-center text-3xl font-black leading-tight text-white drop-shadow-[0_4px_0_rgba(2,132,199,0.55)] sm:text-5xl">
-        Выбери машинку
-      </h1>
+      <h1 class="sr-only">Выбери машинку</h1>
       <button
         type="button"
         class="btn-round"
@@ -81,10 +86,12 @@ onBeforeUnmount(stopVoice)
       :items="items"
       :start="game.menuLevel[mode] - 1"
       :hint="game.totalStars === 0"
+      :next-index="nextIndex"
       @select="open"
       @active="onActive"
       @settle="onSettle"
     />
     <TrophyShelf v-if="mode === 'learn'" :learned="learnedFlags" />
+    <StickerAward v-if="mode === 'learn'" />
   </main>
 </template>
